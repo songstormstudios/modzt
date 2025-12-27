@@ -37,7 +37,7 @@ if platform.system() == "Windows":
     except Exception:
         pass
 
-APP_VERSION = "1.1.2"
+APP_VERSION = "1.1.3"
 SETTINGS_FILE = "settings.json"
 BASE_PATH = getattr(sys, '_MEIPASS', os.path.abspath("."))
 CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".zt2_manager")
@@ -624,18 +624,51 @@ def get_system_theme():
 
 def set_game_path(lbl_widget=None, status_widget=None):
     global GAME_PATH
-    path = filedialog.askdirectory(title="Select Zoo Tycoon 2 Game Folder")
-    if not path:
+
+    try:
+        print("Opening file dialog to select ZT2 folder...")
+        path = filedialog.askdirectory(title="Select Zoo Tycoon 2 Game Folder")
+    except Exception as e:
+        print(f"Error opening file dialog: {e}")
+        messagebox.showerror("Error", f"Failed to open file dialog:\n{e}")
         return
+
+    if not path:
+        print("No folder selected.")
+        return
+
     GAME_PATH = path
-    save_game_path(GAME_PATH)
+    print(f"Selected path: {GAME_PATH}")
+
+    try:
+        save_game_path(GAME_PATH)
+        print("Game path saved successfully.")
+    except Exception as e:
+        print(f"Error saving game path: {e}")
+        messagebox.showwarning("Warning", f"Could not save game path:\n{e}")
+
     if lbl_widget:
-        lbl_widget.config(text=GAME_PATH)
+        try:
+            lbl_widget.config(text=GAME_PATH)
+        except Exception as e:
+            print(f"Failed to update label widget: {e}")
     if status_widget:
-        status_widget.config(
-            text=f"ZT2 path: {GAME_PATH} | {enabled_count()} mods enabled")
-    log(f"Game path set: {GAME_PATH}", text_widget=log_text)
-    refresh_tree()
+        try:
+            status_widget.config(
+                text=f"ZT2 path: {GAME_PATH} | {enabled_count()} mods enabled")
+        except Exception as e:
+            print(f"Failed to update status widget: {e}")
+
+    if 'log_text' in globals():
+        try:
+            log(f"Game path set: {GAME_PATH}", text_widget=log_text)
+        except Exception as e:
+            print(f"Failed to log message: {e}")
+
+    try:
+        refresh_tree()
+    except Exception as e:
+        print(f"refresh_tree() failed: {e}")
 
 
 def launch_game(params=None):
@@ -671,6 +704,8 @@ def launch_game(params=None):
 
 
 def mods_disabled_dir():
+    if not GAME_PATH:
+        return None
     return os.path.join(GAME_PATH, "Mods", "Disabled")
 
 
@@ -1406,24 +1441,9 @@ else:
     with open(GAME_PATH_FILE, "r", encoding="utf-8") as f:
         GAME_PATH = f.read().strip()
 
-root = Window(themename="darkly" if system_theme == "dark" else "cosmo")
+root = Window(themename="darkly" if system_theme == "dark" else "litera")
 root.title(f"ModZT v{APP_VERSION}")
 root.geometry("1400x1000")
-
-
-def auto_switch_theme():
-    try:
-        current_system = get_system_theme()
-        current_app = "dark" if root.style.theme.name == "darkly" else "light"
-        if current_system != current_app:
-            new_theme = "darkly" if current_system == "dark" else "cosmo"
-            root.style.theme_use(new_theme)
-            log(f"Switched to {new_theme} mode automatically.",
-                text_widget=log_text)
-            apply_tree_theme()
-    except Exception as e:
-        print("Theme auto-switch error:", e)
-    root.after(10000, auto_switch_theme)
 
 
 icon_candidates = [
@@ -1523,7 +1543,7 @@ toolbar.pack(side=tk.TOP, fill=tk.X)
 
 def toggle_theme():
     if root.style.theme_use() == 'darkly':
-        root.style.theme_use('cosmo')
+        root.style.theme_use('litera')
     else:
         root.style.theme_use('darkly')
     log("Toggled theme", text_widget=log_text)
@@ -1539,10 +1559,13 @@ help_menu_btn = ttk.Menubutton(toolbar, text="Help", bootstyle="info-outline")
 help_menu = tk.Menu(help_menu_btn, tearoff=0)
 help_menu.add_command(label="About ModZT",
                       command=lambda: messagebox.showinfo(
-                          "About", "ModZT v1.1.2\nCreated by Kael"))
+                          "About", "ModZT v1.1.3\nCreated by Kael"))
 help_menu.add_command(
     label="Open GitHub Page",
     command=lambda: webbrowser.open("https://github.com/kaelelson05/modzt"))
+help_menu.add_command(
+    label="Discord Server", 
+    command=lambda: webbrowser.open("https://discord.gg/9y9DfmpZG4"))
 help_menu.add_command(label="Check for Updates", command=check_for_updates)
 help_menu_btn["menu"] = help_menu
 help_menu_btn.pack(side=tk.RIGHT, padx=4)
@@ -1585,7 +1608,7 @@ game_menu = tk.Menu(game_menu_btn, tearoff=0)
 game_menu.add_command(label="Set ZT1 Path", command=set_zt1_paths)
 game_menu.add_command(
     label="Set ZT2 Path",
-    command=lambda: set_game_path)
+    command=set_game_path)
 game_menu.add_command(label="Play ZT1", command=launch_zt1)
 game_menu.add_command(label="Play ZT2", command=launch_game)
 game_menu_btn["menu"] = game_menu
@@ -1879,7 +1902,7 @@ def disable_selected_zt1_mod():
 
 def apply_zt1_tree_theme():
     if root.style.theme_use() == "darkly":
-        zt1_tree.tag_configure("enabled", foreground="#5efc82")
+        zt1_tree.tag_configure("enabled", foreground="#4bc969")
         zt1_tree.tag_configure("disabled", foreground="#ff6961")
     else:
         zt1_tree.tag_configure("enabled", foreground="#007f00")
@@ -2166,7 +2189,7 @@ def show_full_preview(img_paths, start_index=0):
             except Exception as e:
                 messagebox.showerror("Export error", str(e))
 
-    ttk.Button(btns, text="Export…", command=export_copy).pack(side=tk.LEFT,
+    ttk.Button(btns, text="Move...", command=export_copy).pack(side=tk.LEFT,
                                                                padx=8)
 
     def render():
@@ -2548,7 +2571,8 @@ def refresh_tree():
     enabled_dir = mods_enabled_dir()
     disabled_dir = mods_disabled_dir()
     os.makedirs(enabled_dir, exist_ok=True)
-    os.makedirs(disabled_dir, exist_ok=True)
+    if disabled_dir:
+        os.makedirs(disabled_dir, exist_ok=True)
 
     found_mods = {}
     for folder, enabled_flag in [(enabled_dir, 1), (disabled_dir, 0)]:
@@ -2656,7 +2680,7 @@ def sort_tree_by(column):
 
 def apply_tree_theme():
     if root.style.theme_use() == 'darkly':
-        mods_tree.tag_configure('enabled', foreground='#5efc82')
+        mods_tree.tag_configure('enabled', foreground="#4bc969")
         mods_tree.tag_configure('disabled', foreground='#ff6961')
         mods_tree.tag_configure('missing', foreground='#f5d97e')
     else:
@@ -3086,8 +3110,6 @@ if __name__ == '__main__':
             pass
         else:
             log("⚠️ Could not auto-detect Zoo Tycoon 2 path.", log_text)
-
-    root.after(30000, auto_switch_theme)
 
 
 def on_close():
