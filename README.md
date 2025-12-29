@@ -1,4 +1,4 @@
-<img width="1391" height="995" alt="image" src="https://github.com/user-attachments/assets/f342fdef-fc72-4b80-bd50-13a32d739054" />
+<img width="1748" height="1249" alt="image" src="https://github.com/user-attachments/assets/4920eeee-9d97-423e-a9c2-9f579f51b671" />
 
 
 # ModZT - Mod Manager/Launcher for Zoo Tycoon, Zoo Tycoon 2, and OpenZT2. 
@@ -82,6 +82,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
 
 
 
