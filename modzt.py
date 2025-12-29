@@ -24,9 +24,16 @@ from PIL import Image, ImageTk
 from datetime import datetime
 import hashlib
 import zlib
-import io
 import sys
 import re
+
+try:
+    from tkinterdnd2 import DND_FILES, TkinterDnD
+    DND_AVAILABLE = True
+except ImportError:
+    DND_AVAILABLE = False
+    print("[!] tkinterdnd2 not installed. Drag and drop disabled.")
+    print("    Install with: pip install tkinterdnd2")
 
 db_lock = threading.Lock()
 
@@ -37,7 +44,7 @@ if platform.system() == "Windows":
     except Exception:
         pass
 
-APP_VERSION = "1.1.3"
+APP_VERSION = "1.1.4"
 SETTINGS_FILE = "settings.json"
 BASE_PATH = getattr(sys, '_MEIPASS', os.path.abspath("."))
 CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".zt2_manager")
@@ -110,7 +117,16 @@ COMMON_ZT1_PATHS = [
 DEFAULT_SETTINGS = {
     "game_path": "",
     "theme": "flatly",
-    "geometry": "1200x700+100+100"
+    "geometry": "700x700"
+}
+
+THEMES = {
+    "flatly": "Flatly",
+    "darkly": "Darkly",
+    "superhero": "Superhero",
+    "cyborg": "Cyborg",
+    "vapor": "Vapor",
+    "solar": "Solar"
 }
 
 
@@ -224,6 +240,78 @@ def auto_detect_zt2_installation():
 
 sort_state = {"column": "Name", "reverse": False}
 ui_mode = {"compact": False}
+
+action_history = []
+MAX_HISTORY = 50
+
+TRASH_DIR = os.path.join(CONFIG_DIR, "trash")
+os.makedirs(TRASH_DIR, exist_ok=True)
+
+def record_action(action_type, data):
+    action_history.append({"type": action_type, "data": data})
+    if len(action_history) > MAX_HISTORY:
+        old = action_history.pop(0)
+        if old["type"] == "uninstall":
+            trash_path = old["data"].get("trash_path")
+            if trash_path and os.path.isfile(trash_path):
+                try:
+                    os.remove(trash_path)
+                except Exception:
+                    pass
+
+
+def undo_last_action():
+    if not action_history:
+        messagebox.showinfo("Undo", "Nothing to undo.", parent=globals().get('root'))
+        return
+
+    action = action_history.pop()
+    action_type = action["type"]
+    data = action["data"]
+    log_text = globals().get('log_text')
+
+    try:
+        if action_type == "enable":
+            mod_name = data["mod_name"]
+            disable_mod(mod_name, text_widget=log_text, record=False)
+            log(f"Undo: Disabled {mod_name}", log_text)
+
+        elif action_type == "disable":
+            mod_name = data["mod_name"]
+            enable_mod(mod_name, text_widget=log_text, record=False)
+            log(f"Undo: Enabled {mod_name}", log_text)
+
+        elif action_type == "uninstall":
+            mod_name = data["mod_name"]
+            trash_path = data["trash_path"]
+            was_enabled = data.get("was_enabled", True)
+
+            if not os.path.isfile(trash_path):
+                messagebox.showerror("Undo Failed", f"Backup file not found:\n{trash_path}")
+                return
+
+            if was_enabled:
+                dest = os.path.join(GAME_PATH, mod_name)
+            else:
+                dest = os.path.join(mods_disabled_dir(), mod_name)
+
+            shutil.move(trash_path, dest)
+            detect_existing_mods()
+            refresh_tree()
+            log(f"Undo: Restored {mod_name}", log_text)
+
+        elif action_type == "install":
+            mod_names = data["mod_names"]
+            for mod_name in mod_names:
+                uninstall_mod(mod_name, text_widget=log_text, record=False)
+            log(f"Undo: Uninstalled {len(mod_names)} mod(s)", log_text)
+
+        messagebox.showinfo("Undo", f"Undid: {action_type} operation", parent=globals().get('root'))
+
+    except Exception as e:
+        messagebox.showerror("Undo Failed", f"Could not undo action:\n{e}")
+        action_history.append(action)
+
 
 conn = sqlite3.connect(DB_FILE, check_same_thread=False)
 cursor = conn.cursor()
@@ -567,6 +655,12 @@ def list_album_images(album_path):
         imgs.extend(glob.glob(os.path.join(album_path, pat)))
     imgs.sort(key=lambda p: os.path.getmtime(p), reverse=True)
     return imgs
+
+def get_current_theme():
+    try:
+        return settings.get("zt2_theme", "classic")
+    except Exception:
+        return "classic"
 
 
 def set_dependencies(mod_name, dependencies):
@@ -919,14 +1013,14 @@ def detect_existing_mods(cursor=None, conn=None):
         pass
 
 
-def enable_mod(mod_name, text_widget=None):
+def enable_mod(mod_name, text_widget=None, record=True):
     deps = get_dependencies(mod_name)
     for dep in deps:
         cursor.execute("SELECT enabled FROM mods WHERE name=?", (dep, ))
         row = cursor.fetchone()
         if not row or row[0] == 0:
             log(f"Enabling dependency: {dep}", text_widget)
-            enable_mod(dep, text_widget)
+            enable_mod(dep, text_widget, record=False)
 
     if not mod_name or not GAME_PATH:
         return
@@ -947,6 +1041,9 @@ def enable_mod(mod_name, text_widget=None):
     cursor.execute("UPDATE mods SET enabled=1 WHERE name=?", (mod_name, ))
     conn.commit()
 
+    if record:
+        record_action("enable", {"mod_name": mod_name})
+
     for iid in mods_tree.get_children():
         vals = mods_tree.item(iid, "values")
         if vals and vals[0] == mod_name:
@@ -958,7 +1055,7 @@ def enable_mod(mod_name, text_widget=None):
     log(f"Enabled mod: {mod_name}", text_widget)
 
 
-def disable_mod(mod_name, text_widget=None):
+def disable_mod(mod_name, text_widget=None, record=True):
     dependents = get_dependents(mod_name)
     if dependents:
         if not messagebox.askyesno(
@@ -967,7 +1064,7 @@ def disable_mod(mod_name, text_widget=None):
         ):
             return
         for d in dependents:
-            disable_mod(d, text_widget)
+            disable_mod(d, text_widget, record=False)
 
     if not mod_name or not GAME_PATH:
         return
@@ -989,6 +1086,9 @@ def disable_mod(mod_name, text_widget=None):
     cursor.execute("UPDATE mods SET enabled=0 WHERE name=?", (mod_name, ))
     conn.commit()
 
+    if record:
+        record_action("disable", {"mod_name": mod_name})
+
     for iid in mods_tree.get_children():
         vals = mods_tree.item(iid, "values")
         if vals and vals[0] == mod_name:
@@ -1000,7 +1100,7 @@ def disable_mod(mod_name, text_widget=None):
     log(f"Disabled mod: {mod_name}", text_widget)
 
 
-def uninstall_mod(mod_name, text_widget=None):
+def uninstall_mod(mod_name, text_widget=None, record=True):
     if not mod_name or not GAME_PATH:
         return
     paths = [
@@ -1008,16 +1108,34 @@ def uninstall_mod(mod_name, text_widget=None):
         os.path.join(mods_disabled_dir(), mod_name)
     ]
     removed = False
+    was_enabled = False
+    trash_path = None
+
     for p in paths:
         if os.path.isfile(p):
             try:
-                os.remove(p)
-                log(f"Removed file: {p}", text_widget)
+                trash_path = os.path.join(TRASH_DIR, mod_name)
+                if os.path.exists(trash_path):
+                    base, ext = os.path.splitext(mod_name)
+                    trash_path = os.path.join(TRASH_DIR, f"{base}_{int(time.time())}{ext}")
+                shutil.move(p, trash_path)
+                was_enabled = (p == os.path.join(GAME_PATH, mod_name))
+                log(f"Moved to trash: {p}", text_widget)
                 removed = True
+                break
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to remove {p}: {e}")
+
     cursor.execute("DELETE FROM mods WHERE name=?", (mod_name, ))
     conn.commit()
+
+    if record and removed and trash_path:
+        record_action("uninstall", {
+            "mod_name": mod_name,
+            "trash_path": trash_path,
+            "was_enabled": was_enabled
+        })
+
     if removed:
         log(f"Uninstalled mod: {mod_name}", text_widget)
     else:
@@ -1025,6 +1143,64 @@ def uninstall_mod(mod_name, text_widget=None):
             text_widget)
     refresh_tree()
     update_status()
+
+
+def install_mods(file_paths, text_widget=None):
+    if not GAME_PATH:
+        messagebox.showerror("Error", "Game path not set. Please set your Zoo Tycoon 2 folder first.")
+        return
+
+    installed = []
+    skipped = []
+    errors = []
+
+    for path in file_paths:
+        path = path.strip()
+        if path.startswith('{') and path.endswith('}'):
+            path = path[1:-1]
+
+        if not os.path.isfile(path):
+            errors.append(f"File not found: {path}")
+            continue
+
+        filename = os.path.basename(path)
+        if not filename.lower().endswith('.z2f'):
+            skipped.append(f"Not a .z2f file: {filename}")
+            continue
+
+        dest = os.path.join(GAME_PATH, filename)
+        if os.path.exists(dest):
+            if not messagebox.askyesno("Overwrite?", f"{filename} already exists.\nOverwrite?"):
+                skipped.append(f"Skipped (exists): {filename}")
+                continue
+
+        try:
+            shutil.copy2(path, dest)
+            installed.append(filename)
+            log(f"Installed mod: {filename}", text_widget)
+        except Exception as e:
+            errors.append(f"Failed to copy {filename}: {e}")
+
+    if installed:
+        detect_existing_mods()
+        refresh_tree()
+        record_action("install", {"mod_names": installed})
+
+    summary = []
+    if installed:
+        summary.append(f"Installed: {len(installed)} mod(s)")
+    if skipped:
+        summary.append(f"Skipped: {len(skipped)}")
+    if errors:
+        summary.append(f"Errors: {len(errors)}")
+
+    if summary:
+        details = "\n".join(installed) if installed else ""
+        if errors:
+            details += "\n\nErrors:\n" + "\n".join(errors)
+        if skipped:
+            details += "\n\nSkipped:\n" + "\n".join(skipped)
+        messagebox.showinfo("Install Complete", "\n".join(summary) + "\n\n" + details)
 
 
 def export_load_order():
@@ -1441,24 +1617,15 @@ else:
     with open(GAME_PATH_FILE, "r", encoding="utf-8") as f:
         GAME_PATH = f.read().strip()
 
-root = Window(themename="darkly" if system_theme == "dark" else "litera")
+if DND_AVAILABLE:
+    root = TkinterDnD.Tk()
+    theme_name = "darkly" if system_theme == "dark" else "litera"
+    root.style = tb.Style(theme=theme_name)
+else:
+    root = Window(themename="darkly" if system_theme == "dark" else "litera")
+
 root.title(f"ModZT v{APP_VERSION}")
 root.geometry("1400x1000")
-
-
-icon_candidates = [
-    resource_path("modzt.ico"),
-    os.path.join(CONFIG_DIR, "modzt.ico")
-]
-
-for icon_path in icon_candidates:
-    if os.path.exists(icon_path):
-        try:
-            root.iconbitmap(icon_path)
-            print(f"[i] Icon set from: {icon_path}")
-            break
-        except Exception as e:
-            print(f"[!] Failed to set icon from {icon_path}: {e}")
 
 
 def set_zt1_paths():
@@ -1559,7 +1726,7 @@ help_menu_btn = ttk.Menubutton(toolbar, text="Help", bootstyle="info-outline")
 help_menu = tk.Menu(help_menu_btn, tearoff=0)
 help_menu.add_command(label="About ModZT",
                       command=lambda: messagebox.showinfo(
-                          "About", "ModZT v1.1.3\nCreated by Kael"))
+                          "About", "ModZT v1.1.4\nCreated by Kael"))
 help_menu.add_command(
     label="Open GitHub Page",
     command=lambda: webbrowser.open("https://github.com/kaelelson05/modzt"))
@@ -1618,6 +1785,52 @@ footer = ttk.Frame(root, padding=4)
 footer.pack(fill=tk.X, side=tk.BOTTOM)
 
 root.bind("<Control-q>", lambda e: root.quit())
+
+status_bar = ttk.Frame(root)
+status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+
+status_size_label = ttk.Label(status_bar, text="Total Mod Size: Calculating...", bootstyle="secondary")
+status_size_label.pack(side=tk.LEFT, padx=10, pady=2)
+
+status_disk_label = ttk.Label(status_bar, text="Disk Space: Calculating...", bootstyle="secondary")
+status_disk_label.pack(side=tk.RIGHT, padx=10, pady=2)
+
+
+def update_status_bar():
+    try:
+        enabled_dir = mods_enabled_dir()
+        disabled_dir = mods_disabled_dir()
+        total_size = 0
+
+        for folder in [enabled_dir, disabled_dir]:
+            if folder and os.path.isdir(folder):
+                for f in os.listdir(folder):
+                    if f.lower().endswith(".z2f"):
+                        path = os.path.join(folder, f)
+                        try:
+                            total_size += os.path.getsize(path)
+                        except OSError:
+                            pass
+
+        if total_size >= 1024 * 1024 * 1024:
+            size_str = f"{total_size / (1024**3):.2f} GB"
+        elif total_size >= 1024 * 1024:
+            size_str = f"{total_size / (1024**2):.2f} MB"
+        else:
+            size_str = f"{total_size / 1024:.2f} KB"
+
+        status_size_label.config(text=f"Total Mod Size: {size_str}")
+
+        if GAME_PATH and os.path.isdir(GAME_PATH):
+            import shutil
+            total, used, free = shutil.disk_usage(GAME_PATH)
+            free_gb = free / (1024**3)
+            status_disk_label.config(text=f"Disk Space Free: {free_gb:.2f} GB")
+        else:
+            status_disk_label.config(text="Disk Space: N/A")
+    except Exception as e:
+        print(f"[ModZT] Error updating status bar: {e}")
+
 
 main_frame = ttk.Frame(root)
 main_frame.pack(fill=tk.BOTH, expand=True)
@@ -1923,21 +2136,27 @@ mods_tree_scroll = ttk.Scrollbar(mods_tree_frame)
 mods_tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
 
 mods_tree = ttk.Treeview(mods_tree_frame,
-                         columns=("Name", "Status", "Size", "Modified"),
+                         columns=("Name", "Status", "Category", "Size", "Modified"),
                          show="headings",
+                         selectmode="extended",
                          yscrollcommand=mods_tree_scroll.set)
 mods_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
 mods_tree_scroll.config(command=mods_tree.yview)
 
 mods_tree.column("Name", width=250, anchor="w")
 mods_tree.column("Status", width=100, anchor="center")
-mods_tree.column("Size", width=100, anchor="e")
-mods_tree.column("Modified", width=180, anchor="center")
+mods_tree.column("Category", width=120, anchor="center")
+mods_tree.column("Size", width=80, anchor="e")
+mods_tree.column("Modified", width=150, anchor="center")
 
 mods_tree.heading("Name", text="Name", command=lambda: sort_tree_by("Name"))
 mods_tree.heading("Status",
                   text="Status",
                   command=lambda: sort_tree_by("Status"))
+mods_tree.heading("Category",
+                  text="Category",
+                  command=lambda: sort_tree_by("Category"))
 mods_tree.heading("Size",
                   text="Size (MB)",
                   command=lambda: sort_tree_by("Size"))
@@ -1963,14 +2182,38 @@ mods_menu.add_command(label="Uninstall",
 mods_menu.add_command(label="Inspect ZIP",
                       command=lambda: inspect_selected_mod())
 mods_menu.add_separator()
+mods_menu.add_command(label="Set Category",
+                      command=lambda: set_mod_category_dialog())
+mods_menu.add_separator()
 mods_menu.add_command(label="Open Mod Folder",
                       command=lambda: open_mod_folder())
+
+
+def set_mod_category_dialog():
+    selected = mods_tree.selection()
+    if not selected:
+        return
+
+    name = mods_tree.item(selected[0])["values"][0]
+    old = get_mod_category(name, zt1=False)
+
+    new = simpledialog.askstring("Set Category",
+                                 f"Enter category for '{name}':" if len(selected) == 1
+                                 else f"Enter category for {len(selected)} mods:",
+                                 initialvalue=old or "Uncategorized",
+                                 parent=root)
+    if new:
+        for iid in selected:
+            mod_name = mods_tree.item(iid)["values"][0]
+            set_mod_category(mod_name, new, zt1=False)
+        refresh_tree()
 
 
 def on_mod_right_click(event):
     iid = mods_tree.identify_row(event.y)
     if iid:
-        mods_tree.selection_set(iid)
+        if iid not in mods_tree.selection():
+            mods_tree.selection_set(iid)
         mods_menu.post(event.x_root, event.y_root)
 
 
@@ -2001,6 +2244,48 @@ def treeview_sort_column(tree, col, reverse=False):
 
 mods_tree.bind("<Button-3>", on_mod_right_click)
 
+def on_drop(event):
+    data = event.data
+    files = []
+    i = 0
+    while i < len(data):
+        if data[i] == '{':
+            end = data.index('}', i)
+            files.append(data[i+1:end])
+            i = end + 2
+        elif data[i] == ' ':
+            i += 1
+        else:
+            end = data.find(' ', i)
+            if end == -1:
+                files.append(data[i:])
+                break
+            files.append(data[i:end])
+            i = end + 1
+
+    if files:
+        text_widget = globals().get('log_text')
+        install_mods(files, text_widget=text_widget)
+
+if DND_AVAILABLE:
+    mods_tree.drop_target_register(DND_FILES)
+    mods_tree.dnd_bind('<<Drop>>', on_drop)
+    print("[i] Drag and drop enabled - drop .z2f files onto the mod list to install")
+
+def on_mods_key(event):
+    if event.keysym == 'Delete':
+        if mods_tree.selection():
+            uninstall_selected_mod()
+    elif event.keysym == 'Return':
+        if mods_tree.selection():
+            enable_selected_mod()
+
+mods_tree.bind('<Delete>', on_mods_key)
+mods_tree.bind('<Return>', on_mods_key)
+mods_tree.bind('<Control-a>', lambda e: mods_tree.selection_set(mods_tree.get_children()))
+mods_tree.bind('<Escape>', lambda e: mods_tree.selection_remove(mods_tree.get_children()))
+mods_tree.bind('<Control-z>', lambda e: undo_last_action())
+
 mod_btns = ttk.Frame(mods_tab, padding=6)
 mod_btns.pack(fill=tk.X)
 
@@ -2025,11 +2310,53 @@ refresh_btn = ttk.Button(mod_btns,
                          (detect_existing_mods(), refresh_tree()))
 refresh_btn.pack(side=tk.LEFT, padx=4)
 
+ttk.Separator(mod_btns, orient="vertical").pack(side=tk.LEFT, padx=8, fill=tk.Y)
+select_all_btn = ttk.Button(mod_btns,
+                            text="Select All",
+                            command=lambda: mods_tree.selection_set(mods_tree.get_children()),
+                            bootstyle="secondary-outline")
+select_all_btn.pack(side=tk.LEFT, padx=4)
+deselect_all_btn = ttk.Button(mod_btns,
+                              text="Deselect All",
+                              command=lambda: mods_tree.selection_remove(mods_tree.get_children()),
+                              bootstyle="secondary-outline")
+deselect_all_btn.pack(side=tk.LEFT, padx=4)
+
+ttk.Separator(mod_btns, orient="vertical").pack(side=tk.LEFT, padx=8, fill=tk.Y)
+undo_btn = ttk.Button(mod_btns,
+                      text="Undo",
+                      command=undo_last_action,
+                      bootstyle="info-outline")
+undo_btn.pack(side=tk.LEFT, padx=4)
+
 bundles_tab = ttk.Frame(notebook, padding=6)
 notebook.add(bundles_tab, text="Bundles")
 
 shots_tab = ttk.Frame(notebook, padding=6)
 notebook.add(shots_tab, text="Screenshots")
+
+themes_tab = ttk.Frame(notebook, padding=20)
+notebook.add(themes_tab, text="Themes")
+
+msg_frame = ttk.Frame(themes_tab)
+msg_frame.pack(expand=True)
+
+header = ttk.Label(
+    msg_frame,
+    text="Themes",
+    font=("Segoe UI", 14, "bold")
+)
+header.pack(pady=(0, 10))
+
+message = ttk.Label(
+    msg_frame,
+    text="Menu theme functionality is currently unavailable.\n\n"
+         "It will be added in a future update.",
+    justify="center",
+    foreground="#666666"
+)
+message.pack()
+
 
 shots_toolbar = ttk.Frame(shots_tab)
 shots_toolbar.pack(fill=tk.X, pady=(0, 6))
@@ -2590,14 +2917,14 @@ def refresh_tree():
     conn.commit()
 
     cursor.execute(
-        "SELECT name, enabled FROM mods ORDER BY enabled DESC, name ASC")
+        "SELECT name, enabled, category FROM mods ORDER BY enabled DESC, name ASC")
     mods = cursor.fetchall()
 
     total = len(mods)
-    enabled_count = sum(1 for _, e in mods if e)
+    enabled_count = sum(1 for _, e, _ in mods if e)
     disabled_count = total - enabled_count
 
-    for name, enabled_flag in mods:
+    for name, enabled_flag, category in mods:
         path = find_mod_file(name)
         exists = path and os.path.isfile(path)
 
@@ -2611,7 +2938,7 @@ def refresh_tree():
 
         mods_tree.insert("",
                          tk.END,
-                         values=(name, status, f"{size_mb:.2f}", modified),
+                         values=(name, status, category or "—", f"{size_mb:.2f}", modified),
                          tags=("enabled" if enabled_flag else
                                ("missing" if not exists else "disabled"), ))
 
@@ -2622,6 +2949,7 @@ def refresh_tree():
 
     apply_tree_theme()
     refresh_bundles_list()
+    update_status_bar()
 
     print(f"[ModZT] Refreshed mod list ({total} mods found).")
 
@@ -2635,7 +2963,7 @@ def sort_tree_by(column):
 
     items = [mods_tree.item(iid)["values"] for iid in mods_tree.get_children()]
 
-    col_index = {"Name": 0, "Status": 1, "Size": 2, "Modified": 3}[column]
+    col_index = {"Name": 0, "Status": 1, "Category": 2, "Size": 3, "Modified": 4}[column]
 
     def sort_key(row):
         val = row[col_index]
@@ -2669,7 +2997,7 @@ def sort_tree_by(column):
 
     apply_tree_theme()
 
-    for col in ("Name", "Status", "Size", "Modified"):
+    for col in ("Name", "Status", "Category", "Size", "Modified"):
         arrow = ""
         if col == column:
             arrow = "▼" if sort_state["reverse"] else "▲"
@@ -2723,18 +3051,34 @@ def get_selected_mod():
     return mods_tree.item(sel[0])['values'][0]
 
 
+def get_selected_mods():
+    sel = mods_tree.selection()
+    if not sel:
+        messagebox.showinfo("Select", "Select one or more mods first.", parent=root)
+        return []
+    return [mods_tree.item(iid)['values'][0] for iid in sel]
+
+
 def enable_selected_mod():
-    mod = get_selected_mod()
-    if mod:
+    mods = get_selected_mods()
+    if not mods:
+        return
+    for mod in mods:
         enable_mod(mod, text_widget=log_text)
+    if len(mods) > 1:
+        log(f"Enabled {len(mods)} mods", log_text)
 
 
 def disable_selected_mod():
-    sel = mods_tree.selection()
-    mod = get_selected_mod()
-    if mod:
+    mods = get_selected_mods()
+    if not mods:
+        return
+    for mod in mods:
         disable_mod(mod, text_widget=log_text)
-        root.after(100, lambda: restore_selection(mod))
+    if len(mods) > 1:
+        log(f"Disabled {len(mods)} mods", log_text)
+    if mods:
+        root.after(100, lambda: restore_selection(mods[-1]))
 
 
 def restore_selection(mod_name):
@@ -2772,10 +3116,20 @@ def restore_tree_state(tree, state):
 
 
 def uninstall_selected_mod():
-    mod = get_selected_mod()
-    if mod:
-        if messagebox.askyesno("Uninstall", f"Uninstall {mod}?"):
+    mods = get_selected_mods()
+    if not mods:
+        return
+    if len(mods) == 1:
+        msg = f"Uninstall {mods[0]}?"
+    else:
+        msg = f"Uninstall {len(mods)} selected mods?\n\n" + "\n".join(mods[:10])
+        if len(mods) > 10:
+            msg += f"\n... and {len(mods) - 10} more"
+    if messagebox.askyesno("Uninstall", msg):
+        for mod in mods:
             uninstall_mod(mod, text_widget=log_text)
+        if len(mods) > 1:
+            log(f"Uninstalled {len(mods)} mods", log_text)
 
 
 def open_mod_folder():
@@ -3046,12 +3400,13 @@ def filter_tree(*_):
         mods_tree.delete(row)
 
     cursor.execute(
-        "SELECT name, enabled FROM mods ORDER BY enabled DESC, name ASC")
+        "SELECT name, enabled, category FROM mods ORDER BY enabled DESC, name ASC")
     mods = cursor.fetchall()
 
     visible_rows = []
-    for name, enabled_flag in mods:
-        if query and query not in name.lower():
+    for name, enabled_flag, category in mods:
+        combined = f"{name.lower()} {category.lower() if category else ''}"
+        if query and query not in combined:
             continue
 
         path = find_mod_file(name)
@@ -3074,7 +3429,7 @@ def filter_tree(*_):
 
         mods_tree.insert("",
                          tk.END,
-                         values=(name, status, f"{size_mb:.2f}", modified),
+                         values=(name, status, category or "—", f"{size_mb:.2f}", modified),
                          tags=(tag, ))
 
         visible_rows.append(name)
@@ -3122,6 +3477,47 @@ def on_close():
 
 root.protocol("WM_DELETE_WINDOW", on_close)
 
+
+icon_candidates = [
+    resource_path("modzt.ico"),
+    os.path.join(CONFIG_DIR, "modzt.ico"),
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "modzt.ico"),
+    "modzt.ico"
+]
+
+icon_set = False
+app_icon_photo = None
+
+print(f"[i] Looking for icon in these locations:")
+for candidate in icon_candidates:
+    print(f"    - {candidate} {'(exists)' if os.path.exists(candidate) else '(not found)'}")
+
+for icon_path in icon_candidates:
+    if os.path.exists(icon_path):
+        try:
+            abs_icon_path = os.path.abspath(icon_path)
+
+            root.iconbitmap(abs_icon_path)
+
+            try:
+                icon_img = Image.open(abs_icon_path)
+                if icon_img.mode != 'RGBA':
+                    icon_img = icon_img.convert('RGBA')
+                app_icon_photo = ImageTk.PhotoImage(icon_img)
+                root.iconphoto(True, app_icon_photo)
+            except Exception as e2:
+                print(f"[!] iconphoto failed: {e2}")
+
+            root.update_idletasks()
+
+            print(f"[✓] Icon successfully set from: {abs_icon_path}")
+            icon_set = True
+            break
+        except Exception as e:
+            print(f"[!] Failed to set icon from {icon_path}: {e}")
+
+if not icon_set:
+    print("[!] No icon file found, using default")
 
 refresh_screenshots()
 root.mainloop()
