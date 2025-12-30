@@ -46,12 +46,427 @@ except ImportError:
     print("[!] pygame not installed. Background music disabled.")
     print("    Install with: pip install pygame")
 
+TRANSLATIONS = {
+    "en": {
+        "lang_name": "English",
+        "tab_zt2_mods": "ZT2 Mods",
+        "tab_zt1_mods": "ZT1 Mods",
+        "tab_bundles": "Bundles",
+        "tab_saved_games": "Saved Games",
+        "tab_screenshots": "Screenshots",
+        "tab_multiplayer": "Multiplayer",
+        "tab_mod_browser": "Mod Browser",
+        "tab_themes": "Themes",
+
+        "menu_game": "Game",
+        "menu_mods": "Mods",
+        "menu_tools": "Tools",
+        "menu_view": "View",
+        "menu_help": "Help",
+
+        "menu_toggle_theme": "Toggle Theme",
+        "menu_toggle_music": "Toggle Music",
+        "menu_compact_mode": "Compact Mode",
+        "menu_expanded_mode": "Expanded Mode",
+        "menu_language": "Language",
+
+        "btn_install": "Install Mods",
+        "btn_enable": "Enable",
+        "btn_disable": "Disable",
+        "btn_enable_all": "Enable All",
+        "btn_disable_all": "Disable All",
+        "btn_refresh": "Refresh",
+        "btn_delete": "Delete",
+        "btn_search": "Search",
+        "btn_browse": "Browse",
+        "btn_download": "Download",
+        "btn_apply": "Apply",
+        "btn_save": "Save",
+        "btn_cancel": "Cancel",
+        "btn_close": "Close",
+        "btn_launch_game": "Launch Game",
+        "btn_achievements": "Achievements",
+
+        "mb_quick_picks": "Quick Picks...",
+        "mb_featured": "Featured:",
+        "mb_browse_category": "Browse by Category",
+        "mb_search": "Search",
+        "mb_recent": "Recent Additions",
+        "mb_surprise": "Surprise Me!",
+        "mb_wiki_page": "Wiki Page",
+        "mb_mod_details": "Mod Details",
+        "mb_select_mod": "Select a mod to view details",
+        "mb_description": "Description:",
+        "mb_download_links": "Download Links:",
+        "mb_search_tip": "Tip: Search for animal names, creators, or mod types",
+
+        "shots_select_album": "Select Album:",
+        "shots_open_folder": "Open Folder",
+
+        "saves_preview": "Preview",
+        "saves_open_folder": "Open Folder",
+
+        "themes_select": "Select Theme:",
+        "themes_apply": "Apply Theme",
+
+        "msg_no_mods": "No mods installed",
+        "msg_loading": "Loading...",
+        "msg_success": "Success",
+        "msg_error": "Error",
+        "msg_confirm_delete": "Are you sure you want to delete this?",
+        "msg_language_changed": "Language changed. Some changes require restart.",
+
+        "ach_title": "Achievements",
+        "ach_unlocked": "Achievement Unlocked!",
+        "ach_progress": "Progress",
+    },
+    "es": {
+        "lang_name": "Español",
+        "tab_zt2_mods": "Mods ZT2",
+        "tab_zt1_mods": "Mods ZT1",
+        "tab_bundles": "Paquetes",
+        "tab_saved_games": "Partidas Guardadas",
+        "tab_screenshots": "Capturas",
+        "tab_multiplayer": "Multijugador",
+        "tab_mod_browser": "Explorador de Mods",
+        "tab_themes": "Temas",
+        "menu_game": "Juego",
+        "menu_mods": "Mods",
+        "menu_tools": "Herramientas",
+        "menu_view": "Ver",
+        "menu_help": "Ayuda",
+        "menu_toggle_theme": "Cambiar Tema",
+        "menu_toggle_music": "Cambiar Música",
+        "menu_compact_mode": "Modo Compacto",
+        "menu_expanded_mode": "Modo Expandido",
+        "menu_language": "Idioma",
+        "btn_install": "Instalar Mods",
+        "btn_enable": "Activar",
+        "btn_disable": "Desactivar",
+        "btn_enable_all": "Activar Todo",
+        "btn_disable_all": "Desactivar Todo",
+        "btn_refresh": "Actualizar",
+        "btn_delete": "Eliminar",
+        "btn_search": "Buscar",
+        "btn_browse": "Explorar",
+        "btn_download": "Descargar",
+        "btn_apply": "Aplicar",
+        "btn_save": "Guardar",
+        "btn_cancel": "Cancelar",
+        "btn_close": "Cerrar",
+        "btn_launch_game": "Iniciar Juego",
+        "btn_achievements": "Logros",
+        "mb_quick_picks": "Selección Rápida...",
+        "mb_featured": "Destacados:",
+        "mb_browse_category": "Explorar por Categoría",
+        "mb_search": "Buscar",
+        "mb_recent": "Añadidos Recientes",
+        "mb_surprise": "¡Sorpréndeme!",
+        "mb_wiki_page": "Página Wiki",
+        "mb_mod_details": "Detalles del Mod",
+        "mb_select_mod": "Selecciona un mod para ver detalles",
+        "mb_description": "Descripción:",
+        "mb_download_links": "Enlaces de Descarga:",
+        "mb_search_tip": "Consejo: Busca nombres de animales, creadores o tipos de mod",
+        "shots_select_album": "Seleccionar Álbum:",
+        "shots_open_folder": "Abrir Carpeta",
+        "saves_preview": "Vista Previa",
+        "saves_open_folder": "Abrir Carpeta",
+        "themes_select": "Seleccionar Tema:",
+        "themes_apply": "Aplicar Tema",
+        "msg_no_mods": "No hay mods instalados",
+        "msg_loading": "Cargando...",
+        "msg_success": "Éxito",
+        "msg_error": "Error",
+        "msg_confirm_delete": "¿Estás seguro de que quieres eliminar esto?",
+        "msg_language_changed": "Idioma cambiado. Algunos cambios requieren reinicio.",
+        "ach_title": "Logros",
+        "ach_unlocked": "¡Logro Desbloqueado!",
+        "ach_progress": "Progreso",
+    },
+    "fr": {
+        "lang_name": "Français",
+        "tab_zt2_mods": "Mods ZT2",
+        "tab_zt1_mods": "Mods ZT1",
+        "tab_bundles": "Paquets",
+        "tab_saved_games": "Sauvegardes",
+        "tab_screenshots": "Captures d'écran",
+        "tab_multiplayer": "Multijoueur",
+        "tab_mod_browser": "Navigateur de Mods",
+        "tab_themes": "Thèmes",
+        "menu_game": "Jeu",
+        "menu_mods": "Mods",
+        "menu_tools": "Outils",
+        "menu_view": "Affichage",
+        "menu_help": "Aide",
+        "menu_toggle_theme": "Changer de Thème",
+        "menu_toggle_music": "Changer la Musique",
+        "menu_compact_mode": "Mode Compact",
+        "menu_expanded_mode": "Mode Étendu",
+        "menu_language": "Langue",
+        "btn_install": "Installer Mods",
+        "btn_enable": "Activer",
+        "btn_disable": "Désactiver",
+        "btn_enable_all": "Tout Activer",
+        "btn_disable_all": "Tout Désactiver",
+        "btn_refresh": "Actualiser",
+        "btn_delete": "Supprimer",
+        "btn_search": "Rechercher",
+        "btn_browse": "Parcourir",
+        "btn_download": "Télécharger",
+        "btn_apply": "Appliquer",
+        "btn_save": "Sauvegarder",
+        "btn_cancel": "Annuler",
+        "btn_close": "Fermer",
+        "btn_launch_game": "Lancer le Jeu",
+        "btn_achievements": "Succès",
+        "mb_quick_picks": "Sélection Rapide...",
+        "mb_featured": "En vedette:",
+        "mb_browse_category": "Parcourir par Catégorie",
+        "mb_search": "Rechercher",
+        "mb_recent": "Ajouts Récents",
+        "mb_surprise": "Surprenez-moi!",
+        "mb_wiki_page": "Page Wiki",
+        "mb_mod_details": "Détails du Mod",
+        "mb_select_mod": "Sélectionnez un mod pour voir les détails",
+        "mb_description": "Description:",
+        "mb_download_links": "Liens de Téléchargement:",
+        "mb_search_tip": "Conseil: Recherchez des noms d'animaux, créateurs ou types de mods",
+        "shots_select_album": "Sélectionner Album:",
+        "shots_open_folder": "Ouvrir Dossier",
+        "saves_preview": "Aperçu",
+        "saves_open_folder": "Ouvrir Dossier",
+        "themes_select": "Sélectionner Thème:",
+        "themes_apply": "Appliquer Thème",
+        "msg_no_mods": "Aucun mod installé",
+        "msg_loading": "Chargement...",
+        "msg_success": "Succès",
+        "msg_error": "Erreur",
+        "msg_confirm_delete": "Êtes-vous sûr de vouloir supprimer ceci?",
+        "msg_language_changed": "Langue changée. Certains changements nécessitent un redémarrage.",
+        "ach_title": "Succès",
+        "ach_unlocked": "Succès Débloqué!",
+        "ach_progress": "Progression",
+    },
+    "de": {
+        "lang_name": "Deutsch",
+        "tab_zt2_mods": "ZT2 Mods",
+        "tab_zt1_mods": "ZT1 Mods",
+        "tab_bundles": "Pakete",
+        "tab_saved_games": "Spielstände",
+        "tab_screenshots": "Screenshots",
+        "tab_multiplayer": "Mehrspieler",
+        "tab_mod_browser": "Mod-Browser",
+        "tab_themes": "Designs",
+        "menu_game": "Spiel",
+        "menu_mods": "Mods",
+        "menu_tools": "Werkzeuge",
+        "menu_view": "Ansicht",
+        "menu_help": "Hilfe",
+        "menu_toggle_theme": "Design wechseln",
+        "menu_toggle_music": "Musik umschalten",
+        "menu_compact_mode": "Kompaktmodus",
+        "menu_expanded_mode": "Erweiterter Modus",
+        "menu_language": "Sprache",
+        "btn_install": "Mods Installieren",
+        "btn_enable": "Aktivieren",
+        "btn_disable": "Deaktivieren",
+        "btn_enable_all": "Alle Aktivieren",
+        "btn_disable_all": "Alle Deaktivieren",
+        "btn_refresh": "Aktualisieren",
+        "btn_delete": "Löschen",
+        "btn_search": "Suchen",
+        "btn_browse": "Durchsuchen",
+        "btn_download": "Herunterladen",
+        "btn_apply": "Anwenden",
+        "btn_save": "Speichern",
+        "btn_cancel": "Abbrechen",
+        "btn_close": "Schließen",
+        "btn_launch_game": "Spiel Starten",
+        "btn_achievements": "Erfolge",
+        "mb_quick_picks": "Schnellauswahl...",
+        "mb_featured": "Empfohlen:",
+        "mb_browse_category": "Nach Kategorie durchsuchen",
+        "mb_search": "Suchen",
+        "mb_recent": "Neueste Ergänzungen",
+        "mb_surprise": "Überrasch mich!",
+        "mb_wiki_page": "Wiki-Seite",
+        "mb_mod_details": "Mod-Details",
+        "mb_select_mod": "Wähle einen Mod für Details",
+        "mb_description": "Beschreibung:",
+        "mb_download_links": "Download-Links:",
+        "mb_search_tip": "Tipp: Suche nach Tiernamen, Erstellern oder Mod-Typen",
+        "shots_select_album": "Album Auswählen:",
+        "shots_open_folder": "Ordner Öffnen",
+        "saves_preview": "Vorschau",
+        "saves_open_folder": "Ordner Öffnen",
+        "themes_select": "Design Auswählen:",
+        "themes_apply": "Design Anwenden",
+        "msg_no_mods": "Keine Mods installiert",
+        "msg_loading": "Laden...",
+        "msg_success": "Erfolg",
+        "msg_error": "Fehler",
+        "msg_confirm_delete": "Sind Sie sicher, dass Sie dies löschen möchten?",
+        "msg_language_changed": "Sprache geändert. Einige Änderungen erfordern Neustart.",
+        "ach_title": "Erfolge",
+        "ach_unlocked": "Erfolg Freigeschaltet!",
+        "ach_progress": "Fortschritt",
+    },
+    "pt": {
+        "lang_name": "Português",
+        "tab_zt2_mods": "Mods ZT2",
+        "tab_zt1_mods": "Mods ZT1",
+        "tab_bundles": "Pacotes",
+        "tab_saved_games": "Jogos Salvos",
+        "tab_screenshots": "Capturas de Tela",
+        "tab_multiplayer": "Multijogador",
+        "tab_mod_browser": "Navegador de Mods",
+        "tab_themes": "Temas",
+        "menu_game": "Jogo",
+        "menu_mods": "Mods",
+        "menu_tools": "Ferramentas",
+        "menu_view": "Visualizar",
+        "menu_help": "Ajuda",
+        "menu_toggle_theme": "Alternar Tema",
+        "menu_toggle_music": "Alternar Música",
+        "menu_compact_mode": "Modo Compacto",
+        "menu_expanded_mode": "Modo Expandido",
+        "menu_language": "Idioma",
+        "btn_install": "Instalar Mods",
+        "btn_enable": "Ativar",
+        "btn_disable": "Desativar",
+        "btn_enable_all": "Ativar Todos",
+        "btn_disable_all": "Desativar Todos",
+        "btn_refresh": "Atualizar",
+        "btn_delete": "Excluir",
+        "btn_search": "Pesquisar",
+        "btn_browse": "Navegar",
+        "btn_download": "Baixar",
+        "btn_apply": "Aplicar",
+        "btn_save": "Salvar",
+        "btn_cancel": "Cancelar",
+        "btn_close": "Fechar",
+        "btn_launch_game": "Iniciar Jogo",
+        "btn_achievements": "Conquistas",
+        "mb_quick_picks": "Seleção Rápida...",
+        "mb_featured": "Destaque:",
+        "mb_browse_category": "Navegar por Categoria",
+        "mb_search": "Pesquisar",
+        "mb_recent": "Adições Recentes",
+        "mb_surprise": "Surpreenda-me!",
+        "mb_wiki_page": "Página Wiki",
+        "mb_mod_details": "Detalhes do Mod",
+        "mb_select_mod": "Selecione um mod para ver detalhes",
+        "mb_description": "Descrição:",
+        "mb_download_links": "Links de Download:",
+        "mb_search_tip": "Dica: Pesquise nomes de animais, criadores ou tipos de mods",
+        "shots_select_album": "Selecionar Álbum:",
+        "shots_open_folder": "Abrir Pasta",
+        "saves_preview": "Visualizar",
+        "saves_open_folder": "Abrir Pasta",
+        "themes_select": "Selecionar Tema:",
+        "themes_apply": "Aplicar Tema",
+        "msg_no_mods": "Nenhum mod instalado",
+        "msg_loading": "Carregando...",
+        "msg_success": "Sucesso",
+        "msg_error": "Erro",
+        "msg_confirm_delete": "Tem certeza de que deseja excluir isso?",
+        "msg_language_changed": "Idioma alterado. Algumas alterações requerem reinício.",
+        "ach_title": "Conquistas",
+        "ach_unlocked": "Conquista Desbloqueada!",
+        "ach_progress": "Progresso",
+    },
+    "it": {
+        "lang_name": "Italiano",
+        "tab_zt2_mods": "Mod ZT2",
+        "tab_zt1_mods": "Mod ZT1",
+        "tab_bundles": "Pacchetti",
+        "tab_saved_games": "Salvataggi",
+        "tab_screenshots": "Screenshot",
+        "tab_multiplayer": "Multigiocatore",
+        "tab_mod_browser": "Browser Mod",
+        "tab_themes": "Temi",
+        "menu_game": "Gioco",
+        "menu_mods": "Mod",
+        "menu_tools": "Strumenti",
+        "menu_view": "Visualizza",
+        "menu_help": "Aiuto",
+        "menu_toggle_theme": "Cambia Tema",
+        "menu_toggle_music": "Cambia Musica",
+        "menu_compact_mode": "Modalità Compatta",
+        "menu_expanded_mode": "Modalità Estesa",
+        "menu_language": "Lingua",
+        "btn_install": "Installa Mod",
+        "btn_enable": "Attiva",
+        "btn_disable": "Disattiva",
+        "btn_enable_all": "Attiva Tutti",
+        "btn_disable_all": "Disattiva Tutti",
+        "btn_refresh": "Aggiorna",
+        "btn_delete": "Elimina",
+        "btn_search": "Cerca",
+        "btn_browse": "Sfoglia",
+        "btn_download": "Scarica",
+        "btn_apply": "Applica",
+        "btn_save": "Salva",
+        "btn_cancel": "Annulla",
+        "btn_close": "Chiudi",
+        "btn_launch_game": "Avvia Gioco",
+        "btn_achievements": "Obiettivi",
+        "mb_quick_picks": "Selezione Rapida...",
+        "mb_featured": "In evidenza:",
+        "mb_browse_category": "Sfoglia per Categoria",
+        "mb_search": "Cerca",
+        "mb_recent": "Aggiunte Recenti",
+        "mb_surprise": "Sorprendimi!",
+        "mb_wiki_page": "Pagina Wiki",
+        "mb_mod_details": "Dettagli Mod",
+        "mb_select_mod": "Seleziona un mod per vedere i dettagli",
+        "mb_description": "Descrizione:",
+        "mb_download_links": "Link di Download:",
+        "mb_search_tip": "Suggerimento: Cerca nomi di animali, creatori o tipi di mod",
+        "shots_select_album": "Seleziona Album:",
+        "shots_open_folder": "Apri Cartella",
+        "saves_preview": "Anteprima",
+        "saves_open_folder": "Apri Cartella",
+        "themes_select": "Seleziona Tema:",
+        "themes_apply": "Applica Tema",
+        "msg_no_mods": "Nessun mod installato",
+        "msg_loading": "Caricamento...",
+        "msg_success": "Successo",
+        "msg_error": "Errore",
+        "msg_confirm_delete": "Sei sicuro di voler eliminare questo?",
+        "msg_language_changed": "Lingua cambiata. Alcune modifiche richiedono il riavvio.",
+        "ach_title": "Obiettivi",
+        "ach_unlocked": "Obiettivo Sbloccato!",
+        "ach_progress": "Progresso",
+    },
+}
+
+current_language = "en"
+
+def t(key):
+    lang_dict = TRANSLATIONS.get(current_language, TRANSLATIONS["en"])
+    return lang_dict.get(key, TRANSLATIONS["en"].get(key, key))
+
+def set_language(lang_code):
+    global current_language
+    current_language = lang_code
+    settings["language"] = lang_code
+    save_settings(settings)
+
+
+def get_app_dir():
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(os.path.abspath(__file__))
+
 
 def start_background_music(volume=0.3):
     if not AUDIO_AVAILABLE:
         return False
 
-    music_file = os.path.join(os.path.dirname(__file__), "theme_remaster_sirgoose.mp3")
+    music_file = os.path.join(get_app_dir(), "theme_remaster_sirgoose.mp3")
     if not os.path.isfile(music_file):
         print(f"[!] Music file not found: {music_file}")
         return False
@@ -99,7 +514,7 @@ if platform.system() == "Windows":
     except Exception:
         pass
 
-APP_VERSION = "1.1.5"
+APP_VERSION = "1.1.6"
 SETTINGS_FILE = "settings.json"
 CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".zt2_manager")
 os.makedirs(CONFIG_DIR, exist_ok=True)
@@ -110,6 +525,10 @@ DB_FILE = os.path.join(CONFIG_DIR, "mods.db")
 ICON_FILE = os.path.join(CONFIG_DIR, "modzt.ico")
 BANNER_FILE = os.path.join(CONFIG_DIR, "banner.png")
 GITHUB_REPO = "kaelelson05/modzt"
+
+ZT2DL_API_BASE = "https://zt2downloadlibrary.fandom.com/api.php"
+ZT2DL_WIKI_BASE = "https://zt2downloadlibrary.fandom.com/wiki"
+ZT2DL_CACHE_TTL = 600
 
 GAME_PATH = None
 ZT1_PATH = None
@@ -309,7 +728,9 @@ COMMON_ZT1_PATHS = [
 DEFAULT_SETTINGS = {
     "game_path": "",
     "theme": "flatly",
-    "geometry": "700x700"
+    "window_geometry": "1200x882+78+78",
+    "window_maximized": False,
+    "language": "en"
 }
 
 THEMES = {
@@ -332,7 +753,7 @@ def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")
+        base_path = get_app_dir()
     return os.path.join(base_path, relative_path)
 
 
@@ -549,6 +970,27 @@ CREATE TABLE IF NOT EXISTS bundle_mods (
 )
 """)
 conn.commit()
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS zt2dl_cache (
+    cache_key TEXT PRIMARY KEY,
+    data TEXT,
+    cached_at TEXT
+)
+""")
+conn.commit()
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS user_stats (
+    stat_name TEXT PRIMARY KEY,
+    value INTEGER DEFAULT 0
+)
+""")
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS achievements (
+    id TEXT PRIMARY KEY,
+    unlocked_at TEXT
+)
+""")
+conn.commit()
 
 
 def ensure_category_column():
@@ -665,6 +1107,468 @@ def detect_existing_zt1_mods():
         if name not in scanned:
             cursor.execute("DELETE FROM zt1_mods WHERE name=?", (name, ))
     conn.commit()
+
+ACHIEVEMENTS = {
+    "first_mod": {
+        "name": "First Steps",
+        "description": "Install your first mod",
+        "icon": "package",
+        "category": "Collector",
+        "condition": lambda stats: stats.get("mods_installed", 0) >= 1
+    },
+    "mod_enthusiast": {
+        "name": "Mod Enthusiast",
+        "description": "Install 10 mods",
+        "icon": "packages",
+        "category": "Collector",
+        "target": 10,
+        "condition": lambda stats: stats.get("mods_installed", 0) >= 10
+    },
+    "mod_collector": {
+        "name": "Mod Collector",
+        "description": "Install 50 mods",
+        "icon": "archive",
+        "category": "Collector",
+        "target": 50,
+        "condition": lambda stats: stats.get("mods_installed", 0) >= 50
+    },
+    "mod_hoarder": {
+        "name": "Mod Hoarder",
+        "description": "Install 100 mods",
+        "icon": "warehouse",
+        "category": "Collector",
+        "target": 100,
+        "condition": lambda stats: stats.get("mods_installed", 0) >= 100
+    },
+
+    "browser": {
+        "name": "Browser",
+        "description": "Use the Mod Browser to search for mods",
+        "icon": "search",
+        "category": "Explorer",
+        "condition": lambda stats: stats.get("browser_searches", 0) >= 1
+    },
+    "random_discovery": {
+        "name": "Random Discovery",
+        "description": "Use the Random mod button",
+        "icon": "shuffle",
+        "category": "Explorer",
+        "condition": lambda stats: stats.get("random_mods_viewed", 0) >= 1
+    },
+    "category_explorer": {
+        "name": "Category Explorer",
+        "description": "Browse all mod categories",
+        "icon": "compass",
+        "category": "Explorer",
+        "target": 6,
+        "condition": lambda stats: stats.get("categories_browsed", 0) >= 6
+    },
+
+    "zookeeper": {
+        "name": "Zookeeper",
+        "description": "Have 5 saved games",
+        "icon": "save",
+        "category": "Zoo Keeper",
+        "target": 5,
+        "condition": lambda stats: stats.get("saves_count", 0) >= 5
+    },
+    "screenshot_artist": {
+        "name": "Screenshot Artist",
+        "description": "View 10 screenshots",
+        "icon": "camera",
+        "category": "Zoo Keeper",
+        "target": 10,
+        "condition": lambda stats: stats.get("screenshots_viewed", 0) >= 10
+    },
+    "bundle_master": {
+        "name": "Bundle Master",
+        "description": "Create 3 mod bundles",
+        "icon": "layers",
+        "category": "Zoo Keeper",
+        "target": 3,
+        "condition": lambda stats: stats.get("bundles_created", 0) >= 3
+    },
+
+    "multiplayer_pioneer": {
+        "name": "Multiplayer Pioneer",
+        "description": "Create a multiplayer session",
+        "icon": "users",
+        "category": "Social",
+        "condition": lambda stats: stats.get("mp_sessions_created", 0) >= 1
+    },
+    "turn_taker": {
+        "name": "Turn Taker",
+        "description": "Submit 5 multiplayer turns",
+        "icon": "repeat",
+        "category": "Social",
+        "target": 5,
+        "condition": lambda stats: stats.get("mp_turns_submitted", 0) >= 5
+    },
+
+    "theme_changer": {
+        "name": "Theme Changer",
+        "description": "Try 5 different themes",
+        "icon": "palette",
+        "category": "Customization",
+        "target": 5,
+        "condition": lambda stats: stats.get("themes_applied", 0) >= 5
+    },
+    "objective_seeker": {
+        "name": "Objective Seeker",
+        "description": "Generate 10 random objectives",
+        "icon": "target",
+        "category": "Customization",
+        "target": 10,
+        "condition": lambda stats: stats.get("objectives_generated", 0) >= 10
+    },
+
+    "completionist": {
+        "name": "Completionist",
+        "description": "Unlock all other achievements",
+        "icon": "trophy",
+        "category": "Secret",
+        "condition": lambda stats: stats.get("achievements_unlocked", 0) >= 14
+    },
+}
+
+def get_user_stats():
+    cursor.execute("SELECT stat_name, value FROM user_stats")
+    return {row[0]: row[1] for row in cursor.fetchall()}
+
+def increment_stat(stat_name, amount=1):
+    cursor.execute("""
+        INSERT INTO user_stats (stat_name, value) VALUES (?, ?)
+        ON CONFLICT(stat_name) DO UPDATE SET value = value + ?
+    """, (stat_name, amount, amount))
+    conn.commit()
+    check_achievements()
+
+def set_stat(stat_name, value):
+    cursor.execute("""
+        INSERT INTO user_stats (stat_name, value) VALUES (?, ?)
+        ON CONFLICT(stat_name) DO UPDATE SET value = ?
+    """, (stat_name, value, value))
+    conn.commit()
+    check_achievements()
+
+def get_unlocked_achievements():
+    cursor.execute("SELECT id FROM achievements WHERE unlocked_at IS NOT NULL")
+    return [row[0] for row in cursor.fetchall()]
+
+def unlock_achievement(achievement_id):
+    cursor.execute("""
+        INSERT OR IGNORE INTO achievements (id, unlocked_at) VALUES (?, datetime('now'))
+    """, (achievement_id,))
+    conn.commit()
+
+    unlocked = get_unlocked_achievements()
+    set_stat("achievements_unlocked", len(unlocked))
+
+def check_achievements():
+    stats = get_user_stats()
+    unlocked = get_unlocked_achievements()
+    newly_unlocked = []
+
+    for ach_id, ach_data in ACHIEVEMENTS.items():
+        if ach_id not in unlocked:
+            try:
+                if ach_data["condition"](stats):
+                    unlock_achievement(ach_id)
+                    newly_unlocked.append(ach_data["name"])
+            except Exception:
+                pass
+
+    for name in newly_unlocked:
+        show_achievement_toast(name)
+
+    return newly_unlocked
+
+def show_achievement_toast(achievement_name):
+    try:
+        toast = tk.Toplevel(root)
+        toast.overrideredirect(True)
+        toast.attributes("-topmost", True)
+
+        toast.update_idletasks()
+        x = root.winfo_x() + root.winfo_width() - 320
+        y = root.winfo_y() + root.winfo_height() - 100
+        toast.geometry(f"300x70+{x}+{y}")
+
+        frame = ttk.Frame(toast, padding=10)
+        frame.pack(fill=tk.BOTH, expand=True)
+
+        ttk.Label(frame, text="Achievement Unlocked!",
+                  font=("Segoe UI", 9, "bold"),
+                  bootstyle="warning").pack(anchor="w")
+        ttk.Label(frame, text=achievement_name,
+                  font=("Segoe UI", 11, "bold")).pack(anchor="w")
+
+        toast.after(3000, toast.destroy)
+    except Exception:
+        pass
+
+def open_achievements_dialog():
+    dialog = tk.Toplevel(root)
+    dialog.title("Achievements")
+    dialog.geometry("600x500")
+    dialog.transient(root)
+    dialog.grab_set()
+
+    dialog.update_idletasks()
+    x = root.winfo_x() + (root.winfo_width() // 2) - 300
+    y = root.winfo_y() + (root.winfo_height() // 2) - 250
+    dialog.geometry(f"+{x}+{y}")
+
+    main_frame = ttk.Frame(dialog, padding=15)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    header_frame = ttk.Frame(main_frame)
+    header_frame.pack(fill=tk.X, pady=(0, 15))
+
+    ttk.Label(header_frame, text="Achievements",
+              font=("Segoe UI", 16, "bold")).pack(side=tk.LEFT)
+
+    unlocked = get_unlocked_achievements()
+    total = len(ACHIEVEMENTS)
+    progress_text = f"{len(unlocked)}/{total} Unlocked"
+    ttk.Label(header_frame, text=progress_text,
+              font=("Segoe UI", 11),
+              bootstyle="info").pack(side=tk.RIGHT)
+
+    progress_pct = (len(unlocked) / total) * 100 if total > 0 else 0
+    progress_bar = ttk.Progressbar(main_frame, value=progress_pct,
+                                    bootstyle="success-striped", length=570)
+    progress_bar.pack(fill=tk.X, pady=(0, 15))
+
+    canvas = tk.Canvas(main_frame, highlightthickness=0)
+    scrollbar = ttk.Scrollbar(main_frame, orient="vertical", command=canvas.yview)
+    scroll_frame = ttk.Frame(canvas)
+
+    scroll_frame.bind("<Configure>",
+                      lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+    canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+    def _on_mousewheel(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+    canvas.bind_all("<MouseWheel>", _on_mousewheel)
+    dialog.bind("<Destroy>", lambda e: canvas.unbind_all("<MouseWheel>"))
+
+    stats = get_user_stats()
+
+    categories = {}
+    for ach_id, ach_data in ACHIEVEMENTS.items():
+        cat = ach_data["category"]
+        if cat not in categories:
+            categories[cat] = []
+        categories[cat].append((ach_id, ach_data))
+
+    row = 0
+    for cat_name in ["Collector", "Explorer", "Zoo Keeper", "Social", "Customization", "Secret"]:
+        if cat_name not in categories:
+            continue
+
+        cat_label = ttk.Label(scroll_frame, text=cat_name,
+                              font=("Segoe UI", 11, "bold"))
+        cat_label.grid(row=row, column=0, columnspan=2, sticky="w", pady=(10, 5))
+        row += 1
+
+        for ach_id, ach_data in categories[cat_name]:
+            is_unlocked = ach_id in unlocked
+            is_secret = cat_name == "Secret" and not is_unlocked
+
+            ach_frame = ttk.Frame(scroll_frame, padding=8)
+            ach_frame.grid(row=row, column=0, columnspan=2, sticky="ew", pady=2, padx=5)
+
+            icon_color = "#4CAF50" if is_unlocked else "#666666"
+            icon_canvas = tk.Canvas(ach_frame, width=40, height=40,
+                                    highlightthickness=0, bg=icon_color)
+            icon_canvas.pack(side=tk.LEFT, padx=(0, 10))
+
+            text_frame = ttk.Frame(ach_frame)
+            text_frame.pack(side=tk.LEFT, fill=tk.X, expand=True)
+
+            name = "???" if is_secret else ach_data["name"]
+            desc = "Complete other achievements to reveal" if is_secret else ach_data["description"]
+
+            name_style = "default" if is_unlocked else "secondary"
+            ttk.Label(text_frame, text=name,
+                      font=("Segoe UI", 10, "bold"),
+                      bootstyle=name_style).pack(anchor="w")
+            ttk.Label(text_frame, text=desc,
+                      font=("Segoe UI", 9),
+                      bootstyle="secondary").pack(anchor="w")
+
+            if "target" in ach_data and not is_unlocked and not is_secret:
+                stat_map = {
+                    "mod_enthusiast": "mods_installed",
+                    "mod_collector": "mods_installed",
+                    "mod_hoarder": "mods_installed",
+                    "category_explorer": "categories_browsed",
+                    "zookeeper": "saves_count",
+                    "screenshot_artist": "screenshots_viewed",
+                    "bundle_master": "bundles_created",
+                    "turn_taker": "mp_turns_submitted",
+                    "theme_changer": "themes_applied",
+                    "objective_seeker": "objectives_generated",
+                }
+                stat_name = stat_map.get(ach_id, "")
+                current = stats.get(stat_name, 0)
+                target = ach_data["target"]
+                progress_str = f"{current}/{target}"
+                ttk.Label(ach_frame, text=progress_str,
+                          font=("Segoe UI", 9),
+                          bootstyle="info").pack(side=tk.RIGHT, padx=10)
+
+            if is_unlocked:
+                ttk.Label(ach_frame, text="✓",
+                          font=("Segoe UI", 14, "bold"),
+                          bootstyle="success").pack(side=tk.RIGHT, padx=10)
+
+            row += 1
+
+    btn_frame = ttk.Frame(main_frame)
+    btn_frame.pack(fill=tk.X, pady=(15, 0))
+    ttk.Button(btn_frame, text="Close", command=dialog.destroy,
+               bootstyle="secondary").pack(side=tk.RIGHT)
+
+class ZT2DownloadLibraryAPI:
+
+    def __init__(self):
+        self.api_base = ZT2DL_API_BASE
+        self.wiki_base = ZT2DL_WIKI_BASE
+        self.last_request_time = 0
+        self.min_request_interval = 0.5
+
+    def _rate_limit(self):
+        import time
+        elapsed = time.time() - self.last_request_time
+        if elapsed < self.min_request_interval:
+            time.sleep(self.min_request_interval - elapsed)
+        self.last_request_time = time.time()
+
+    def _get_cached(self, cache_key):
+        cursor.execute(
+            "SELECT data, cached_at FROM zt2dl_cache WHERE cache_key=?",
+            (cache_key,)
+        )
+        row = cursor.fetchone()
+        if row:
+            data, cached_at = row
+            try:
+                cached_time = datetime.fromisoformat(cached_at)
+                if (datetime.now() - cached_time).total_seconds() < ZT2DL_CACHE_TTL:
+                    return json.loads(data)
+            except Exception:
+                pass
+        return None
+
+    def _set_cache(self, cache_key, data):
+        cursor.execute(
+            "INSERT OR REPLACE INTO zt2dl_cache (cache_key, data, cached_at) VALUES (?, ?, ?)",
+            (cache_key, json.dumps(data), datetime.now().isoformat())
+        )
+        conn.commit()
+
+    def _request(self, params, use_cache=True):
+        """Make API request with caching"""
+        cache_key = f"zt2dl:{json.dumps(params, sort_keys=True)}"
+
+        if use_cache:
+            cached = self._get_cached(cache_key)
+            if cached:
+                return cached
+
+        self._rate_limit()
+
+        params['format'] = 'json'
+        response = requests.get(self.api_base, params=params, timeout=15)
+        response.raise_for_status()
+        data = response.json()
+
+        if use_cache:
+            self._set_cache(cache_key, data)
+
+        return data
+
+    def get_categories(self):
+        return [
+            {"name": "Animals", "title": "Category:Animals"},
+            {"name": "Foliage", "title": "Category:Foliage"},
+            {"name": "Objects", "title": "Category:Objects"},
+            {"name": "Scenery", "title": "Category:Scenery"},
+            {"name": "Buildings", "title": "Category:Building_Sets"},
+            {"name": "Packs", "title": "Category:Packs"},
+            {"name": "Recent", "title": "Special:RecentChanges"},
+        ]
+
+    def get_category_members(self, category, limit=50):
+        params = {
+            'action': 'query',
+            'list': 'categorymembers',
+            'cmtitle': category,
+            'cmlimit': limit,
+            'cmtype': 'page|subcat',
+            'cmprop': 'title|type'
+        }
+        data = self._request(params)
+        return data.get('query', {}).get('categorymembers', [])
+
+    def search_mods(self, query, limit=25):
+        params = {
+            'action': 'query',
+            'list': 'search',
+            'srsearch': query,
+            'srlimit': limit,
+            'srnamespace': 0,
+            'srprop': 'snippet|titlesnippet'
+        }
+        data = self._request(params, use_cache=False)
+        return data.get('query', {}).get('search', [])
+
+    def get_page_content(self, title):
+        params = {
+            'action': 'parse',
+            'page': title,
+            'prop': 'text|links|externallinks|images',
+            'disablelimitreport': 'true'
+        }
+        data = self._request(params)
+        return data.get('parse', {})
+
+    def get_page_info(self, title):
+        params = {
+            'action': 'query',
+            'titles': title,
+            'prop': 'info|images|categories',
+            'inprop': 'url'
+        }
+        data = self._request(params)
+        pages = data.get('query', {}).get('pages', {})
+        for page_id, page_data in pages.items():
+            if page_id != '-1':
+                return page_data
+        return None
+
+    def get_recent_downloads(self, limit=30):
+        params = {
+            'action': 'query',
+            'list': 'recentchanges',
+            'rcnamespace': 0,
+            'rclimit': limit,
+            'rctype': 'new|edit',
+            'rcprop': 'title|timestamp|user'
+        }
+        data = self._request(params, use_cache=False)
+        return data.get('query', {}).get('recentchanges', [])
+
+    def get_page_url(self, title):
+        return f"{self.wiki_base}/{title.replace(' ', '_')}"
+
+zt2dl_api = ZT2DownloadLibraryAPI()
 
 
 def check_for_updates():
@@ -833,12 +1737,30 @@ def list_zt2_albums(root):
 
 
 def list_album_images(album_path):
-    exts = ("*.jpg", "*.jpeg", "*.png", "*.bmp")
+    exts = ("*.jpg", "*.jpeg", "*.png", "*.bmp", "*.JPG", "*.JPEG", "*.PNG", "*.BMP")
     imgs = []
+
     for pat in exts:
         imgs.extend(glob.glob(os.path.join(album_path, pat)))
-    imgs.sort(key=lambda p: os.path.getmtime(p), reverse=True)
-    return imgs
+
+    images_subdir = os.path.join(album_path, "images")
+    if os.path.isdir(images_subdir):
+        for pat in exts:
+            imgs.extend(glob.glob(os.path.join(images_subdir, pat)))
+
+    for pat in exts:
+        imgs.extend(glob.glob(os.path.join(album_path, "**", pat), recursive=True))
+
+    seen = set()
+    unique_imgs = []
+    for img in imgs:
+        normalized = os.path.normpath(img)
+        if normalized not in seen:
+            seen.add(normalized)
+            unique_imgs.append(img)
+
+    unique_imgs.sort(key=lambda p: os.path.getmtime(p), reverse=True)
+    return unique_imgs
 
 def get_current_theme():
     try:
@@ -1367,6 +2289,7 @@ def install_mods(file_paths, text_widget=None):
         detect_existing_mods()
         refresh_tree()
         record_action("install", {"mod_names": installed})
+        increment_stat("mods_installed", len(installed))
 
     summary = []
     if installed:
@@ -1709,6 +2632,7 @@ def create_bundle(bundle_name, mod_list):
             "INSERT OR IGNORE INTO bundle_mods (bundle_id, mod_name) VALUES (?, ?)",
             (bundle_id, m))
     conn.commit()
+    increment_stat("bundles_created")
     return True
 
 
@@ -1942,6 +2866,7 @@ def export_bundle_as_mod_ui(bundle_name=None):
 
 
 settings = load_settings()
+current_language = settings.get("language", "en")
 system_theme = get_system_theme()
 
 if not os.path.isfile(GAME_PATH_FILE):
@@ -1964,7 +2889,16 @@ else:
     root = Window(themename="darkly" if system_theme == "dark" else "litera")
 
 root.title(f"ModZT v{APP_VERSION}")
-root.geometry("1400x1000")
+
+_startup_settings = load_settings()
+_saved_geometry = _startup_settings.get("window_geometry", "1200x800")
+_was_maximized = _startup_settings.get("window_maximized", False)
+
+root.geometry(_saved_geometry)
+root.update_idletasks()
+
+if _was_maximized:
+    root.state('zoomed')
 
 
 def set_zt1_paths():
@@ -2059,14 +2993,19 @@ def toggle_ui_mode():
     ui_mode["compact"] = not ui_mode["compact"]
     apply_ui_mode()
     mode = "Compact" if ui_mode["compact"] else "Expanded"
+    new_label = t("menu_expanded_mode") if ui_mode["compact"] else t("menu_compact_mode")
+    view_menu.entryconfig(2, label=new_label)
     log(f"Switched to {mode} mode", text_widget=log_text)
 
-help_menu_btn = ttk.Menubutton(toolbar, text="Help", bootstyle="info-outline")
+_translatable_widgets = {}
+
+help_menu_btn = ttk.Menubutton(toolbar, text=t("menu_help"), bootstyle="info-outline")
+_translatable_widgets["help_menu_btn"] = help_menu_btn
 help_menu = tk.Menu(help_menu_btn, tearoff=0)
 help_menu.add_command(label="About ModZT",
                       command=lambda: messagebox.showinfo(
                           "About",
-                          "ModZT v1.1.5\n"
+                          "ModZT v1.1.6\n"
                           "Created by Kael\n\n"
                           "Music: Zoo Tycoon 2 Theme Remaster\n"
                           "by SirGoose"))
@@ -2085,18 +3024,79 @@ help_menu_btn["menu"] = help_menu
 help_menu_btn.pack(side=tk.RIGHT, padx=4)
 
 view_menu_button = ttk.Menubutton(toolbar,
-                                  text="View",
+                                  text=t("menu_view"),
                                   bootstyle="info-outline")
 view_menu = tk.Menu(view_menu_button, tearoff=0)
-view_menu.add_command(label="Toggle Theme", command=toggle_theme)
-view_menu.add_command(label="Toggle Music", command=toggle_background_music)
-view_menu.add_command(label="Compact Mode", command=toggle_ui_mode)
+view_menu.add_command(label=t("menu_toggle_theme"), command=toggle_theme)
+view_menu.add_command(label=t("menu_toggle_music"), command=toggle_background_music)
+view_menu.add_command(label=t("menu_compact_mode"), command=toggle_ui_mode)
+
+def refresh_ui_language():
+    view_menu_button.configure(text=t("menu_view"))
+    view_menu.entryconfig(0, label=t("menu_toggle_theme"))
+    view_menu.entryconfig(1, label=t("menu_toggle_music"))
+    if ui_mode.get("compact", False):
+        view_menu.entryconfig(2, label=t("menu_expanded_mode"))
+    else:
+        view_menu.entryconfig(2, label=t("menu_compact_mode"))
+    view_menu.entryconfig(3, label=t("menu_language"))
+
+    if "help_menu_btn" in _translatable_widgets:
+        _translatable_widgets["help_menu_btn"].configure(text=t("menu_help"))
+    if "tools_menu_btn" in _translatable_widgets:
+        _translatable_widgets["tools_menu_btn"].configure(text=t("menu_tools"))
+    if "mods_menu_btn" in _translatable_widgets:
+        _translatable_widgets["mods_menu_btn"].configure(text=t("menu_mods"))
+    if "game_menu_btn" in _translatable_widgets:
+        _translatable_widgets["game_menu_btn"].configure(text=t("menu_game"))
+
+    if "achievements_btn" in _translatable_widgets:
+        _translatable_widgets["achievements_btn"].configure(text=t("btn_achievements"))
+
+    if "launch_btn" in _translatable_widgets:
+        _translatable_widgets["launch_btn"].configure(text=t("btn_launch_game"))
+
+    if "notebook" in _translatable_widgets:
+        nb = _translatable_widgets["notebook"]
+        tab_keys = ["tab_zt2_mods", "tab_zt1_mods", "tab_bundles", "tab_screenshots",
+                    "tab_saved_games", "tab_multiplayer", "tab_mod_browser", "tab_themes"]
+        for i, key in enumerate(tab_keys):
+            try:
+                nb.tab(i, text=t(key))
+            except Exception:
+                pass
+
+def apply_language(lang_code):
+    global current_language
+    current_language = lang_code
+    settings["language"] = lang_code
+    save_settings(settings)
+    refresh_ui_language()
+    messagebox.showinfo(
+        t("msg_success"),
+        t("msg_language_changed")
+    )
+
+language_menu = tk.Menu(view_menu, tearoff=0)
+for lang_code, lang_data in TRANSLATIONS.items():
+    language_menu.add_command(
+        label=lang_data["lang_name"],
+        command=lambda lc=lang_code: apply_language(lc)
+    )
+view_menu.add_cascade(label=t("menu_language"), menu=language_menu)
+
 view_menu_button["menu"] = view_menu
 view_menu_button.pack(side=tk.RIGHT, padx=4)
 
+achievements_btn = ttk.Button(toolbar, text=t("btn_achievements"), bootstyle="warning-outline",
+                               command=open_achievements_dialog)
+achievements_btn.pack(side=tk.RIGHT, padx=4)
+_translatable_widgets["achievements_btn"] = achievements_btn
+
 tools_menu_btn = ttk.Menubutton(toolbar,
-                                text="Tools",
+                                text=t("menu_tools"),
                                 bootstyle="info-outline")
+_translatable_widgets["tools_menu_btn"] = tools_menu_btn
 tools_menu = tk.Menu(tools_menu_btn, tearoff=0)
 tools_menu.add_command(
     label="Validate Mods",
@@ -2113,7 +3113,8 @@ tools_menu_btn.pack(side=tk.RIGHT, padx=4)
 
 ttk.Separator(toolbar, orient="vertical").pack(side=tk.RIGHT, fill=tk.Y, padx=8)
 
-mods_menu_btn = ttk.Menubutton(toolbar, text="Mods", bootstyle="info-outline")
+mods_menu_btn = ttk.Menubutton(toolbar, text=t("menu_mods"), bootstyle="info-outline")
+_translatable_widgets["mods_menu_btn"] = mods_menu_btn
 mods_menu = tk.Menu(mods_menu_btn, tearoff=0)
 mods_menu.add_command(label="Export Load Order", command=export_load_order)
 mods_menu.add_command(label="Backup Mods", command=backup_mods)
@@ -2121,7 +3122,8 @@ mods_menu.add_command(label="Restore Mods", command=restore_mods)
 mods_menu_btn["menu"] = mods_menu
 mods_menu_btn.pack(side=tk.RIGHT, padx=4)
 
-game_menu_btn = ttk.Menubutton(toolbar, text="Game", bootstyle="info-outline")
+game_menu_btn = ttk.Menubutton(toolbar, text=t("menu_game"), bootstyle="info-outline")
+_translatable_widgets["game_menu_btn"] = game_menu_btn
 game_menu = tk.Menu(game_menu_btn, tearoff=0)
 game_menu.add_command(label="Set ZT1 Path", command=set_zt1_paths)
 game_menu.add_command(
@@ -2187,12 +3189,13 @@ main_frame.pack(fill=tk.BOTH, expand=True)
 
 notebook = ttk.Notebook(main_frame)
 notebook.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+_translatable_widgets["notebook"] = notebook
 
 mods_tab = ttk.Frame(notebook, padding=6)
-notebook.add(mods_tab, text="ZT2 Mods")
+notebook.add(mods_tab, text=t("tab_zt2_mods"))
 
 zt1_tab = ttk.Frame(notebook, padding=6)
-notebook.add(zt1_tab, text="ZT1 Mods")
+notebook.add(zt1_tab, text=t("tab_zt1_mods"))
 
 zt1_toolbar = ttk.Frame(zt1_tab)
 zt1_toolbar.pack(fill=tk.X, pady=4)
@@ -2691,35 +3694,256 @@ undo_btn = ttk.Button(mod_btns,
 undo_btn.pack(side=tk.LEFT, padx=4)
 
 bundles_tab = ttk.Frame(notebook, padding=6)
-notebook.add(bundles_tab, text="Bundles")
+notebook.add(bundles_tab, text=t("tab_bundles"))
 
 shots_tab = ttk.Frame(notebook, padding=6)
-notebook.add(shots_tab, text="Screenshots")
+notebook.add(shots_tab, text=t("tab_screenshots"))
 
 saves_tab = ttk.Frame(notebook, padding=6)
-notebook.add(saves_tab, text="Saved Games")
+notebook.add(saves_tab, text=t("tab_saved_games"))
 
-themes_tab = ttk.Frame(notebook, padding=20)
-notebook.add(themes_tab, text="Themes")
+multiplayer_tab = ttk.Frame(notebook, padding=6)
+notebook.add(multiplayer_tab, text=t("tab_multiplayer"))
 
-msg_frame = ttk.Frame(themes_tab)
-msg_frame.pack(expand=True)
+modbrowser_tab = ttk.Frame(notebook, padding=6)
+notebook.add(modbrowser_tab, text=t("tab_mod_browser"))
 
-header = ttk.Label(
-    msg_frame,
-    text="Themes",
-    font=("Segoe UI", 14, "bold")
-)
-header.pack(pady=(0, 10))
+themes_tab = ttk.Frame(notebook, padding=10)
+notebook.add(themes_tab, text=t("tab_themes"))
 
-message = ttk.Label(
-    msg_frame,
-    text="Menu theme functionality is currently unavailable.\n\n"
-         "It will be added in a future update.",
-    justify="center",
-    foreground="#666666"
-)
-message.pack()
+themes_header = ttk.Frame(themes_tab)
+themes_header.pack(fill=tk.X, pady=(0, 10))
+
+ttk.Label(themes_header, text="ModZT Interface Themes",
+          font=("Segoe UI", 14, "bold")).pack(side=tk.LEFT)
+
+current_theme_var = tk.StringVar(value=f"Current: {root.style.theme_use()}")
+ttk.Label(themes_header, textvariable=current_theme_var,
+          bootstyle="secondary").pack(side=tk.RIGHT)
+
+themes_content = ttk.PanedWindow(themes_tab, orient=tk.HORIZONTAL)
+themes_content.pack(fill=tk.BOTH, expand=True)
+
+themes_left = ttk.Frame(themes_content, padding=6)
+themes_content.add(themes_left, weight=1)
+
+ttk.Label(themes_left, text="Available Themes",
+          font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(0, 8))
+
+MODZT_THEMES = {
+    "darkly": {
+        "display": "Dark Mode",
+        "description": "Classic dark theme with blue accents. Easy on the eyes for night sessions.",
+        "category": "Standard",
+        "colors": {"bg": "#222222", "fg": "#ffffff", "accent": "#375a7f"}
+    },
+    "litera": {
+        "display": "Light Mode",
+        "description": "Clean, bright theme perfect for daytime use.",
+        "category": "Standard",
+        "colors": {"bg": "#ffffff", "fg": "#333333", "accent": "#4582ec"}
+    },
+    "superhero": {
+        "display": "Superhero",
+        "description": "Bold dark theme with vibrant orange accents.",
+        "category": "Standard",
+        "colors": {"bg": "#2b3e50", "fg": "#ffffff", "accent": "#df691a"}
+    },
+    "solar": {
+        "display": "Solar",
+        "description": "Solarized dark theme with cyan highlights.",
+        "category": "Standard",
+        "colors": {"bg": "#002b36", "fg": "#839496", "accent": "#2aa198"}
+    },
+    "cyborg": {
+        "display": "Cyborg",
+        "description": "High-contrast dark theme with electric blue.",
+        "category": "Standard",
+        "colors": {"bg": "#060606", "fg": "#888888", "accent": "#2a9fd6"}
+    },
+    "vapor": {
+        "display": "Vapor",
+        "description": "Retro synthwave aesthetic with pink and cyan.",
+        "category": "Standard",
+        "colors": {"bg": "#1a1a2e", "fg": "#ffffff", "accent": "#ea39b8"}
+    },
+    "flatly": {
+        "display": "Flatly",
+        "description": "Modern flat design with green accents.",
+        "category": "Standard",
+        "colors": {"bg": "#ffffff", "fg": "#2c3e50", "accent": "#18bc9c"}
+    },
+    "journal": {
+        "display": "Journal",
+        "description": "Crisp and readable, like a newspaper.",
+        "category": "Standard",
+        "colors": {"bg": "#ffffff", "fg": "#222222", "accent": "#eb6864"}
+    },
+    "cosmo": {
+        "display": "Cosmo",
+        "description": "Space-inspired theme with purple tones.",
+        "category": "Standard",
+        "colors": {"bg": "#ffffff", "fg": "#222222", "accent": "#2780e3"}
+    },
+    "morph": {
+        "display": "Morph",
+        "description": "Soft, modern theme with rounded elements.",
+        "category": "Standard",
+        "colors": {"bg": "#f0f0f0", "fg": "#333333", "accent": "#378dfc"}
+    },
+
+    "minty": {
+        "display": "Rainforest Green",
+        "description": "Lush green theme inspired by tropical rainforest exhibits.",
+        "category": "Zoo Tycoon",
+        "colors": {"bg": "#ffffff", "fg": "#333333", "accent": "#3cb371"}
+    },
+    "united": {
+        "display": "Prehistoric Orange",
+        "description": "Warm orange theme inspired by dinosaur exhibits and ancient times.",
+        "category": "Zoo Tycoon",
+        "colors": {"bg": "#ffffff", "fg": "#333333", "accent": "#e95420"}
+    },
+    "cerculean": {
+        "display": "Marine Blue",
+        "description": "Ocean-inspired blue for marine mammal and aquarium exhibits.",
+        "category": "Zoo Tycoon",
+        "colors": {"bg": "#ffffff", "fg": "#333333", "accent": "#033c73"}
+    },
+    "sandstone": {
+        "display": "Savanna Gold",
+        "description": "Warm golden tones of the African savanna at sunset.",
+        "category": "Zoo Tycoon",
+        "colors": {"bg": "#faf5e6", "fg": "#5c4827", "accent": "#d4a855"}
+    },
+    "pulse": {
+        "display": "Tropical Sunset",
+        "description": "Vibrant purple and pink, like a tropical evening sky.",
+        "category": "Zoo Tycoon",
+        "colors": {"bg": "#ffffff", "fg": "#333333", "accent": "#593196"}
+    },
+    "lumen": {
+        "display": "Arctic Ice",
+        "description": "Cool, crisp theme inspired by polar exhibits.",
+        "category": "Zoo Tycoon",
+        "colors": {"bg": "#ffffff", "fg": "#333333", "accent": "#158cba"}
+    },
+}
+
+themes_list_frame = ttk.Frame(themes_left)
+themes_list_frame.pack(fill=tk.BOTH, expand=True)
+
+themes_tree = ttk.Treeview(themes_list_frame, show="tree", selectmode="browse")
+themes_tree_scroll = ttk.Scrollbar(themes_list_frame, command=themes_tree.yview)
+themes_tree.configure(yscrollcommand=themes_tree_scroll.set)
+themes_tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+themes_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+_theme_categories = {}
+for theme_id, theme_data in MODZT_THEMES.items():
+    cat = theme_data["category"]
+    if cat not in _theme_categories:
+        _theme_categories[cat] = themes_tree.insert("", tk.END, text=cat, open=True)
+    themes_tree.insert(_theme_categories[cat], tk.END, text=theme_data["display"],
+                       values=(theme_id,), tags=(theme_id,))
+
+themes_right = ttk.LabelFrame(themes_content, text="Theme Preview", padding=10)
+themes_content.add(themes_right, weight=2)
+
+preview_name_var = tk.StringVar(value="Select a theme")
+preview_desc_var = tk.StringVar(value="Click on a theme to see its preview")
+preview_category_var = tk.StringVar(value="")
+
+ttk.Label(themes_right, textvariable=preview_name_var,
+          font=("Segoe UI", 12, "bold")).pack(anchor="w", pady=(0, 4))
+ttk.Label(themes_right, textvariable=preview_category_var,
+          bootstyle="info").pack(anchor="w", pady=(0, 8))
+ttk.Label(themes_right, textvariable=preview_desc_var,
+          wraplength=350, justify="left").pack(anchor="w", pady=(0, 15))
+
+colors_frame = ttk.LabelFrame(themes_right, text="Color Palette", padding=10)
+colors_frame.pack(fill=tk.X, pady=(0, 15))
+
+color_preview_bg = tk.Canvas(colors_frame, width=80, height=50, highlightthickness=1)
+color_preview_bg.pack(side=tk.LEFT, padx=5)
+color_preview_bg.create_rectangle(0, 0, 80, 50, fill="#222222", outline="")
+ttk.Label(colors_frame, text="Background").pack(side=tk.LEFT, padx=(0, 15))
+
+color_preview_fg = tk.Canvas(colors_frame, width=80, height=50, highlightthickness=1)
+color_preview_fg.pack(side=tk.LEFT, padx=5)
+color_preview_fg.create_rectangle(0, 0, 80, 50, fill="#ffffff", outline="")
+ttk.Label(colors_frame, text="Text").pack(side=tk.LEFT, padx=(0, 15))
+
+color_preview_accent = tk.Canvas(colors_frame, width=80, height=50, highlightthickness=1)
+color_preview_accent.pack(side=tk.LEFT, padx=5)
+color_preview_accent.create_rectangle(0, 0, 80, 50, fill="#375a7f", outline="")
+ttk.Label(colors_frame, text="Accent").pack(side=tk.LEFT)
+
+apply_frame = ttk.Frame(themes_right)
+apply_frame.pack(fill=tk.X, pady=(10, 0))
+
+_selected_theme_id = [None]
+
+def on_theme_select(event=None):
+    sel = themes_tree.selection()
+    if not sel:
+        return
+    item = themes_tree.item(sel[0])
+    if not item.get("values"):
+        return
+
+    theme_id = item["values"][0]
+    _selected_theme_id[0] = theme_id
+
+    if theme_id in MODZT_THEMES:
+        theme = MODZT_THEMES[theme_id]
+        preview_name_var.set(theme["display"])
+        preview_category_var.set(theme["category"])
+        preview_desc_var.set(theme["description"])
+
+        colors = theme["colors"]
+        color_preview_bg.delete("all")
+        color_preview_bg.create_rectangle(0, 0, 80, 50, fill=colors["bg"], outline="#666")
+        color_preview_fg.delete("all")
+        color_preview_fg.create_rectangle(0, 0, 80, 50, fill=colors["fg"], outline="#666")
+        color_preview_accent.delete("all")
+        color_preview_accent.create_rectangle(0, 0, 80, 50, fill=colors["accent"], outline="#666")
+
+def apply_selected_theme():
+    theme_id = _selected_theme_id[0]
+    if not theme_id:
+        messagebox.showinfo("Theme", "Please select a theme first.")
+        return
+
+    try:
+        root.style.theme_use(theme_id)
+        current_theme_var.set(f"Current: {theme_id}")
+
+        settings["theme"] = theme_id
+        save_settings(settings)
+
+        if 'apply_tree_theme' in dir():
+            apply_tree_theme()
+
+        log(f"Applied theme: {MODZT_THEMES[theme_id]['display']}", text_widget=log_text)
+        increment_stat("themes_applied")
+    except Exception as e:
+        messagebox.showerror("Theme Error", f"Could not apply theme: {e}")
+
+themes_tree.bind("<<TreeviewSelect>>", on_theme_select)
+
+ttk.Button(apply_frame, text="Apply Theme", command=apply_selected_theme,
+           bootstyle="success").pack(side=tk.LEFT, padx=5)
+ttk.Button(apply_frame, text="Reset to Default",
+           command=lambda: (root.style.theme_use("darkly"), current_theme_var.set("Current: darkly")),
+           bootstyle="secondary").pack(side=tk.LEFT, padx=5)
+
+info_frame = ttk.LabelFrame(themes_right, text="Tips", padding=10)
+info_frame.pack(fill=tk.X, pady=(15, 0))
+ttk.Label(info_frame, text="• Dark themes are easier on the eyes during long sessions\n"
+                           "• Zoo Tycoon themes are inspired by in-game biomes\n"
+                           "• Your theme choice is saved automatically",
+          justify="left", bootstyle="secondary").pack(anchor="w")
 
 
 shots_toolbar = ttk.Frame(shots_tab)
@@ -2827,6 +4051,8 @@ def show_full_preview(img_paths, start_index=0):
     if not img_paths:
         return
     idx = max(0, min(start_index, len(img_paths) - 1))
+
+    increment_stat("screenshots_viewed")
 
     top = tk.Toplevel(root)
     top.title("Screenshot Preview")
@@ -3020,6 +4246,10 @@ def open_saves_folder():
 
 ttk.Button(saves_toolbar, text="Open Folder", command=open_saves_folder).pack(side=tk.LEFT, padx=2)
 
+ttk.Separator(saves_toolbar, orient="vertical").pack(side=tk.LEFT, padx=8, fill=tk.Y, pady=2)
+ttk.Button(saves_toolbar, text="Random Objective", command=lambda: generate_random_objective(),
+           bootstyle="info-outline").pack(side=tk.LEFT, padx=2)
+
 saves_split = ttk.PanedWindow(saves_tab, orient=tk.HORIZONTAL)
 saves_split.pack(fill=tk.BOTH, expand=True)
 
@@ -3196,8 +4426,14 @@ _SAVE_THUMB_CACHE = {}
 
 
 def extract_save_thumbnail(save_path):
-    if save_path in _SAVE_THUMB_CACHE:
-        return _SAVE_THUMB_CACHE[save_path]
+    try:
+        mtime = os.path.getmtime(save_path)
+        cache_key = (save_path, mtime)
+    except OSError:
+        cache_key = save_path
+
+    if cache_key in _SAVE_THUMB_CACHE:
+        return _SAVE_THUMB_CACHE[cache_key]
 
     try:
         if zipfile.is_zipfile(save_path):
@@ -3208,12 +4444,12 @@ def extract_save_thumbnail(save_path):
                         img = Image.open(io.BytesIO(data))
                         img.thumbnail((300, 200), Image.LANCZOS)
                         photo = ImageTk.PhotoImage(img)
-                        _SAVE_THUMB_CACHE[save_path] = photo
+                        _SAVE_THUMB_CACHE[cache_key] = photo
                         return photo
     except Exception:
         pass
 
-    _SAVE_THUMB_CACHE[save_path] = None
+    _SAVE_THUMB_CACHE[cache_key] = None
     return None
 
 
@@ -3294,6 +4530,1493 @@ def refresh_saves_list():
         saves_tree.insert("", tk.END, values=(name, size_str, date_str))
 
     log(f"Found {len(saves)} saved game(s)", log_text)
+    set_stat("saves_count", len(saves))
+
+MULTIPLAYER_DIR = os.path.join(CONFIG_DIR, "multiplayer")
+os.makedirs(MULTIPLAYER_DIR, exist_ok=True)
+
+def get_session_file(session_id):
+    return os.path.join(MULTIPLAYER_DIR, f"{session_id}.json")
+
+def get_session_save_dir(session_id):
+    d = os.path.join(MULTIPLAYER_DIR, session_id)
+    os.makedirs(d, exist_ok=True)
+    return d
+
+def generate_session_id():
+    import random
+    import string
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+def export_save_for_sharing(save_path, output_path=None):
+    if not os.path.isfile(save_path):
+        return None, "Save file not found"
+
+    save_name = os.path.basename(save_path)
+
+    if not output_path:
+        output_path = filedialog.asksaveasfilename(
+            title="Export Save For Sharing",
+            defaultextension=".zt2share",
+            filetypes=[("ZT2 Share Package", "*.zt2share"), ("All Files", "*.*")],
+            initialfile=os.path.splitext(save_name)[0] + ".zt2share"
+        )
+
+    if not output_path:
+        return None, "Export cancelled"
+
+    try:
+        with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+            zf.write(save_path, save_name)
+
+            metadata = {
+                "original_name": save_name,
+                "exported_by": os.environ.get("USERNAME", "Unknown"),
+                "exported_at": datetime.now().isoformat(),
+                "size": os.path.getsize(save_path),
+                "version": APP_VERSION
+            }
+            zf.writestr("metadata.json", json.dumps(metadata, indent=2))
+
+        return output_path, f"Exported to {os.path.basename(output_path)}"
+    except Exception as e:
+        return None, f"Export failed: {e}"
+
+def import_shared_save(package_path=None):
+    if not package_path:
+        package_path = filedialog.askopenfilename(
+            title="Import Shared Save",
+            filetypes=[("ZT2 Share Package", "*.zt2share"), ("All Files", "*.*")]
+        )
+
+    if not package_path:
+        return None, "Import cancelled"
+
+    saves_dir = get_zt2_saves_dir()
+    if not saves_dir:
+        return None, "Could not find saves directory"
+
+    try:
+        with zipfile.ZipFile(package_path, 'r') as zf:
+            try:
+                metadata = json.loads(zf.read("metadata.json"))
+            except:
+                metadata = {}
+
+            save_files = [f for f in zf.namelist() if f.lower().endswith('.z2s')]
+            if not save_files:
+                return None, "No save file found in package"
+
+            save_name = save_files[0]
+
+            dest_path = os.path.join(saves_dir, save_name)
+            if os.path.exists(dest_path):
+                base, ext = os.path.splitext(save_name)
+                counter = 1
+                while os.path.exists(dest_path):
+                    dest_path = os.path.join(saves_dir, f"{base}_{counter}{ext}")
+                    counter += 1
+                save_name = os.path.basename(dest_path)
+
+            zf.extract(save_files[0], saves_dir)
+            if save_files[0] != save_name:
+                os.rename(os.path.join(saves_dir, save_files[0]), dest_path)
+
+            return dest_path, f"Imported: {save_name}"
+    except Exception as e:
+        return None, f"Import failed: {e}"
+
+def create_multiplayer_session(save_path, session_name):
+    if not os.path.isfile(save_path):
+        return None, "Save file not found"
+
+    session_id = generate_session_id()
+    session_dir = get_session_save_dir(session_id)
+
+    save_name = os.path.basename(save_path)
+    shutil.copy2(save_path, os.path.join(session_dir, save_name))
+
+    session_data = {
+        "id": session_id,
+        "name": session_name,
+        "created_at": datetime.now().isoformat(),
+        "created_by": os.environ.get("USERNAME", "Unknown"),
+        "current_save": save_name,
+        "turn_number": 1,
+        "turn_history": [
+            {
+                "turn": 0,
+                "player": os.environ.get("USERNAME", "Unknown"),
+                "action": "Created session",
+                "timestamp": datetime.now().isoformat(),
+                "save_file": save_name
+            }
+        ],
+        "players": [os.environ.get("USERNAME", "Unknown")]
+    }
+
+    with open(get_session_file(session_id), 'w') as f:
+        json.dump(session_data, f, indent=2)
+
+    increment_stat("mp_sessions_created")
+
+    return session_id, f"Session created: {session_id}"
+
+def load_session(session_id):
+    session_file = get_session_file(session_id)
+    if not os.path.isfile(session_file):
+        return None
+
+    try:
+        with open(session_file, 'r') as f:
+            return json.load(f)
+    except:
+        return None
+
+def list_sessions():
+    sessions = []
+    for f in os.listdir(MULTIPLAYER_DIR):
+        if f.endswith('.json'):
+            session_id = f[:-5]
+            session = load_session(session_id)
+            if session:
+                sessions.append(session)
+    return sessions
+
+
+def parse_zoo_stats(save_path):
+    stats = {
+        "money": None,
+        "animals": None,
+        "species": None,
+        "guests": None,
+        "rating": None,
+        "zoo_name": None
+    }
+
+    if not os.path.isfile(save_path):
+        return stats
+
+    try:
+        if zipfile.is_zipfile(save_path):
+            with zipfile.ZipFile(save_path, 'r') as zf:
+                for name in zf.namelist():
+                    if name.lower().endswith('.xml'):
+                        try:
+                            content = zf.read(name).decode('utf-8', errors='ignore')
+
+                            import re
+
+                            money_match = re.search(r'<cash[^>]*>(\d+(?:\.\d+)?)</cash>', content, re.I)
+                            if money_match:
+                                stats["money"] = float(money_match.group(1))
+
+                            name_match = re.search(r'<zooname[^>]*>([^<]+)</zooname>', content, re.I)
+                            if name_match:
+                                stats["zoo_name"] = name_match.group(1)
+
+                            rating_match = re.search(r'<rating[^>]*>(\d+(?:\.\d+)?)</rating>', content, re.I)
+                            if rating_match:
+                                stats["rating"] = float(rating_match.group(1))
+
+                        except Exception:
+                            pass
+    except Exception:
+        pass
+
+    return stats
+
+
+def take_turn(session_id, new_save_path, note=""):
+    session = load_session(session_id)
+    if not session:
+        return False, "Session not found"
+
+    if not os.path.isfile(new_save_path):
+        return False, "Save file not found"
+
+    session_dir = get_session_save_dir(session_id)
+    save_name = os.path.basename(new_save_path)
+    turn_save_name = f"turn_{session['turn_number']}_{save_name}"
+
+    shutil.copy2(new_save_path, os.path.join(session_dir, turn_save_name))
+
+    stats = parse_zoo_stats(new_save_path)
+
+    session['turn_number'] += 1
+    session['current_save'] = turn_save_name
+    session['turn_history'].append({
+        "turn": session['turn_number'],
+        "player": os.environ.get("USERNAME", "Unknown"),
+        "timestamp": datetime.now().isoformat(),
+        "save_file": turn_save_name,
+        "note": note,
+        "stats": stats
+    })
+
+    player = os.environ.get("USERNAME", "Unknown")
+    if player not in session['players']:
+        session['players'].append(player)
+
+    with open(get_session_file(session_id), 'w') as f:
+        json.dump(session, f, indent=2)
+
+    increment_stat("mp_turns_submitted")
+
+    return True, f"Turn {session['turn_number']} submitted"
+
+
+def delete_session(session_id):
+    session_file = get_session_file(session_id)
+    session_dir = get_session_save_dir(session_id)
+
+    try:
+        if os.path.isfile(session_file):
+            os.remove(session_file)
+
+        if os.path.isdir(session_dir):
+            shutil.rmtree(session_dir)
+
+        return True, "Session deleted"
+    except Exception as e:
+        return False, f"Failed to delete session: {e}"
+
+
+def rollback_turn(session_id, target_turn):
+    session = load_session(session_id)
+    if not session:
+        return False, "Session not found"
+
+    if target_turn < 0 or target_turn >= session['turn_number']:
+        return False, f"Invalid turn number. Valid range: 0-{session['turn_number']-1}"
+
+    target_history = None
+    for h in session['turn_history']:
+        if h['turn'] == target_turn:
+            target_history = h
+            break
+
+    if not target_history:
+        return False, "Turn not found in history"
+
+    session['current_save'] = target_history['save_file']
+    session['turn_number'] = target_turn + 1
+
+    session['turn_history'] = [h for h in session['turn_history'] if h['turn'] <= target_turn]
+
+    session['turn_history'].append({
+        "turn": target_turn,
+        "player": os.environ.get("USERNAME", "Unknown"),
+        "timestamp": datetime.now().isoformat(),
+        "save_file": target_history['save_file'],
+        "note": f"[Rolled back to turn {target_turn}]",
+        "is_rollback": True
+    })
+
+    with open(get_session_file(session_id), 'w') as f:
+        json.dump(session, f, indent=2)
+
+    return True, f"Rolled back to turn {target_turn}"
+
+def export_session(session_id, output_path=None):
+    session = load_session(session_id)
+    if not session:
+        return None, "Session not found"
+
+    if not output_path:
+        output_path = filedialog.asksaveasfilename(
+            title="Export Session",
+            defaultextension=".zt2session",
+            filetypes=[("ZT2 Session", "*.zt2session")],
+            initialfile=f"{session['name']}_{session_id}.zt2session"
+        )
+
+    if not output_path:
+        return None, "Export cancelled"
+
+    try:
+        session_dir = get_session_save_dir(session_id)
+        with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("session.json", json.dumps(session, indent=2))
+
+            for f in os.listdir(session_dir):
+                if f.endswith('.z2s'):
+                    zf.write(os.path.join(session_dir, f), f"saves/{f}")
+
+        return output_path, f"Session exported"
+    except Exception as e:
+        return None, f"Export failed: {e}"
+
+def import_session(package_path=None):
+    if not package_path:
+        package_path = filedialog.askopenfilename(
+            title="Import Session",
+            filetypes=[("ZT2 Session", "*.zt2session"), ("All Files", "*.*")]
+        )
+
+    if not package_path:
+        return None, "Import cancelled"
+
+    try:
+        with zipfile.ZipFile(package_path, 'r') as zf:
+            session = json.loads(zf.read("session.json"))
+            session_id = session['id']
+
+            if os.path.exists(get_session_file(session_id)):
+                pass
+
+            with open(get_session_file(session_id), 'w') as f:
+                json.dump(session, f, indent=2)
+
+            session_dir = get_session_save_dir(session_id)
+            for f in zf.namelist():
+                if f.startswith('saves/') and f.endswith('.z2s'):
+                    save_name = os.path.basename(f)
+                    with open(os.path.join(session_dir, save_name), 'wb') as out:
+                        out.write(zf.read(f))
+
+            return session_id, f"Session imported: {session['name']}"
+    except Exception as e:
+        return None, f"Import failed: {e}"
+
+def load_session_save_to_game(session_id):
+    session = load_session(session_id)
+    if not session:
+        return False, "Session not found"
+
+    saves_dir = get_zt2_saves_dir()
+    if not saves_dir:
+        return False, "Could not find saves directory"
+
+    session_dir = get_session_save_dir(session_id)
+    current_save = session.get('current_save')
+
+    if not current_save:
+        return False, "No save in session"
+
+    src = os.path.join(session_dir, current_save)
+    if not os.path.isfile(src):
+        return False, "Session save not found"
+
+    dest_name = f"MP_{session['name']}_{current_save}"
+    dest = os.path.join(saves_dir, dest_name)
+
+    shutil.copy2(src, dest)
+    return True, f"Loaded to game: {dest_name}"
+
+
+mp_paned = ttk.PanedWindow(multiplayer_tab, orient=tk.HORIZONTAL)
+mp_paned.pack(fill=tk.BOTH, expand=True)
+
+sharing_frame = ttk.LabelFrame(mp_paned, text="Save Sharing", padding=10)
+mp_paned.add(sharing_frame, weight=1)
+
+ttk.Label(sharing_frame, text="Share your zoos with friends!",
+          bootstyle="secondary").pack(anchor="w", pady=(0, 10))
+
+sharing_btn_frame = ttk.Frame(sharing_frame)
+sharing_btn_frame.pack(fill=tk.X, pady=5)
+
+def on_export_save():
+    saves_dir = get_zt2_saves_dir()
+    if not saves_dir:
+        messagebox.showerror("Error", "Could not find saves directory")
+        return
+
+    save_path = filedialog.askopenfilename(
+        title="Select Save to Export",
+        initialdir=saves_dir,
+        filetypes=[("ZT2 Saves", "*.z2s"), ("All Files", "*.*")]
+    )
+
+    if save_path:
+        result, msg = export_save_for_sharing(save_path)
+        if result:
+            log(f"Exported save: {msg}", log_text)
+            messagebox.showinfo("Export Complete", msg)
+        else:
+            messagebox.showerror("Export Failed", msg)
+
+def on_import_save():
+    result, msg = import_shared_save()
+    if result:
+        log(f"Imported save: {msg}", log_text)
+        messagebox.showinfo("Import Complete", msg)
+        refresh_saves_list()
+    else:
+        if msg != "Import cancelled":
+            messagebox.showerror("Import Failed", msg)
+
+ttk.Button(sharing_btn_frame, text="Export Save (.zt2share)",
+           command=on_export_save, bootstyle="info", width=25).pack(pady=2)
+ttk.Button(sharing_btn_frame, text="Import Save (.zt2share)",
+           command=on_import_save, bootstyle="success", width=25).pack(pady=2)
+
+ttk.Separator(sharing_frame, orient="horizontal").pack(fill=tk.X, pady=15)
+
+ttk.Label(sharing_frame, text="Quick Share",
+          font=("Segoe UI", 9, "bold")).pack(anchor="w")
+
+def copy_save_to_clipboard():
+    saves_dir = get_zt2_saves_dir()
+    if not saves_dir:
+        messagebox.showerror("Error", "Could not find saves directory")
+        return
+
+    save_path = filedialog.askopenfilename(
+        title="Select Save to Copy",
+        initialdir=saves_dir,
+        filetypes=[("ZT2 Saves", "*.z2s")]
+    )
+
+    if not save_path:
+        return
+
+    try:
+        import base64
+        with open(save_path, 'rb') as f:
+            data = f.read()
+
+        package = {
+            "name": os.path.basename(save_path),
+            "data": base64.b64encode(data).decode('ascii'),
+            "size": len(data)
+        }
+
+        encoded = base64.b64encode(json.dumps(package).encode()).decode('ascii')
+        root.clipboard_clear()
+        root.clipboard_append(f"ZT2SAVE:{encoded}")
+
+        messagebox.showinfo("Copied", f"Save copied to clipboard!\nSize: {len(data)//1024} KB\n\nShare this with a friend.")
+        log(f"Copied save to clipboard: {os.path.basename(save_path)}", log_text)
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to copy: {e}")
+
+def paste_save_from_clipboard():
+    try:
+        import base64
+        clipboard = root.clipboard_get()
+
+        if not clipboard.startswith("ZT2SAVE:"):
+            messagebox.showerror("Error", "No valid save data in clipboard.\nAsk your friend to copy their save first.")
+            return
+
+        encoded = clipboard[8:]
+        package = json.loads(base64.b64decode(encoded).decode())
+        data = base64.b64decode(package['data'])
+
+        saves_dir = get_zt2_saves_dir()
+        if not saves_dir:
+            messagebox.showerror("Error", "Could not find saves directory")
+            return
+
+        save_name = package.get('name', 'shared_save.z2s')
+        dest = os.path.join(saves_dir, f"Shared_{save_name}")
+
+        counter = 1
+        while os.path.exists(dest):
+            base, ext = os.path.splitext(save_name)
+            dest = os.path.join(saves_dir, f"Shared_{base}_{counter}{ext}")
+            counter += 1
+
+        with open(dest, 'wb') as f:
+            f.write(data)
+
+        messagebox.showinfo("Success", f"Save imported!\n{os.path.basename(dest)}")
+        log(f"Imported save from clipboard: {os.path.basename(dest)}", log_text)
+        refresh_saves_list()
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to paste: {e}")
+
+clip_frame = ttk.Frame(sharing_frame)
+clip_frame.pack(fill=tk.X, pady=5)
+ttk.Button(clip_frame, text="Copy Save", command=copy_save_to_clipboard,
+           width=12).pack(side=tk.LEFT, padx=2)
+ttk.Button(clip_frame, text="Paste Save", command=paste_save_from_clipboard,
+           width=12).pack(side=tk.LEFT, padx=2)
+
+async_frame = ttk.LabelFrame(mp_paned, text="Multiplayer", padding=10)
+mp_paned.add(async_frame, weight=2)
+
+ttk.Label(async_frame, text="Take turns building a zoo with friends!",
+          bootstyle="secondary").pack(anchor="w", pady=(0, 10))
+
+session_list_frame = ttk.Frame(async_frame)
+session_list_frame.pack(fill=tk.BOTH, expand=True)
+
+session_tree = ttk.Treeview(
+    session_list_frame,
+    columns=("Name", "Turn", "Players", "Last Activity"),
+    show="headings",
+    height=8
+)
+session_tree.heading("Name", text="Session Name")
+session_tree.heading("Turn", text="Turn #")
+session_tree.heading("Players", text="Players")
+session_tree.heading("Last Activity", text="Last Activity")
+
+session_tree.column("Name", width=150)
+session_tree.column("Turn", width=60, anchor="center")
+session_tree.column("Players", width=100)
+session_tree.column("Last Activity", width=120)
+
+session_scroll = ttk.Scrollbar(session_list_frame, orient="vertical", command=session_tree.yview)
+session_tree.configure(yscrollcommand=session_scroll.set)
+
+session_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+session_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+def refresh_sessions():
+    session_tree.delete(*session_tree.get_children())
+    sessions = list_sessions()
+
+    for s in sorted(sessions, key=lambda x: x.get('turn_history', [{}])[-1].get('timestamp', ''), reverse=True):
+        last_turn = s.get('turn_history', [{}])[-1]
+        last_time = last_turn.get('timestamp', '')[:16].replace('T', ' ')
+        players = ', '.join(s.get('players', [])[:3])
+        if len(s.get('players', [])) > 3:
+            players += f" +{len(s['players'])-3}"
+
+        session_tree.insert("", tk.END, iid=s['id'], values=(
+            s.get('name', 'Unnamed'),
+            s.get('turn_number', 0),
+            players,
+            last_time
+        ))
+
+    log(f"Found {len(sessions)} multiplayer session(s)", log_text)
+
+session_btn_frame = ttk.Frame(async_frame)
+session_btn_frame.pack(fill=tk.X, pady=(10, 0))
+
+def on_create_session():
+    saves_dir = get_zt2_saves_dir()
+    if not saves_dir:
+        messagebox.showerror("Error", "Could not find saves directory")
+        return
+
+    save_path = filedialog.askopenfilename(
+        title="Select Starting Save",
+        initialdir=saves_dir,
+        filetypes=[("ZT2 Saves", "*.z2s")]
+    )
+
+    if not save_path:
+        return
+
+    session_name = simpledialog.askstring("Session Name",
+                                          "Enter a name for this multiplayer session:",
+                                          parent=root)
+    if not session_name:
+        return
+
+    session_id, msg = create_multiplayer_session(save_path, session_name)
+    if session_id:
+        log(f"Created multiplayer session: {session_name} ({session_id})", log_text)
+        messagebox.showinfo("Session Created",
+                           f"Session ID: {session_id}\n\nExport this session to share with friends!")
+        refresh_sessions()
+    else:
+        messagebox.showerror("Error", msg)
+
+def on_load_session():
+    selected = session_tree.selection()
+    if not selected:
+        messagebox.showinfo("Select Session", "Please select a session first")
+        return
+
+    session_id = selected[0]
+    success, msg = load_session_save_to_game(session_id)
+
+    if success:
+        log(msg, log_text)
+        messagebox.showinfo("Loaded", f"{msg}\n\nYou can now play this save in Zoo Tycoon 2!")
+        refresh_saves_list()
+    else:
+        messagebox.showerror("Error", msg)
+
+def on_take_turn():
+    selected = session_tree.selection()
+    if not selected:
+        messagebox.showinfo("Select Session", "Please select a session first")
+        return
+
+    session_id = selected[0]
+    session = load_session(session_id)
+
+    saves_dir = get_zt2_saves_dir()
+    if not saves_dir:
+        messagebox.showerror("Error", "Could not find saves directory")
+        return
+
+    save_path = filedialog.askopenfilename(
+        title="Select Your Updated Save",
+        initialdir=saves_dir,
+        filetypes=[("ZT2 Saves", "*.z2s")]
+    )
+
+    if not save_path:
+        return
+
+    note = simpledialog.askstring("Turn Note",
+                                   "Add a note about what you did this turn (optional):",
+                                   parent=root) or ""
+
+    success, msg = take_turn(session_id, save_path, note)
+    if success:
+        log(f"Turn submitted for {session['name']}: {msg}", log_text)
+        messagebox.showinfo("Turn Submitted", f"{msg}\n\nExport the session to share your turn!")
+        refresh_sessions()
+    else:
+        messagebox.showerror("Error", msg)
+
+def on_export_session():
+    selected = session_tree.selection()
+    if not selected:
+        messagebox.showinfo("Select Session", "Please select a session to export")
+        return
+
+    session_id = selected[0]
+    result, msg = export_session(session_id)
+
+    if result:
+        log(f"Exported session: {msg}", log_text)
+        messagebox.showinfo("Exported", f"{msg}\n\nShare this file with your friends!")
+    else:
+        if msg != "Export cancelled":
+            messagebox.showerror("Error", msg)
+
+def on_import_session():
+    result, msg = import_session()
+
+    if result:
+        log(f"Imported session: {msg}", log_text)
+        messagebox.showinfo("Imported", msg)
+        refresh_sessions()
+    else:
+        if msg != "Import cancelled":
+            messagebox.showerror("Error", msg)
+
+def on_delete_session():
+    selected = session_tree.selection()
+    if not selected:
+        messagebox.showinfo("Select Session", "Please select a session to delete")
+        return
+
+    session_id = selected[0]
+    session = load_session(session_id)
+    session_name = session.get('name', 'Unknown') if session else 'Unknown'
+
+    if not messagebox.askyesno("Confirm Delete",
+                                f"Delete session '{session_name}'?\n\nThis will remove all saves and cannot be undone!"):
+        return
+
+    success, msg = delete_session(session_id)
+    if success:
+        log(f"Deleted session: {session_name}", log_text)
+        refresh_sessions()
+    else:
+        messagebox.showerror("Error", msg)
+
+def on_view_history():
+    selected = session_tree.selection()
+    if not selected:
+        messagebox.showinfo("Select Session", "Please select a session first")
+        return
+
+    session_id = selected[0]
+    session = load_session(session_id)
+    if not session:
+        messagebox.showerror("Error", "Could not load session")
+        return
+
+    history_win = tk.Toplevel(root)
+    history_win.title(f"Turn History - {session.get('name', 'Unknown')}")
+    history_win.geometry("700x450")
+    history_win.transient(root)
+
+    history_frame = ttk.Frame(history_win, padding=10)
+    history_frame.pack(fill=tk.BOTH, expand=True)
+
+    history_tree = ttk.Treeview(
+        history_frame,
+        columns=("Turn", "Player", "Time", "Note", "Stats"),
+        show="headings",
+        height=15
+    )
+    history_tree.heading("Turn", text="Turn")
+    history_tree.heading("Player", text="Player")
+    history_tree.heading("Time", text="Timestamp")
+    history_tree.heading("Note", text="Note")
+    history_tree.heading("Stats", text="Zoo Stats")
+
+    history_tree.column("Turn", width=50, anchor="center")
+    history_tree.column("Player", width=100)
+    history_tree.column("Time", width=130)
+    history_tree.column("Note", width=200)
+    history_tree.column("Stats", width=180)
+
+    history_scroll = ttk.Scrollbar(history_frame, orient="vertical", command=history_tree.yview)
+    history_tree.configure(yscrollcommand=history_scroll.set)
+
+    history_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    history_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+    for h in session.get('turn_history', []):
+        turn = h.get('turn', 0)
+        player = h.get('player', 'Unknown')
+        timestamp = h.get('timestamp', '')[:16].replace('T', ' ')
+        note = h.get('note', '')[:50]
+        if h.get('is_rollback'):
+            note = f"🔄 {note}"
+
+        stats = h.get('stats', {})
+        stats_str = ""
+        if stats:
+            parts = []
+            if stats.get('money') is not None:
+                parts.append(f"${stats['money']:,.0f}")
+            if stats.get('rating') is not None:
+                parts.append(f"⭐{stats['rating']:.1f}")
+            if stats.get('zoo_name'):
+                parts.append(stats['zoo_name'][:20])
+            stats_str = " | ".join(parts)
+
+        history_tree.insert("", tk.END, values=(turn, player, timestamp, note, stats_str))
+
+    def do_rollback():
+        sel = history_tree.selection()
+        if not sel:
+            messagebox.showinfo("Select Turn", "Please select a turn to rollback to")
+            return
+
+        item = history_tree.item(sel[0])
+        target_turn = int(item['values'][0])
+
+        if not messagebox.askyesno("Confirm Rollback",
+                                    f"Rollback to turn {target_turn}?\n\nAll turns after this will be removed!"):
+            return
+
+        success, msg = rollback_turn(session_id, target_turn)
+        if success:
+            log(f"Rolled back session to turn {target_turn}", log_text)
+            messagebox.showinfo("Success", msg)
+            history_win.destroy()
+            refresh_sessions()
+        else:
+            messagebox.showerror("Error", msg)
+
+    btn_frame = ttk.Frame(history_win, padding=10)
+    btn_frame.pack(fill=tk.X)
+
+    ttk.Button(btn_frame, text="Rollback to Selected Turn", command=do_rollback,
+               bootstyle="warning").pack(side=tk.LEFT, padx=5)
+    ttk.Button(btn_frame, text="Close", command=history_win.destroy,
+               bootstyle="secondary").pack(side=tk.RIGHT, padx=5)
+
+def on_rollback():
+    selected = session_tree.selection()
+    if not selected:
+        messagebox.showinfo("Select Session", "Please select a session first")
+        return
+
+    session_id = selected[0]
+    session = load_session(session_id)
+    if not session:
+        messagebox.showerror("Error", "Could not load session")
+        return
+
+    max_turn = session.get('turn_number', 1) - 1
+    if max_turn <= 0:
+        messagebox.showinfo("Cannot Rollback", "No previous turns to rollback to")
+        return
+
+    target = simpledialog.askinteger("Rollback Turn",
+                                      f"Enter turn number to rollback to (0-{max_turn}):",
+                                      parent=root,
+                                      minvalue=0,
+                                      maxvalue=max_turn)
+    if target is None:
+        return
+
+    if not messagebox.askyesno("Confirm Rollback",
+                                f"Rollback to turn {target}?\n\nAll turns after this will be removed!"):
+        return
+
+    success, msg = rollback_turn(session_id, target)
+    if success:
+        log(f"Rolled back session to turn {target}", log_text)
+        messagebox.showinfo("Success", msg)
+        refresh_sessions()
+    else:
+        messagebox.showerror("Error", msg)
+
+btn_row1 = ttk.Frame(session_btn_frame)
+btn_row1.pack(fill=tk.X, pady=2)
+
+ttk.Button(btn_row1, text="New Session", command=on_create_session,
+           bootstyle="success", width=12).pack(side=tk.LEFT, padx=2)
+ttk.Button(btn_row1, text="Load Save", command=on_load_session,
+           bootstyle="info", width=12).pack(side=tk.LEFT, padx=2)
+ttk.Button(btn_row1, text="Submit Turn", command=on_take_turn,
+           bootstyle="warning", width=12).pack(side=tk.LEFT, padx=2)
+ttk.Button(btn_row1, text="Refresh", command=refresh_sessions,
+           bootstyle="secondary", width=10).pack(side=tk.LEFT, padx=2)
+
+btn_row2 = ttk.Frame(session_btn_frame)
+btn_row2.pack(fill=tk.X, pady=2)
+
+ttk.Button(btn_row2, text="Export Session", command=on_export_session,
+           bootstyle="info-outline", width=14).pack(side=tk.LEFT, padx=2)
+ttk.Button(btn_row2, text="Import Session", command=on_import_session,
+           bootstyle="success-outline", width=14).pack(side=tk.LEFT, padx=2)
+
+btn_row3 = ttk.Frame(session_btn_frame)
+btn_row3.pack(fill=tk.X, pady=2)
+
+ttk.Button(btn_row3, text="View History", command=on_view_history,
+           bootstyle="secondary", width=12).pack(side=tk.LEFT, padx=2)
+ttk.Button(btn_row3, text="Rollback", command=on_rollback,
+           bootstyle="warning-outline", width=10).pack(side=tk.LEFT, padx=2)
+ttk.Button(btn_row3, text="Delete", command=on_delete_session,
+           bootstyle="danger-outline", width=10).pack(side=tk.LEFT, padx=2)
+
+ttk.Separator(async_frame, orient="horizontal").pack(fill=tk.X, pady=10)
+
+instructions = ttk.Label(async_frame, text="""How to play:
+1. Create a new session with a starting save
+2. Export session and share with friends
+3. Friends import the session and load the save
+4. After playing, submit your turn with the updated save
+5. Export again and pass to the next player!""",
+    justify="left", bootstyle="secondary", font=("Segoe UI", 9))
+instructions.pack(anchor="w")
+
+modbrowser_header = ttk.Frame(modbrowser_tab)
+modbrowser_header.pack(fill=tk.X, pady=(0, 10))
+
+ttk.Label(modbrowser_header, text="Mod Browser",
+          font=("Segoe UI", 14, "bold")).pack(side=tk.LEFT)
+
+FEATURED_MODS = [
+    "Radical Remake", "African Elephant", "Bengal Tiger", "Giant Panda",
+    "Komodo Dragon", "Emperor Penguin", "Grizzly Bear", "Deinonychus"
+]
+
+def load_featured_mod(mod_title):
+    search_zt2dl_mods(mod_title)
+
+def on_quickpick_select(event=None):
+    sel = quickpick_var.get()
+    if sel and sel != "Quick Picks...":
+        load_featured_mod(sel)
+        quickpick_var.set("Quick Picks...")
+
+quickpick_var = tk.StringVar(value="Quick Picks...")
+quickpick_combo = ttk.Combobox(modbrowser_header, textvariable=quickpick_var,
+                               values=FEATURED_MODS, state="readonly", width=18)
+quickpick_combo.pack(side=tk.RIGHT, padx=4)
+quickpick_combo.bind("<<ComboboxSelected>>", on_quickpick_select)
+ttk.Label(modbrowser_header, text="Featured:", bootstyle="secondary").pack(side=tk.RIGHT)
+
+browse_frame = ttk.LabelFrame(modbrowser_tab, text="Browse by Category", padding=6)
+browse_frame.pack(fill=tk.X, pady=(0, 8))
+
+modbrowser_category_var = tk.StringVar(value="Animals")
+modbrowser_category_combo = ttk.Combobox(
+    browse_frame,
+    textvariable=modbrowser_category_var,
+    values=["Animals", "Foliage", "Objects", "Scenery", "Buildings", "Packs"],
+    state="readonly",
+    width=12
+)
+modbrowser_category_combo.pack(side=tk.LEFT, padx=(0, 8))
+
+ttk.Button(browse_frame, text="Browse", command=lambda: browse_zt2dl_category(),
+           bootstyle="success", width=10).pack(side=tk.LEFT, padx=2)
+
+ttk.Separator(browse_frame, orient="vertical").pack(side=tk.LEFT, padx=12, fill=tk.Y, pady=2)
+
+ttk.Button(browse_frame, text="Recent Additions", command=lambda: load_recent_zt2dl(),
+           bootstyle="info-outline").pack(side=tk.LEFT, padx=2)
+
+ttk.Button(browse_frame, text="Surprise Me!", command=lambda: load_random_zt2dl_mod(),
+           bootstyle="warning-outline").pack(side=tk.LEFT, padx=2)
+
+search_frame = ttk.LabelFrame(modbrowser_tab, text="Search", padding=6)
+search_frame.pack(fill=tk.X, pady=(0, 8))
+
+modbrowser_search_var = tk.StringVar()
+modbrowser_search_entry = ttk.Entry(search_frame, textvariable=modbrowser_search_var, width=40)
+modbrowser_search_entry.pack(side=tk.LEFT, padx=(0, 8))
+
+def on_modbrowser_search(event=None):
+    query = modbrowser_search_var.get().strip()
+    if query:
+        search_zt2dl_mods(query)
+
+modbrowser_search_entry.bind("<Return>", on_modbrowser_search)
+ttk.Button(search_frame, text="Search", command=on_modbrowser_search,
+           bootstyle="info", width=10).pack(side=tk.LEFT, padx=2)
+
+ttk.Label(search_frame, text="Tip: Search for animal names, creators, or mod types",
+          bootstyle="secondary", font=("Segoe UI", 8)).pack(side=tk.LEFT, padx=(12, 0))
+
+modbrowser_split = ttk.PanedWindow(modbrowser_tab, orient=tk.HORIZONTAL)
+modbrowser_split.pack(fill=tk.BOTH, expand=True)
+
+modbrowser_list_frame = ttk.Frame(modbrowser_split, padding=4)
+modbrowser_split.add(modbrowser_list_frame, weight=2)
+
+modbrowser_tree_scroll = ttk.Scrollbar(modbrowser_list_frame)
+modbrowser_tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+modbrowser_tree = ttk.Treeview(
+    modbrowser_list_frame,
+    columns=("Name", "Type"),
+    show="headings",
+    selectmode="browse",
+    yscrollcommand=modbrowser_tree_scroll.set
+)
+modbrowser_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+modbrowser_tree_scroll.config(command=modbrowser_tree.yview)
+
+modbrowser_tree.heading("Name", text="Name")
+modbrowser_tree.heading("Type", text="Type")
+modbrowser_tree.column("Name", width=300, anchor="w")
+modbrowser_tree.column("Type", width=80, anchor="center")
+
+modbrowser_details_frame = ttk.LabelFrame(modbrowser_split, text="Mod Details", padding=8)
+modbrowser_split.add(modbrowser_details_frame, weight=1)
+
+modbrowser_detail_title = tk.StringVar(value="Select a mod to view details")
+ttk.Label(modbrowser_details_frame, textvariable=modbrowser_detail_title,
+          font=("Segoe UI", 11, "bold"), wraplength=280).pack(anchor="w", pady=(0, 6))
+
+modbrowser_action_frame = ttk.Frame(modbrowser_details_frame)
+modbrowser_action_frame.pack(fill=tk.X, pady=(0, 8))
+
+modbrowser_open_btn = ttk.Button(modbrowser_action_frame, text="Wiki Page",
+                                  bootstyle="info", command=lambda: open_zt2dl_page(),
+                                  state="disabled")
+modbrowser_open_btn.pack(side=tk.LEFT, padx=(0, 4))
+
+modbrowser_link_btn = ttk.Button(modbrowser_action_frame, text="Download",
+                                  bootstyle="success", command=lambda: open_zt2dl_download(),
+                                  state="disabled")
+modbrowser_link_btn.pack(side=tk.LEFT, padx=2)
+
+modbrowser_content_canvas = tk.Canvas(modbrowser_details_frame, highlightthickness=0)
+modbrowser_content_scroll = ttk.Scrollbar(modbrowser_details_frame, orient="vertical",
+                                           command=modbrowser_content_canvas.yview)
+modbrowser_content_inner = ttk.Frame(modbrowser_content_canvas)
+
+modbrowser_content_inner.bind("<Configure>",
+    lambda _: modbrowser_content_canvas.configure(scrollregion=modbrowser_content_canvas.bbox("all")))
+modbrowser_content_canvas.create_window((0, 0), window=modbrowser_content_inner, anchor="nw")
+modbrowser_content_canvas.configure(yscrollcommand=modbrowser_content_scroll.set)
+
+modbrowser_content_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+modbrowser_content_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+def _on_modbrowser_mousewheel(event):
+    modbrowser_content_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+modbrowser_content_canvas.bind_all("<MouseWheel>", _on_modbrowser_mousewheel)
+
+modbrowser_image_frame = ttk.Frame(modbrowser_content_inner)
+modbrowser_image_frame.pack(fill=tk.X, pady=(0, 8))
+
+modbrowser_image_label = ttk.Label(modbrowser_image_frame, text="(No preview)",
+                                    bootstyle="secondary")
+modbrowser_image_label.pack(anchor="center")
+
+_modbrowser_current_image = None
+
+ttk.Label(modbrowser_content_inner, text="Description:",
+          font=("Segoe UI", 9, "bold")).pack(anchor="w", pady=(0, 2))
+
+modbrowser_desc_text = tk.Text(modbrowser_content_inner, wrap=tk.WORD, height=6,
+                                state="disabled", bg="#2b2b2b", fg="#e0e0e0",
+                                font=("Segoe UI", 9))
+modbrowser_desc_text.pack(fill=tk.X, pady=(0, 8))
+
+ttk.Label(modbrowser_content_inner, text="Download Links:",
+          font=("Segoe UI", 9, "bold")).pack(anchor="w", pady=(0, 2))
+
+modbrowser_links_list = tk.Listbox(modbrowser_content_inner, height=3, exportselection=False,
+                                    bg="#2b2b2b", fg="#e0e0e0")
+modbrowser_links_list.pack(fill=tk.X)
+
+modbrowser_status_var = tk.StringVar(value="Select a category and click Browse, or search for mods")
+ttk.Label(modbrowser_tab, textvariable=modbrowser_status_var,
+          bootstyle="secondary").pack(anchor="w", pady=(8, 0))
+
+_modbrowser_current_page = None
+_modbrowser_items = []
+
+def browse_zt2dl_category():
+    global _modbrowser_items
+    category = modbrowser_category_var.get()
+
+    category_map = {
+        "Animals": "Category:Animals",
+        "Foliage": "Category:Foliage",
+        "Objects": "Category:Objects",
+        "Scenery": "Category:Scenery",
+        "Buildings": "Category:Building_Sets",
+        "Packs": "Category:Packs",
+        "Recent": "Special:RecentChanges"
+    }
+
+    cat_title = category_map.get(category, f"Category:{category}")
+    modbrowser_status_var.set(f"Loading {category}...")
+    root.update()
+
+    def fetch():
+        try:
+            if category == "Recent":
+                items = zt2dl_api.get_recent_downloads(limit=50)
+                return [{"title": i.get("title", ""), "type": "page"} for i in items], None
+            else:
+                items = zt2dl_api.get_category_members(cat_title, limit=100)
+                return items, None
+        except Exception as e:
+            return None, str(e)
+
+    def on_complete(result):
+        items, error = result
+        if error:
+            modbrowser_status_var.set(f"Error: {error}")
+            return
+
+        global _modbrowser_items
+        _modbrowser_items = items
+
+        modbrowser_tree.delete(*modbrowser_tree.get_children())
+        for item in items:
+            title = item.get("title", "Unknown")
+            item_type = item.get("type", "page")
+            if item_type == "subcat":
+                display_type = "Category"
+            else:
+                display_type = "Mod"
+            modbrowser_tree.insert("", tk.END, values=(title, display_type))
+
+        modbrowser_status_var.set(f"Found {len(items)} items in {category}")
+        increment_stat("categories_browsed")
+
+    threading.Thread(target=lambda: root.after(0, lambda: on_complete(fetch())),
+                     daemon=True).start()
+
+def search_zt2dl_mods(query):
+    global _modbrowser_items
+    modbrowser_status_var.set(f"Searching for '{query}'...")
+    root.update()
+
+    def fetch():
+        try:
+            results = zt2dl_api.search_mods(query, limit=50)
+            return results, None
+        except Exception as e:
+            return None, str(e)
+
+    def on_complete(result):
+        results, error = result
+        if error:
+            modbrowser_status_var.set(f"Error: {error}")
+            return
+
+        global _modbrowser_items
+        _modbrowser_items = [{"title": r.get("title", ""), "type": "page"} for r in results]
+
+        modbrowser_tree.delete(*modbrowser_tree.get_children())
+        for r in results:
+            title = r.get("title", "Unknown")
+            modbrowser_tree.insert("", tk.END, values=(title, "Mod"))
+
+        modbrowser_status_var.set(f"Found {len(results)} results for '{query}'")
+        increment_stat("browser_searches")
+
+    threading.Thread(target=lambda: root.after(0, lambda: on_complete(fetch())),
+                     daemon=True).start()
+
+def load_recent_zt2dl():
+    modbrowser_category_var.set("Recent")
+    browse_zt2dl_category()
+
+def generate_random_objective():
+    import random as rnd
+
+    increment_stat("objectives_generated")
+
+    objectives = {
+        "Animal Challenge": [
+            "Create an exhibit with exactly 5 different species from the same continent",
+            "Raise 10 baby animals to adulthood without any deaths",
+            "Have 3 endangered species reach maximum happiness",
+            "Create a nocturnal animal zone with at least 4 species",
+            "Build a marine exhibit with dolphins, orcas, and sea lions",
+            "Breed every big cat species in your zoo",
+            "Create a primate paradise with 6+ different monkey/ape species",
+            "Have 20 animals achieve 'Superstar' status",
+            "Build an African savanna with lions, elephants, zebras, and giraffes",
+            "Create an Australian outback with kangaroos, koalas, and platypus",
+            "Maintain 50+ animals with 95%+ happiness for 6 months",
+            "Successfully release 5 animals back to the wild",
+        ],
+        "Building Challenge": [
+            "Build a zoo using only ancient/historical themed buildings",
+            "Create a zoo with no straight paths - curves only!",
+            "Build elevated walkways connecting at least 5 exhibits",
+            "Design a zoo with a central water feature visible from all exhibits",
+            "Create themed zones for each continent represented",
+            "Build an underwater viewing tunnel for marine exhibits",
+            "Construct a zoo with no food courts - only scattered vendors",
+            "Design a perfectly symmetrical zoo layout",
+            "Create a jungle-themed zoo with maximum foliage coverage",
+            "Build a desert oasis zoo with water features throughout",
+        ],
+        "Financial Challenge": [
+            "Reach $500,000 profit without using any donations",
+            "Achieve 5-star zoo rating with starting budget only",
+            "Run a profitable zoo with free admission for 1 year",
+            "Earn $100,000 from gift shop sales alone",
+            "Complete a zoo with budget under $200,000 total spent",
+            "Maintain profitability with 50% of exhibits being endangered species",
+            "Reach 1000 monthly guests with ticket prices over $50",
+        ],
+        "Guest Challenge": [
+            "Achieve 98% guest happiness for 3 consecutive months",
+            "Have 500 guests in your zoo simultaneously",
+            "Get 100 guests to use the guided tour at once",
+            "Maintain zero guest complaints for 6 months",
+            "Have guests rate every exhibit 4+ stars",
+            "Create a zoo where average guest stay exceeds 4 hours",
+            "Build enough amenities that no guest ever gets hungry/thirsty",
+        ],
+        "Creative Challenge": [
+            "Build a zoo inspired by your favorite movie",
+            "Create a 'mythical creatures' zoo using available animals creatively",
+            "Design a zoo that tells a story through its layout",
+            "Build the smallest possible 5-star zoo",
+            "Create a zoo using only animals from one expansion pack",
+            "Design a 'conservation center' focused on breeding programs",
+            "Build a 'walk-through' safari experience",
+            "Create a seasonal-themed zoo (winter wonderland, autumn forest, etc.)",
+        ],
+        "Speed Challenge": [
+            "Achieve 3-star rating within 30 minutes of gameplay",
+            "Build 10 exhibits in under 15 minutes",
+            "Reach 200 guests in the first in-game month",
+            "Get your first baby animal within 2 in-game months",
+            "Achieve profitability within the first in-game week",
+        ],
+    }
+
+    category = rnd.choice(list(objectives.keys()))
+    objective = rnd.choice(objectives[category])
+
+    obj_win = tk.Toplevel(root)
+    obj_win.title("Random Zoo Objective")
+    obj_win.geometry("450x280")
+    obj_win.resizable(False, False)
+    obj_win.transient(root)
+    obj_win.grab_set()
+
+    obj_win.update_idletasks()
+    x = root.winfo_x() + (root.winfo_width() // 2) - (450 // 2)
+    y = root.winfo_y() + (root.winfo_height() // 2) - (280 // 2)
+    obj_win.geometry(f"+{x}+{y}")
+
+    main_frame = ttk.Frame(obj_win, padding=20)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    ttk.Label(main_frame, text="Your Zoo Challenge",
+              font=("Segoe UI", 14, "bold")).pack(pady=(0, 10))
+
+    cat_frame = ttk.Frame(main_frame)
+    cat_frame.pack(pady=(0, 15))
+    ttk.Label(cat_frame, text=category,
+              font=("Segoe UI", 10, "bold"),
+              bootstyle="info").pack()
+
+    obj_text = tk.Text(main_frame, wrap=tk.WORD, height=5, width=45,
+                       bg="#2b2b2b", fg="#e0e0e0", font=("Segoe UI", 11),
+                       relief="flat", padx=10, pady=10)
+    obj_text.pack(fill=tk.X, pady=(0, 15))
+    obj_text.insert("1.0", objective)
+    obj_text.config(state="disabled")
+
+    btn_frame = ttk.Frame(main_frame)
+    btn_frame.pack(fill=tk.X)
+
+    def reroll():
+        new_cat = rnd.choice(list(objectives.keys()))
+        new_obj = rnd.choice(objectives[new_cat])
+        cat_frame.winfo_children()[0].config(text=new_cat)
+        obj_text.config(state="normal")
+        obj_text.delete("1.0", tk.END)
+        obj_text.insert("1.0", new_obj)
+        obj_text.config(state="disabled")
+
+    ttk.Button(btn_frame, text="Reroll", command=reroll,
+               bootstyle="warning").pack(side=tk.LEFT, padx=5)
+    ttk.Button(btn_frame, text="Accept Challenge", command=obj_win.destroy,
+               bootstyle="success").pack(side=tk.LEFT, padx=5)
+    ttk.Button(btn_frame, text="Close", command=obj_win.destroy,
+               bootstyle="secondary").pack(side=tk.RIGHT, padx=5)
+
+def load_random_zt2dl_mod():
+    global _modbrowser_current_page, _modbrowser_items
+    modbrowser_status_var.set("Loading random mod...")
+    root.update()
+
+    def fetch_random():
+        try:
+            params = {
+                "action": "query",
+                "format": "json",
+                "list": "random",
+                "rnnamespace": "0",
+                "rnlimit": "1"
+            }
+            response = requests.get(ZT2DL_API_BASE, params=params, timeout=10)
+            data = response.json()
+            random_pages = data.get("query", {}).get("random", [])
+            if random_pages:
+                return random_pages[0].get("title"), None
+            return None, "No random page found"
+        except Exception as e:
+            return None, str(e)
+
+    def on_complete(result):
+        title, error = result
+        if error:
+            modbrowser_status_var.set(f"Error: {error}")
+            return
+
+        global _modbrowser_current_page, _modbrowser_items
+        _modbrowser_current_page = title
+        _modbrowser_items = [{"title": title, "type": "page"}]
+
+        modbrowser_tree.delete(*modbrowser_tree.get_children())
+        item_id = modbrowser_tree.insert("", tk.END, values=(title, "Mod"))
+        modbrowser_tree.selection_set(item_id)
+
+        modbrowser_status_var.set(f"Random mod: {title}")
+        increment_stat("random_mods_viewed")
+
+        on_modbrowser_select(None)
+
+    threading.Thread(target=lambda: root.after(0, lambda: on_complete(fetch_random())),
+                     daemon=True).start()
+
+def load_modbrowser_image(image_url):
+    global _modbrowser_current_image
+
+    def fetch_image():
+        try:
+            img_response = requests.get(image_url, timeout=15)
+            img_response.raise_for_status()
+            return img_response.content, None
+        except Exception as e:
+            return None, str(e)
+
+    def on_image_loaded(result):
+        global _modbrowser_current_image
+        img_data, error = result
+
+        if error or not img_data:
+            modbrowser_image_label.config(image='', text="(No preview)")
+            _modbrowser_current_image = None
+            return
+
+        try:
+            from PIL import Image, ImageTk
+            import io
+
+            img = Image.open(io.BytesIO(img_data))
+
+            max_width, max_height = 200, 150
+            img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
+
+            photo = ImageTk.PhotoImage(img)
+
+            modbrowser_image_label.config(image=photo, text="")
+            _modbrowser_current_image = photo
+
+        except ImportError:
+            modbrowser_image_label.config(image='', text="(PIL not installed)")
+            _modbrowser_current_image = None
+        except Exception:
+            modbrowser_image_label.config(image='', text="(Image error)")
+            _modbrowser_current_image = None
+
+    modbrowser_image_label.config(image='', text="Loading...")
+
+    threading.Thread(target=lambda: root.after(0, lambda: on_image_loaded(fetch_image())),
+                     daemon=True).start()
+
+def on_modbrowser_select(event=None):
+    global _modbrowser_current_page
+
+    selection = modbrowser_tree.selection()
+    if not selection:
+        return
+
+    item = modbrowser_tree.item(selection[0])
+    title = item['values'][0]
+    item_type = item['values'][1]
+
+    if item_type == "Category":
+        modbrowser_category_var.set(title.replace("Category:", ""))
+        browse_zt2dl_category()
+        return
+
+    _modbrowser_current_page = title
+    modbrowser_detail_title.set(title)
+    modbrowser_status_var.set(f"Loading details for {title}...")
+    root.update()
+
+    def fetch():
+        try:
+            content = zt2dl_api.get_page_content(title)
+            return content, None
+        except Exception as e:
+            return None, str(e)
+
+    def on_complete(result):
+        global _modbrowser_current_image
+        content, error = result
+        if error:
+            modbrowser_status_var.set(f"Error loading details: {error}")
+            return
+
+        import re
+        import html as html_module
+
+        html_text = content.get("text", {}).get("*", "")
+
+        image_loaded = False
+        img_patterns = [
+            r'src="(https://static\.wikia\.nocookie\.net/[^"]+\.(?:png|jpg|jpeg|gif))"',
+            r'href="(https://static\.wikia\.nocookie\.net/[^"]+\.(?:png|jpg|jpeg|gif))"',
+            r'(https://static\.wikia\.nocookie\.net/[^"\s]+\.(?:png|jpg|jpeg|gif))',
+        ]
+
+        for pattern in img_patterns:
+            matches = re.findall(pattern, html_text, re.I)
+            if matches:
+                for img_url in matches:
+                    if '/revision/' in img_url and '/scale-to-width-down/' in img_url:
+                        img_url = re.sub(r'/revision/.*', '', img_url)
+                    if any(x in img_url.lower() for x in ['icon', 'logo', 'button', '/thumb/', '28px', '20px']):
+                        continue
+                    load_modbrowser_image(img_url)
+                    image_loaded = True
+                    break
+            if image_loaded:
+                break
+
+        if not image_loaded:
+            modbrowser_image_label.config(image='', text="(No preview)")
+            _modbrowser_current_image = None
+
+        after_table = re.split(r'</table>|</aside>', html_text, flags=re.I)
+        if len(after_table) > 1:
+            desc_html = after_table[-1]
+        else:
+            desc_html = html_text
+
+        text = desc_html
+        text = re.sub(r'</p>', '\n\n', text, flags=re.I)
+        text = re.sub(r'<br\s*/?>', '\n', text, flags=re.I)
+        text = re.sub(r'</li>', '\n', text, flags=re.I)
+        text = re.sub(r'<[^>]+>', '', text)
+
+        text = html_module.unescape(text)
+
+        text = re.sub(r'[ \t]+', ' ', text)
+        text = re.sub(r'\n\s*\n\s*\n+', '\n\n', text)
+        text = '\n'.join(line.strip() for line in text.split('\n'))
+        text = text.strip()
+
+        for footer in ['Categories', 'Community content', 'FANDOM']:
+            if footer in text:
+                text = text.split(footer)[0].strip()
+
+        text = text[:1200] if text else "No description available."
+
+        modbrowser_desc_text.config(state="normal")
+        modbrowser_desc_text.delete("1.0", tk.END)
+        modbrowser_desc_text.insert("1.0", text)
+        modbrowser_desc_text.config(state="disabled")
+
+        links = content.get("externallinks", [])
+        modbrowser_links_list.delete(0, tk.END)
+
+        exclude_sites = [
+            'fandom.com', 'wikia.com', 'creativecommons.org',
+            'wikipedia.org', 'gnu.org/licenses'
+        ]
+
+        for link in links:
+            link_lower = link.lower()
+            if any(exclude in link_lower for exclude in exclude_sites):
+                continue
+            modbrowser_links_list.insert(tk.END, link)
+
+        if modbrowser_links_list.size() == 0:
+            modbrowser_links_list.insert(tk.END, "(No download links found - try Open Wiki Page)")
+
+        modbrowser_open_btn.config(state="normal")
+        modbrowser_link_btn.config(state="normal" if links else "disabled")
+
+        modbrowser_status_var.set(f"Loaded: {title}")
+
+    threading.Thread(target=lambda: root.after(0, lambda: on_complete(fetch())),
+                     daemon=True).start()
+
+def open_zt2dl_page():
+    global _modbrowser_current_page
+    if _modbrowser_current_page:
+        url = zt2dl_api.get_page_url(_modbrowser_current_page)
+        webbrowser.open(url)
+
+def open_zt2dl_download():
+    selection = modbrowser_links_list.curselection()
+    if selection:
+        link = modbrowser_links_list.get(selection[0])
+        if link and not link.startswith("("):
+            webbrowser.open(link)
+    elif modbrowser_links_list.size() > 0:
+        link = modbrowser_links_list.get(0)
+        if link and not link.startswith("("):
+            webbrowser.open(link)
+
+modbrowser_tree.bind("<<TreeviewSelect>>", on_modbrowser_select)
+modbrowser_tree.bind("<Double-1>", lambda e: open_zt2dl_page())
+modbrowser_links_list.bind("<Double-1>", lambda e: open_zt2dl_download())
+
+modbrowser_context = tk.Menu(modbrowser_tree, tearoff=0)
+modbrowser_context.add_command(label="Open Wiki Page", command=open_zt2dl_page)
+modbrowser_context.add_command(label="Copy Page URL", command=lambda: copy_zt2dl_url())
+
+def on_modbrowser_right_click(event):
+    iid = modbrowser_tree.identify_row(event.y)
+    if iid:
+        modbrowser_tree.selection_set(iid)
+        modbrowser_context.post(event.x_root, event.y_root)
+
+def copy_zt2dl_url():
+    global _modbrowser_current_page
+    if _modbrowser_current_page:
+        url = zt2dl_api.get_page_url(_modbrowser_current_page)
+        root.clipboard_clear()
+        root.clipboard_append(url)
+        modbrowser_status_var.set("URL copied to clipboard!")
+
+modbrowser_tree.bind("<Button-3>", on_modbrowser_right_click)
 
 content_frame = ttk.Frame(bundles_tab)
 content_frame.pack(fill=tk.BOTH, expand=True)
@@ -4132,6 +6855,19 @@ if __name__ == '__main__':
 
 def on_close():
     try:
+        settings = load_settings()
+        is_maximized = root.state() == 'zoomed'
+        settings["window_maximized"] = is_maximized
+
+        if not is_maximized:
+            settings["window_geometry"] = root.geometry()
+
+        save_settings(settings)
+        print(f"Window geometry saved: {settings.get('window_geometry')} (maximized: {is_maximized})")
+    except Exception as e:
+        print(f"Error saving window geometry: {e}")
+
+    try:
         conn.close()
         print("Database connection closed.")
     except Exception as e:
@@ -4143,8 +6879,8 @@ root.protocol("WM_DELETE_WINDOW", on_close)
 
 icon_candidates = [
     resource_path("modzt.ico"),
+    os.path.join(get_app_dir(), "modzt.ico"),
     os.path.join(CONFIG_DIR, "modzt.ico"),
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "modzt.ico"),
     "modzt.ico"
 ]
 
@@ -4184,6 +6920,7 @@ if not icon_set:
 
 refresh_screenshots()
 refresh_saves_list()
+refresh_sessions()
 
 start_background_music(volume=0.3)
 
