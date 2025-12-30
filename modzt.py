@@ -1,31 +1,33 @@
+import glob
+import hashlib
+import io
+import json
 import os
-import webbrowser
+import platform
+import re
 import shutil
 import sqlite3
 import subprocess
-import json
-import zipfile
+import sys
 import tempfile
 import threading
-import requests
-import platform
-import datetime
 import time
-import tkinter as tk
-import tkinter.simpledialog as simpledialog
-import glob
-from pathlib import Path
-from tkinter import ttk, filedialog, messagebox
+import webbrowser
+import zipfile
+import zlib
 from collections import Counter
-from ttkbootstrap import Window
-import xml.etree.ElementTree as ET
+from datetime import datetime
+from pathlib import Path
+
+import requests
 import ttkbootstrap as tb
 from PIL import Image, ImageTk
-from datetime import datetime
-import hashlib
-import zlib
-import sys
-import re
+from ttkbootstrap import Window
+import xml.etree.ElementTree as ET
+
+import tkinter as tk
+import tkinter.simpledialog as simpledialog
+from tkinter import ttk, filedialog, messagebox
 
 try:
     from tkinterdnd2 import DND_FILES, TkinterDnD
@@ -35,7 +37,60 @@ except ImportError:
     print("[!] tkinterdnd2 not installed. Drag and drop disabled.")
     print("    Install with: pip install tkinterdnd2")
 
-db_lock = threading.Lock()
+try:
+    import pygame
+    pygame.mixer.init()
+    AUDIO_AVAILABLE = True
+except ImportError:
+    AUDIO_AVAILABLE = False
+    print("[!] pygame not installed. Background music disabled.")
+    print("    Install with: pip install pygame")
+
+
+def start_background_music(volume=0.3):
+    if not AUDIO_AVAILABLE:
+        return False
+
+    music_file = os.path.join(os.path.dirname(__file__), "theme_remaster_sirgoose.mp3")
+    if not os.path.isfile(music_file):
+        print(f"[!] Music file not found: {music_file}")
+        return False
+
+    try:
+        pygame.mixer.music.load(music_file)
+        pygame.mixer.music.set_volume(volume)
+        pygame.mixer.music.play(-1)
+        print(f"[✔] Background music started")
+        return True
+    except Exception as e:
+        print(f"[!] Failed to play music: {e}")
+        return False
+
+
+def stop_background_music():
+    if AUDIO_AVAILABLE:
+        pygame.mixer.music.stop()
+
+
+def set_music_volume(volume):
+    if AUDIO_AVAILABLE:
+        pygame.mixer.music.set_volume(max(0.0, min(1.0, volume)))
+
+
+def toggle_background_music():
+    if not AUDIO_AVAILABLE:
+        messagebox.showinfo("Audio Unavailable", "pygame is not installed.\nInstall with: pip install pygame")
+        return
+
+    if pygame.mixer.music.get_busy():
+        pygame.mixer.music.pause()
+        log("Background music paused", log_text)
+    else:
+        if pygame.mixer.music.get_pos() == -1:
+            start_background_music()
+        else:
+            pygame.mixer.music.unpause()
+        log("Background music playing", log_text)
 
 if platform.system() == "Windows":
     import ctypes
@@ -44,9 +99,8 @@ if platform.system() == "Windows":
     except Exception:
         pass
 
-APP_VERSION = "1.1.4"
+APP_VERSION = "1.1.5"
 SETTINGS_FILE = "settings.json"
-BASE_PATH = getattr(sys, '_MEIPASS', os.path.abspath("."))
 CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".zt2_manager")
 os.makedirs(CONFIG_DIR, exist_ok=True)
 GAME_PATH_FILE = os.path.join(CONFIG_DIR, "game_path.txt")
@@ -55,7 +109,6 @@ ZT1_MOD_DIR_FILE = os.path.join(CONFIG_DIR, "zt1_mod_dir.txt")
 DB_FILE = os.path.join(CONFIG_DIR, "mods.db")
 ICON_FILE = os.path.join(CONFIG_DIR, "modzt.ico")
 BANNER_FILE = os.path.join(CONFIG_DIR, "banner.png")
-FILEMAP_CACHE = os.path.join(CONFIG_DIR, "mod_filemap.json")
 GITHUB_REPO = "kaelelson05/modzt"
 
 GAME_PATH = None
@@ -86,14 +139,6 @@ else:
     ZT2_PATH = None
     print("ZT2 path not yet set; will register once chosen.")
 
-if os.path.isfile(ZT1_EXE_FILE):
-    with open(ZT1_EXE_FILE, "r", encoding="utf-8") as f:
-        ZT1_PATH = f.read().strip()
-
-if os.path.isfile(ZT1_MOD_DIR_FILE):
-    with open(ZT1_MOD_DIR_FILE, "r", encoding="utf-8") as f:
-        ZT1_MOD_DIR = f.read().strip()
-
 
 def get_zt2_saves_dir():
     appdata = os.environ.get("APPDATA")
@@ -102,6 +147,153 @@ def get_zt2_saves_dir():
     p = os.path.join(appdata, "Microsoft Games", "Zoo Tycoon 2",
                      "Default Profile", "Saved")
     return p if os.path.isdir(p) else None
+
+
+def get_zt2_options_xml_path():
+    appdata = os.environ.get("APPDATA")
+    if not appdata:
+        return None
+    p = os.path.join(appdata, "Microsoft Games", "Zoo Tycoon 2",
+                     "Default Profile", "options.xml")
+    return p if os.path.isfile(p) else None
+
+
+UNLOCK_TUTORIALS = {
+    "Base Game Tutorials": [
+        ("Tutorial1", "Tutorial 1"),
+        ("Tutorial2", "Tutorial 2"),
+        ("Tutorial3", "Tutorial 3"),
+    ],
+    "Endangered Species Tutorials": [
+        ("xp1_Tutorial1", "ES Tutorial 1"),
+        ("xp1_Tutorial2", "ES Tutorial 2"),
+        ("xp1_Tutorial3", "ES Tutorial 3"),
+    ],
+    "African Adventure Tutorials": [
+        ("xp2_Tutorial1", "AA Tutorial 1"),
+        ("xp2_Tutorial2", "AA Tutorial 2"),
+        ("xp2_Tutorial3", "AA Tutorial 3"),
+        ("xp2_Tutorial4", "AA Tutorial 4"),
+        ("xp2_Tutorial5", "AA Tutorial 5"),
+    ],
+    "Marine Mania Tutorials": [
+        ("cp1_tutorial1", "MM Tutorial 1"),
+    ],
+    "Extinct Animals Tutorials": [
+        ("cp2tutorialone", "EA Tutorial 1"),
+        ("cp2tutorialtwo", "EA Tutorial 2"),
+        ("cp2tutorialthree", "EA Tutorial 3"),
+    ],
+}
+
+UNLOCK_CAMPAIGNS = {
+    "Zookeeper Training": [
+        ("ZookeeperTrainingscenario1", "Scenario 1"),
+        ("ZookeeperTrainingscenario2", "Scenario 2"),
+        ("ZookeeperTrainingscenario3", "Scenario 3"),
+    ],
+    "Campaign 1": [
+        ("campaign1scenario1", "Scenario 1"),
+        ("campaign1scenario2", "Scenario 2"),
+        ("campaign1scenario3", "Scenario 3"),
+    ],
+    "Campaign 2": [
+        ("campaign2scenario1", "Scenario 1"),
+        ("campaign2scenario2", "Scenario 2"),
+        ("campaign2scenario3", "Scenario 3"),
+    ],
+    "World Campaigns": [
+        ("worldcampaignscenario1", "Scenario 1"),
+        ("worldcampaignscenario2", "Scenario 2"),
+        ("worldcampaignscenario3", "Scenario 3"),
+        ("worldcampaignscenario4", "Scenario 4"),
+        ("worldcampaignscenario5", "Scenario 5"),
+    ],
+    "Africa Campaign": [
+        ("AfricaCampaignscenario1", "Scenario 1"),
+        ("AfricaCampaignscenario2", "Scenario 2"),
+        ("AfricaCampaignscenario3", "Scenario 3"),
+    ],
+    "Marine Animals Campaign": [
+        ("MarineAnimalsCampaignscenario1", "Scenario 1"),
+        ("MarineAnimalsCampaignscenario2", "Scenario 2"),
+        ("MarineAnimalsCampaignscenario3", "Scenario 3"),
+        ("MarineAnimalsCampaignscenario4", "Scenario 4"),
+    ],
+    "Marine Shows Campaign": [
+        ("MarineShowsCampaignscenario1", "Scenario 1"),
+        ("MarineShowsCampaignscenario2", "Scenario 2"),
+        ("MarineShowsCampaignscenario3", "Scenario 3"),
+        ("MarineShowsCampaignscenario4", "Scenario 4"),
+        ("MarineShowsCampaignscenario5", "Scenario 5"),
+    ],
+    "Endangered Animals Campaign": [
+        ("EndangeredAnimalsCampaignscenario1", "Scenario 1"),
+        ("EndangeredAnimalsCampaignscenario2", "Scenario 2"),
+        ("EndangeredAnimalsCampaignscenario3", "Scenario 3"),
+    ],
+    "Species Survival": [
+        ("SpeciesSurvivalscenario1", "Scenario 1"),
+        ("SpeciesSurvivalscenario2", "Scenario 2"),
+        ("SpeciesSurvivalscenario3", "Scenario 3"),
+    ],
+    "Photo Safari Campaign": [
+        ("PhotoSafariCampaignscenario1", "Scenario 1"),
+        ("PhotoSafariCampaignscenario2", "Scenario 2"),
+        ("PhotoSafariCampaignscenario3", "Scenario 3"),
+    ],
+    "Transportation Campaign": [
+        ("TransportationCampaignscenario1", "Scenario 1"),
+        ("TransportationCampaignscenario2", "Scenario 2"),
+        ("TransportationCampaignscenario3", "Scenario 3"),
+    ],
+    "Dinosaur Zoo Campaign": [
+        ("DinosaurZooCampaignscenario1", "Scenario 1"),
+    ],
+    "Extinct Animals Campaign": [
+        ("cp2scen1", "Scenario 1"),
+        ("cp2scen2", "Scenario 2"),
+        ("cp2scen3", "Scenario 3"),
+        ("cp2scen4", "Scenario 4"),
+        ("cp2scen5", "Scenario 5"),
+        ("cp2scen6", "Scenario 6"),
+    ],
+    "Other Campaigns": [
+        ("Pandascampaign", "Pandas Campaign"),
+        ("adcc1", "ADCC 1"),
+    ],
+}
+
+UNLOCK_ITEMS = {
+    "Building Unlocks": [
+        ("flowerpostlock", "Flower Post"),
+        ("sundiallock", "Sundial"),
+        ("flowerarchlock", "Flower Arch"),
+        ("globelock", "Globe"),
+        ("showtvlock", "Show TV"),
+        ("showcanopylock", "Show Canopy"),
+        ("breedingcenterlock", "Breeding Center"),
+        ("catclimberlock", "Cat Climber"),
+        ("whalehalllock", "Whale Hall"),
+        ("brachiosaurus_slide_lock", "Brachiosaurus Slide"),
+    ],
+    "Biome Unlocks": [
+        ("safarilock", "Safari"),
+        ("junglelock", "Jungle"),
+        ("desertlock", "Desert"),
+    ],
+    "Animal Unlocks": [
+        ("pandalock", "Panda"),
+        ("yellowtunalock", "Yellow Tuna"),
+        ("saigalock", "Saiga"),
+    ],
+    "Feature Unlocks": [
+        ("vehiclegatelock", "Vehicle Gate"),
+        ("endangeredlock", "Endangered Features"),
+        ("quagga_xtlock", "Quagga"),
+        ("extinct_xtlock", "Extinct Animals"),
+    ],
+}
 
 
 COMMON_ZT2_PATHS = [
@@ -377,8 +569,6 @@ def ensure_category_column():
     conn.commit()
 
 
-conn = sqlite3.connect(DB_FILE)
-cursor = conn.cursor()
 ensure_category_column()
 
 
@@ -408,12 +598,6 @@ def log(msg, text_widget=None):
         text_widget.insert(tk.END, full + "\n")
         text_widget.configure(state="disabled")
         text_widget.see(tk.END)
-
-
-def mods_enabled_dir():
-    base = os.path.join(os.getenv("APPDATA"), "ModZT", "mods_enabled")
-    os.makedirs(base, exist_ok=True)
-    return base
 
 
 def save_game_path(p):
@@ -1052,7 +1236,6 @@ def enable_mod(mod_name, text_widget=None, record=True):
             break
 
     update_status()
-    log(f"Enabled mod: {mod_name}", text_widget)
 
 
 def disable_mod(mod_name, text_widget=None, record=True):
@@ -1097,7 +1280,6 @@ def disable_mod(mod_name, text_widget=None, record=True):
             break
 
     update_status()
-    log(f"Disabled mod: {mod_name}", text_widget)
 
 
 def uninstall_mod(mod_name, text_widget=None, record=True):
@@ -1312,6 +1494,163 @@ def bundle_create_dialog():
                text="Cancel",
                command=dlg.destroy,
                bootstyle="secondary").pack(side=tk.RIGHT)
+
+
+def open_game_unlocks_dialog():
+    options_path = get_zt2_options_xml_path()
+    if not options_path:
+        appdata = os.environ.get("APPDATA", "")
+        expected_path = os.path.join(appdata, "Microsoft Games", "Zoo Tycoon 2",
+                                     "Default Profile", "options.xml")
+        messagebox.showerror(
+            "Options File Not Found",
+            f"Could not find options.xml at:\n{expected_path}\n\n"
+            "Make sure Zoo Tycoon 2 has been run at least once.",
+            parent=root)
+        return
+
+    dlg = tk.Toplevel(root)
+    dlg.title("Game Unlocks Manager")
+    dlg.geometry("700x600")
+    dlg.transient(root)
+    dlg.grab_set()
+
+    try:
+        tree = ET.parse(options_path)
+        xml_root = tree.getroot()
+        user_elem = xml_root.find(".//User")
+        if user_elem is None:
+            user_elem = ET.SubElement(xml_root, "User")
+    except Exception as e:
+        messagebox.showerror("XML Error", f"Could not parse options.xml:\n{e}", parent=dlg)
+        dlg.destroy()
+        return
+
+    check_vars = {}
+
+    main_container = ttk.Frame(dlg)
+    main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+    canvas = tk.Canvas(main_container)
+    scrollbar = ttk.Scrollbar(main_container, orient="vertical", command=canvas.yview)
+    scrollable_frame = ttk.Frame(canvas)
+
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+    )
+
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    def _on_mousewheel(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+    canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+    def create_category_section(parent, title, unlock_dict, value_type="completed"):
+        section_frame = ttk.LabelFrame(parent, text=title, padding=10)
+        section_frame.pack(fill=tk.X, pady=5)
+
+        for group_name, items in unlock_dict.items():
+            group_frame = ttk.LabelFrame(section_frame, text=group_name, padding=5)
+            group_frame.pack(fill=tk.X, pady=2)
+
+            items_frame = ttk.Frame(group_frame)
+            items_frame.pack(fill=tk.X)
+
+            col = 0
+            row = 0
+            for attr_name, display_name in items:
+                var = tk.BooleanVar()
+                current_val = user_elem.get(attr_name, "")
+                if value_type == "completed":
+                    var.set(current_val.lower() == "completed")
+                else:
+                    var.set(current_val.lower() == "true")
+
+                check_vars[attr_name] = (var, value_type)
+                cb = ttk.Checkbutton(items_frame, text=display_name, variable=var)
+                cb.grid(row=row, column=col, sticky="w", padx=5, pady=1)
+
+                col += 1
+                if col >= 4:
+                    col = 0
+                    row += 1
+
+    create_category_section(scrollable_frame, "Tutorials", UNLOCK_TUTORIALS, "completed")
+    create_category_section(scrollable_frame, "Campaigns", UNLOCK_CAMPAIGNS, "completed")
+    create_category_section(scrollable_frame, "Unlockable Items", UNLOCK_ITEMS, "true")
+
+    canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+    btn_frame = ttk.Frame(dlg, padding=10)
+    btn_frame.pack(fill=tk.X, side=tk.BOTTOM)
+
+    def select_all():
+        for var, _ in check_vars.values():
+            var.set(True)
+
+    def deselect_all():
+        for var, _ in check_vars.values():
+            var.set(False)
+
+    def save_changes():
+        try:
+            shutil.copy2(options_path, options_path + ".backup")
+
+            for attr_name, (var, value_type) in check_vars.items():
+                if var.get():
+                    if value_type == "completed":
+                        user_elem.set(attr_name, "completed")
+                    else:
+                        user_elem.set(attr_name, "true")
+                else:
+                    if attr_name in user_elem.attrib:
+                        del user_elem.attrib[attr_name]
+
+            tree.write(options_path, encoding="utf-8", xml_declaration=True)
+
+            messagebox.showinfo("Success",
+                               "Game unlocks saved successfully!\n\n"
+                               "A backup was created at:\n"
+                               f"{options_path}.backup",
+                               parent=dlg)
+            dlg.destroy()
+        except Exception as e:
+            messagebox.showerror("Save Error", f"Could not save changes:\n{e}", parent=dlg)
+
+    def restore_backup():
+        backup_path = options_path + ".backup"
+        if not os.path.isfile(backup_path):
+            messagebox.showinfo("No Backup", "No backup file found.", parent=dlg)
+            return
+        if messagebox.askyesno("Restore Backup",
+                              "Restore from backup? This will overwrite current settings.",
+                              parent=dlg):
+            try:
+                shutil.copy2(backup_path, options_path)
+                messagebox.showinfo("Restored", "Backup restored. Please reopen this dialog.", parent=dlg)
+                dlg.destroy()
+            except Exception as e:
+                messagebox.showerror("Error", f"Could not restore backup:\n{e}", parent=dlg)
+
+    ttk.Button(btn_frame, text="Select All", command=select_all,
+               bootstyle="info-outline").pack(side=tk.LEFT, padx=2)
+    ttk.Button(btn_frame, text="Deselect All", command=deselect_all,
+               bootstyle="info-outline").pack(side=tk.LEFT, padx=2)
+    ttk.Button(btn_frame, text="Restore Backup", command=restore_backup,
+               bootstyle="warning-outline").pack(side=tk.LEFT, padx=2)
+    ttk.Button(btn_frame, text="Cancel", command=dlg.destroy,
+               bootstyle="secondary").pack(side=tk.RIGHT, padx=2)
+    ttk.Button(btn_frame, text="Save Changes", command=save_changes,
+               bootstyle="success").pack(side=tk.RIGHT, padx=2)
+
+    def on_close():
+        canvas.unbind_all("<MouseWheel>")
+        dlg.destroy()
+
+    dlg.protocol("WM_DELETE_WINDOW", on_close)
 
 
 def bundle_apply():
@@ -1726,14 +2065,22 @@ help_menu_btn = ttk.Menubutton(toolbar, text="Help", bootstyle="info-outline")
 help_menu = tk.Menu(help_menu_btn, tearoff=0)
 help_menu.add_command(label="About ModZT",
                       command=lambda: messagebox.showinfo(
-                          "About", "ModZT v1.1.4\nCreated by Kael"))
+                          "About",
+                          "ModZT v1.1.5\n"
+                          "Created by Kael\n\n"
+                          "Music: Zoo Tycoon 2 Theme Remaster\n"
+                          "by SirGoose"))
 help_menu.add_command(
     label="Open GitHub Page",
     command=lambda: webbrowser.open("https://github.com/kaelelson05/modzt"))
 help_menu.add_command(
-    label="Discord Server", 
+    label="Discord Server",
     command=lambda: webbrowser.open("https://discord.gg/9y9DfmpZG4"))
 help_menu.add_command(label="Check for Updates", command=check_for_updates)
+help_menu.add_separator()
+help_menu.add_command(
+    label="Music Credit (SirGoose)",
+    command=lambda: webbrowser.open("https://www.youtube.com/watch?v=9S3P64v9lnw"))
 help_menu_btn["menu"] = help_menu
 help_menu_btn.pack(side=tk.RIGHT, padx=4)
 
@@ -1742,6 +2089,7 @@ view_menu_button = ttk.Menubutton(toolbar,
                                   bootstyle="info-outline")
 view_menu = tk.Menu(view_menu_button, tearoff=0)
 view_menu.add_command(label="Toggle Theme", command=toggle_theme)
+view_menu.add_command(label="Toggle Music", command=toggle_background_music)
 view_menu.add_command(label="Compact Mode", command=toggle_ui_mode)
 view_menu_button["menu"] = view_menu
 view_menu_button.pack(side=tk.RIGHT, padx=4)
@@ -1757,6 +2105,9 @@ tools_menu.add_command(
 tools_menu.add_command(label="Clean Temporary Files",
                        command=lambda: messagebox.showinfo(
                            "Cleanup", "Temporary files cleaned up."))
+tools_menu.add_separator()
+tools_menu.add_command(label="Game Unlocks Manager",
+                       command=open_game_unlocks_dialog)
 tools_menu_btn["menu"] = tools_menu
 tools_menu_btn.pack(side=tk.RIGHT, padx=4)
 
@@ -1798,11 +2149,10 @@ status_disk_label.pack(side=tk.RIGHT, padx=10, pady=2)
 
 def update_status_bar():
     try:
-        enabled_dir = mods_enabled_dir()
         disabled_dir = mods_disabled_dir()
         total_size = 0
 
-        for folder in [enabled_dir, disabled_dir]:
+        for folder in [GAME_PATH, disabled_dir]:
             if folder and os.path.isdir(folder):
                 for f in os.listdir(folder):
                     if f.lower().endswith(".z2f"):
@@ -2123,11 +2473,22 @@ def apply_zt1_tree_theme():
 
 
 search_frame = ttk.Frame(mods_tab)
-search_frame.pack(fill=tk.X)
+search_frame.pack(fill=tk.X, padx=6, pady=(4, 0))
+
 ttk.Label(search_frame, text="Search:").pack(side=tk.LEFT)
 search_var = tk.StringVar()
 search_entry = ttk.Entry(search_frame, textvariable=search_var)
-search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=4)
+search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 6))
+
+ttk.Label(search_frame, text="Status:").pack(side=tk.LEFT)
+zt2_status_filter = tk.StringVar(value="All")
+ttk.OptionMenu(search_frame, zt2_status_filter, "All", "All", "Enabled",
+               "Disabled").pack(side=tk.LEFT)
+
+ttk.Button(search_frame,
+           text="Clear",
+           command=lambda: (search_var.set(""), zt2_status_filter.set("All"),
+                           filter_tree())).pack(side=tk.LEFT, padx=(6, 0))
 
 mods_tree_frame = ttk.Frame(mods_tab)
 mods_tree_frame.pack(fill=tk.BOTH, expand=True, pady=(4, 0))
@@ -2334,6 +2695,9 @@ notebook.add(bundles_tab, text="Bundles")
 
 shots_tab = ttk.Frame(notebook, padding=6)
 notebook.add(shots_tab, text="Screenshots")
+
+saves_tab = ttk.Frame(notebook, padding=6)
+notebook.add(saves_tab, text="Saved Games")
 
 themes_tab = ttk.Frame(notebook, padding=20)
 notebook.add(themes_tab, text="Themes")
@@ -2627,6 +2991,310 @@ def _on_album_select(event=None):
 
 album_list.bind("<<ListboxSelect>>", _on_album_select)
 
+saves_toolbar = ttk.Frame(saves_tab)
+saves_toolbar.pack(fill=tk.X, pady=(0, 6))
+
+saves_path_var = tk.StringVar(value=get_zt2_saves_dir() or "(Not found)")
+ttk.Label(saves_toolbar, text="Saves Folder:").pack(side=tk.LEFT)
+ttk.Entry(saves_toolbar, textvariable=saves_path_var, width=60).pack(side=tk.LEFT, padx=6)
+
+
+def browse_saves_folder():
+    p = filedialog.askdirectory(title="Select ZT2 Saved Games folder")
+    if p:
+        saves_path_var.set(p)
+        refresh_saves_list()
+
+
+ttk.Button(saves_toolbar, text="Browse...", command=browse_saves_folder).pack(side=tk.LEFT, padx=2)
+ttk.Button(saves_toolbar, text="Refresh", command=lambda: refresh_saves_list()).pack(side=tk.LEFT, padx=2)
+
+
+def open_saves_folder():
+    folder = saves_path_var.get().strip()
+    if folder and os.path.isdir(folder):
+        os.startfile(folder)
+    else:
+        messagebox.showinfo("Open", "Saves folder not found.")
+
+
+ttk.Button(saves_toolbar, text="Open Folder", command=open_saves_folder).pack(side=tk.LEFT, padx=2)
+
+saves_split = ttk.PanedWindow(saves_tab, orient=tk.HORIZONTAL)
+saves_split.pack(fill=tk.BOTH, expand=True)
+
+saves_left = ttk.Frame(saves_split, width=350, padding=(4, 6))
+saves_left.pack_propagate(False)
+saves_split.add(saves_left, weight=1)
+
+ttk.Label(saves_left, text="Saved Games", font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(0, 6))
+
+saves_list_frame = ttk.Frame(saves_left)
+saves_list_frame.pack(fill=tk.BOTH, expand=True)
+
+saves_list_scroll = ttk.Scrollbar(saves_list_frame, orient="vertical")
+saves_tree = ttk.Treeview(
+    saves_list_frame,
+    columns=("Name", "Size", "Modified"),
+    show="headings",
+    selectmode="extended",
+    yscrollcommand=saves_list_scroll.set
+)
+saves_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+saves_list_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+saves_list_scroll.config(command=saves_tree.yview)
+
+saves_tree.heading("Name", text="Save Name")
+saves_tree.heading("Size", text="Size")
+saves_tree.heading("Modified", text="Last Modified")
+saves_tree.column("Name", width=180, anchor="w")
+saves_tree.column("Size", width=70, anchor="e")
+saves_tree.column("Modified", width=130, anchor="center")
+
+saves_right = ttk.Frame(saves_split, padding=(10, 6))
+saves_split.add(saves_right, weight=1)
+
+save_preview_label = ttk.Label(saves_right, text="Select a save to preview", font=("Segoe UI", 11))
+save_preview_label.pack(anchor="w", pady=(0, 10))
+
+save_preview_canvas = tk.Canvas(saves_right, width=300, height=200, bg="#2b2b2b", highlightthickness=1)
+save_preview_canvas.pack(anchor="w", pady=(0, 10))
+
+save_info_frame = ttk.Frame(saves_right)
+save_info_frame.pack(fill=tk.X, anchor="w")
+
+save_name_var = tk.StringVar(value="")
+save_size_var = tk.StringVar(value="")
+save_date_var = tk.StringVar(value="")
+
+ttk.Label(save_info_frame, text="Name:", width=10).grid(row=0, column=0, sticky="w", pady=2)
+ttk.Label(save_info_frame, textvariable=save_name_var).grid(row=0, column=1, sticky="w", pady=2)
+ttk.Label(save_info_frame, text="Size:", width=10).grid(row=1, column=0, sticky="w", pady=2)
+ttk.Label(save_info_frame, textvariable=save_size_var).grid(row=1, column=1, sticky="w", pady=2)
+ttk.Label(save_info_frame, text="Modified:", width=10).grid(row=2, column=0, sticky="w", pady=2)
+ttk.Label(save_info_frame, textvariable=save_date_var).grid(row=2, column=1, sticky="w", pady=2)
+
+saves_btn_frame = ttk.Frame(saves_right)
+saves_btn_frame.pack(fill=tk.X, pady=(15, 0))
+
+
+def backup_selected_save():
+    selected = saves_tree.selection()
+    if not selected:
+        messagebox.showinfo("Backup", "Select a save first.")
+        return
+
+    saves_folder = saves_path_var.get().strip()
+    if not saves_folder or not os.path.isdir(saves_folder):
+        return
+
+    backup_dir = filedialog.askdirectory(title="Select backup destination")
+    if not backup_dir:
+        return
+
+    for iid in selected:
+        name = saves_tree.item(iid)["values"][0]
+        src = os.path.join(saves_folder, name)
+        if os.path.isfile(src):
+            dst = os.path.join(backup_dir, name)
+            shutil.copy2(src, dst)
+
+    messagebox.showinfo("Backup", f"Backed up {len(selected)} save(s) to:\n{backup_dir}")
+    log(f"Backed up {len(selected)} save(s)", log_text)
+
+
+def delete_selected_save():
+    selected = saves_tree.selection()
+    if not selected:
+        messagebox.showinfo("Delete", "Select a save first.")
+        return
+
+    if not messagebox.askyesno("Confirm Delete", f"Delete {len(selected)} selected save(s)?\nThis cannot be undone."):
+        return
+
+    saves_folder = saves_path_var.get().strip()
+    if not saves_folder or not os.path.isdir(saves_folder):
+        return
+
+    deleted = 0
+    for iid in selected:
+        name = saves_tree.item(iid)["values"][0]
+        path = os.path.join(saves_folder, name)
+        if os.path.isfile(path):
+            try:
+                os.remove(path)
+                deleted += 1
+            except Exception as e:
+                log(f"Failed to delete {name}: {e}", log_text)
+
+    refresh_saves_list()
+    log(f"Deleted {deleted} save(s)", log_text)
+
+
+def rename_selected_save():
+    selected = saves_tree.selection()
+    if not selected or len(selected) != 1:
+        messagebox.showinfo("Rename", "Select exactly one save to rename.")
+        return
+
+    saves_folder = saves_path_var.get().strip()
+    if not saves_folder or not os.path.isdir(saves_folder):
+        return
+
+    old_name = saves_tree.item(selected[0])["values"][0]
+    old_path = os.path.join(saves_folder, old_name)
+
+    base_name = os.path.splitext(old_name)[0]
+    new_name = simpledialog.askstring("Rename Save", "Enter new name:", initialvalue=base_name, parent=root)
+
+    if new_name and new_name != base_name:
+        new_path = os.path.join(saves_folder, new_name + ".z2s")
+        if os.path.exists(new_path):
+            messagebox.showerror("Error", "A save with that name already exists.")
+            return
+        try:
+            os.rename(old_path, new_path)
+            refresh_saves_list()
+            log(f"Renamed save: {old_name} -> {new_name}.z2s", log_text)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to rename: {e}")
+
+
+def play_selected_save():
+    selected = saves_tree.selection()
+    if not selected:
+        messagebox.showwarning("No Selection", "Please select a save to play.")
+        return
+
+    saves_folder = saves_path_var.get().strip()
+    if not saves_folder:
+        messagebox.showerror("Error", "Saves folder not found.")
+        return
+
+    name = saves_tree.item(selected[0])["values"][0]
+    save_path = os.path.join(saves_folder, name)
+
+    if not os.path.isfile(save_path):
+        messagebox.showerror("Error", f"Save file not found: {save_path}")
+        return
+
+    log(f"Launching save: {name}", log_text)
+    launch_game([save_path])
+
+
+ttk.Button(saves_btn_frame, text="Play Save", bootstyle="success",
+           command=play_selected_save).pack(fill=tk.X, pady=2)
+ttk.Separator(saves_btn_frame, orient="horizontal").pack(fill=tk.X, pady=6)
+ttk.Button(saves_btn_frame, text="Backup Selected", bootstyle="info-outline",
+           command=backup_selected_save).pack(fill=tk.X, pady=2)
+ttk.Button(saves_btn_frame, text="Rename", bootstyle="warning-outline",
+           command=rename_selected_save).pack(fill=tk.X, pady=2)
+ttk.Button(saves_btn_frame, text="Delete Selected", bootstyle="danger-outline",
+           command=delete_selected_save).pack(fill=tk.X, pady=2)
+
+_SAVE_THUMB_CACHE = {}
+
+
+def extract_save_thumbnail(save_path):
+    if save_path in _SAVE_THUMB_CACHE:
+        return _SAVE_THUMB_CACHE[save_path]
+
+    try:
+        if zipfile.is_zipfile(save_path):
+            with zipfile.ZipFile(save_path, 'r') as zf:
+                for name in zf.namelist():
+                    if name.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp')):
+                        data = zf.read(name)
+                        img = Image.open(io.BytesIO(data))
+                        img.thumbnail((300, 200), Image.LANCZOS)
+                        photo = ImageTk.PhotoImage(img)
+                        _SAVE_THUMB_CACHE[save_path] = photo
+                        return photo
+    except Exception:
+        pass
+
+    _SAVE_THUMB_CACHE[save_path] = None
+    return None
+
+
+def on_save_select(event=None):
+    selected = saves_tree.selection()
+    if not selected:
+        save_name_var.set("")
+        save_size_var.set("")
+        save_date_var.set("")
+        save_preview_canvas.delete("all")
+        save_preview_label.config(text="Select a save to preview")
+        return
+
+    saves_folder = saves_path_var.get().strip()
+    if not saves_folder:
+        return
+
+    name = saves_tree.item(selected[0])["values"][0]
+    path = os.path.join(saves_folder, name)
+
+    save_name_var.set(name)
+    save_preview_label.config(text=name)
+
+    if os.path.isfile(path):
+        size = os.path.getsize(path)
+        if size >= 1024 * 1024:
+            save_size_var.set(f"{size / (1024*1024):.2f} MB")
+        else:
+            save_size_var.set(f"{size / 1024:.1f} KB")
+
+        mtime = os.path.getmtime(path)
+        save_date_var.set(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mtime)))
+
+        save_preview_canvas.delete("all")
+        thumb = extract_save_thumbnail(path)
+        if thumb:
+            save_preview_canvas.create_image(150, 100, image=thumb, anchor="center")
+            save_preview_canvas.image = thumb
+        else:
+            save_preview_canvas.create_text(150, 100, text="No preview available",
+                                           fill="#888888", font=("Segoe UI", 10))
+    else:
+        save_size_var.set("N/A")
+        save_date_var.set("N/A")
+
+
+saves_tree.bind("<<TreeviewSelect>>", on_save_select)
+
+
+def refresh_saves_list():
+    saves_tree.delete(*saves_tree.get_children())
+
+    saves_folder = saves_path_var.get().strip()
+    if not saves_folder or not os.path.isdir(saves_folder):
+        d = get_zt2_saves_dir()
+        if d:
+            saves_path_var.set(d)
+            saves_folder = d
+        else:
+            return
+
+    saves = []
+    for f in os.listdir(saves_folder):
+        if f.lower().endswith(".z2s"):
+            path = os.path.join(saves_folder, f)
+            size = os.path.getsize(path)
+            mtime = os.path.getmtime(path)
+            saves.append((f, size, mtime))
+
+    saves.sort(key=lambda x: x[2], reverse=True)
+
+    for name, size, mtime in saves:
+        if size >= 1024 * 1024:
+            size_str = f"{size / (1024*1024):.1f} MB"
+        else:
+            size_str = f"{size / 1024:.0f} KB"
+        date_str = time.strftime("%Y-%m-%d %H:%M", time.localtime(mtime))
+        saves_tree.insert("", tk.END, values=(name, size_str, date_str))
+
+    log(f"Found {len(saves)} saved game(s)", log_text)
+
 content_frame = ttk.Frame(bundles_tab)
 content_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -2895,26 +3563,14 @@ log_text.pack(fill=tk.BOTH, expand=True)
 def refresh_tree():
     mods_tree.delete(*mods_tree.get_children())
 
-    enabled_dir = mods_enabled_dir()
+    if not GAME_PATH:
+        return
+
+    detect_existing_mods()
+
     disabled_dir = mods_disabled_dir()
-    os.makedirs(enabled_dir, exist_ok=True)
     if disabled_dir:
         os.makedirs(disabled_dir, exist_ok=True)
-
-    found_mods = {}
-    for folder, enabled_flag in [(enabled_dir, 1), (disabled_dir, 0)]:
-        for f in os.listdir(folder):
-            if f.lower().endswith(".z2f"):
-                found_mods[f] = enabled_flag
-
-    cursor.execute("SELECT name FROM mods")
-    db_mods = {r[0] for r in cursor.fetchall()}
-
-    for mod, enabled_flag in found_mods.items():
-        if mod not in db_mods:
-            cursor.execute("INSERT INTO mods (name, enabled) VALUES (?, ?)",
-                           (mod, enabled_flag))
-    conn.commit()
 
     cursor.execute(
         "SELECT name, enabled, category FROM mods ORDER BY enabled DESC, name ASC")
@@ -3391,10 +4047,12 @@ def update_status():
 
 
 search_var.trace_add('write', lambda *_: filter_tree())
+zt2_status_filter.trace_add('write', lambda *_: filter_tree())
 
 
 def filter_tree(*_):
     query = search_var.get().strip().lower()
+    status_filter = zt2_status_filter.get().lower()
 
     for row in mods_tree.get_children():
         mods_tree.delete(row)
@@ -3405,8 +4063,13 @@ def filter_tree(*_):
 
     visible_rows = []
     for name, enabled_flag, category in mods:
-        combined = f"{name.lower()} {category.lower() if category else ''}"
+        status_str = "enabled" if enabled_flag else "disabled"
+
+        combined = f"{name.lower()} {category.lower() if category else ''} {status_str}"
         if query and query not in combined:
+            continue
+
+        if status_filter != "all" and status_str != status_filter:
             continue
 
         path = find_mod_file(name)
@@ -3520,4 +4183,8 @@ if not icon_set:
     print("[!] No icon file found, using default")
 
 refresh_screenshots()
+refresh_saves_list()
+
+start_background_music(volume=0.3)
+
 root.mainloop()
