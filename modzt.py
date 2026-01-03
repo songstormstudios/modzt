@@ -119,6 +119,22 @@ TRANSLATIONS = {
         "ach_title": "Achievements",
         "ach_unlocked": "Achievement Unlocked!",
         "ach_progress": "Progress",
+
+        "sched_title": "Theme Scheduling",
+        "sched_enable": "Enable automatic theme switching",
+        "sched_light_theme": "Light theme:",
+        "sched_dark_theme": "Dark theme:",
+        "sched_from": "from",
+        "sched_time_hint": "Use 24-hour format (e.g., 07:00, 19:00)",
+
+        "adv_search": "Advanced Search",
+        "adv_search_label": "Search:",
+        "adv_category": "Category:",
+        "adv_filetype": "File Type:",
+        "adv_date": "Date:",
+        "adv_sort": "Sort By:",
+        "adv_clear": "Clear",
+        "adv_tip": "Tip: Combine filters for precise results",
     },
     "es": {
         "lang_name": "Español",
@@ -183,6 +199,22 @@ TRANSLATIONS = {
         "ach_title": "Logros",
         "ach_unlocked": "¡Logro Desbloqueado!",
         "ach_progress": "Progreso",
+
+        "sched_title": "Programación de Temas",
+        "sched_enable": "Activar cambio automático de tema",
+        "sched_light_theme": "Tema claro:",
+        "sched_dark_theme": "Tema oscuro:",
+        "sched_from": "desde",
+        "sched_time_hint": "Usa formato 24 horas (ej., 07:00, 19:00)",
+
+        "adv_search": "Búsqueda Avanzada",
+        "adv_search_label": "Buscar:",
+        "adv_category": "Categoría:",
+        "adv_filetype": "Tipo de Archivo:",
+        "adv_date": "Fecha:",
+        "adv_sort": "Ordenar Por:",
+        "adv_clear": "Limpiar",
+        "adv_tip": "Consejo: Combina filtros para resultados precisos",
     },
     "fr": {
         "lang_name": "Français",
@@ -247,6 +279,22 @@ TRANSLATIONS = {
         "ach_title": "Succès",
         "ach_unlocked": "Succès Débloqué!",
         "ach_progress": "Progression",
+
+        "sched_title": "Planification des Thèmes",
+        "sched_enable": "Activer le changement automatique de thème",
+        "sched_light_theme": "Thème clair:",
+        "sched_dark_theme": "Thème sombre:",
+        "sched_from": "à partir de",
+        "sched_time_hint": "Utilisez le format 24h (ex., 07:00, 19:00)",
+
+        "adv_search": "Recherche Avancée",
+        "adv_search_label": "Rechercher:",
+        "adv_category": "Catégorie:",
+        "adv_filetype": "Type de Fichier:",
+        "adv_date": "Date:",
+        "adv_sort": "Trier Par:",
+        "adv_clear": "Effacer",
+        "adv_tip": "Astuce: Combinez les filtres pour des résultats précis",
     },
     "de": {
         "lang_name": "Deutsch",
@@ -311,6 +359,22 @@ TRANSLATIONS = {
         "ach_title": "Erfolge",
         "ach_unlocked": "Erfolg Freigeschaltet!",
         "ach_progress": "Fortschritt",
+
+        "sched_title": "Design-Planung",
+        "sched_enable": "Automatischen Designwechsel aktivieren",
+        "sched_light_theme": "Helles Design:",
+        "sched_dark_theme": "Dunkles Design:",
+        "sched_from": "ab",
+        "sched_time_hint": "24-Stunden-Format verwenden (z.B., 07:00, 19:00)",
+
+        "adv_search": "Erweiterte Suche",
+        "adv_search_label": "Suche:",
+        "adv_category": "Kategorie:",
+        "adv_filetype": "Dateityp:",
+        "adv_date": "Datum:",
+        "adv_sort": "Sortieren Nach:",
+        "adv_clear": "Löschen",
+        "adv_tip": "Tipp: Kombinieren Sie Filter für genaue Ergebnisse",
     },
     "pt": {
         "lang_name": "Português",
@@ -375,6 +439,22 @@ TRANSLATIONS = {
         "ach_title": "Conquistas",
         "ach_unlocked": "Conquista Desbloqueada!",
         "ach_progress": "Progresso",
+
+        "sched_title": "Agendamento de Temas",
+        "sched_enable": "Ativar troca automática de tema",
+        "sched_light_theme": "Tema claro:",
+        "sched_dark_theme": "Tema escuro:",
+        "sched_from": "a partir de",
+        "sched_time_hint": "Use formato 24 horas (ex., 07:00, 19:00)",
+
+        "adv_search": "Pesquisa Avançada",
+        "adv_search_label": "Pesquisar:",
+        "adv_category": "Categoria:",
+        "adv_filetype": "Tipo de Arquivo:",
+        "adv_date": "Data:",
+        "adv_sort": "Ordenar Por:",
+        "adv_clear": "Limpar",
+        "adv_tip": "Dica: Combine filtros para resultados precisos",
     },
     "it": {
         "lang_name": "Italiano",
@@ -439,6 +519,22 @@ TRANSLATIONS = {
         "ach_title": "Obiettivi",
         "ach_unlocked": "Obiettivo Sbloccato!",
         "ach_progress": "Progresso",
+
+        "sched_title": "Pianificazione Temi",
+        "sched_enable": "Attiva cambio automatico del tema",
+        "sched_light_theme": "Tema chiaro:",
+        "sched_dark_theme": "Tema scuro:",
+        "sched_from": "dalle",
+        "sched_time_hint": "Usa formato 24 ore (es., 07:00, 19:00)",
+
+        "adv_search": "Ricerca Avanzata",
+        "adv_search_label": "Cerca:",
+        "adv_category": "Categoria:",
+        "adv_filetype": "Tipo di File:",
+        "adv_date": "Data:",
+        "adv_sort": "Ordina Per:",
+        "adv_clear": "Cancella",
+        "adv_tip": "Suggerimento: Combina i filtri per risultati precisi",
     },
 }
 
@@ -514,7 +610,7 @@ if platform.system() == "Windows":
     except Exception:
         pass
 
-APP_VERSION = "1.1.6"
+APP_VERSION = "1.1.7 Beta"
 SETTINGS_FILE = "settings.json"
 CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".zt2_manager")
 os.makedirs(CONFIG_DIR, exist_ok=True)
@@ -524,7 +620,7 @@ ZT1_MOD_DIR_FILE = os.path.join(CONFIG_DIR, "zt1_mod_dir.txt")
 DB_FILE = os.path.join(CONFIG_DIR, "mods.db")
 ICON_FILE = os.path.join(CONFIG_DIR, "modzt.ico")
 BANNER_FILE = os.path.join(CONFIG_DIR, "banner.png")
-GITHUB_REPO = "kaelelson05/modzt"
+GITHUB_REPO = "songstormstudios/modzt"
 
 ZT2DL_API_BASE = "https://zt2downloadlibrary.fandom.com/api.php"
 ZT2DL_WIKI_BASE = "https://zt2downloadlibrary.fandom.com/wiki"
@@ -730,7 +826,12 @@ DEFAULT_SETTINGS = {
     "theme": "flatly",
     "window_geometry": "1200x882+78+78",
     "window_maximized": False,
-    "language": "en"
+    "language": "en",
+    "theme_scheduling_enabled": False,
+    "theme_light": "litera",
+    "theme_dark": "darkly",
+    "theme_light_start": "07:00",
+    "theme_dark_start": "19:00"
 }
 
 THEMES = {
@@ -1025,6 +1126,9 @@ def ensure_db_schema():
         if "tags" not in cols:
             cursor.execute(
                 f"ALTER TABLE {table} ADD COLUMN tags TEXT DEFAULT ''")
+        if "author" not in cols:
+            cursor.execute(
+                f"ALTER TABLE {table} ADD COLUMN author TEXT DEFAULT ''")
     conn.commit()
 
 
@@ -1570,6 +1674,188 @@ class ZT2DownloadLibraryAPI:
 
 zt2dl_api = ZT2DownloadLibraryAPI()
 
+class ZT2ModdingWikiAPI:
+
+    def __init__(self):
+        self.api_base = "https://zt2modding.fandom.com/api.php"
+        self.wiki_base = "https://zt2modding.fandom.com/wiki"
+        self.cache = {}
+        self.cache_duration = 3600
+
+    def _get_cached(self, key):
+        if key in self.cache:
+            data, timestamp = self.cache[key]
+            if time.time() - timestamp < self.cache_duration:
+                return data
+        return None
+
+    def _set_cache(self, key, data):
+        self.cache[key] = (data, time.time())
+
+    def _request(self, params):
+        cache_key = f"wiki:{json.dumps(params, sort_keys=True)}"
+        cached = self._get_cached(cache_key)
+        if cached:
+            return cached
+
+        params['format'] = 'json'
+        try:
+            response = requests.get(self.api_base, params=params, timeout=15)
+            response.raise_for_status()
+            data = response.json()
+            self._set_cache(cache_key, data)
+            return data
+        except Exception as e:
+            print(f"[Wiki API Error] {e}")
+            return None
+
+    def get_category_pages(self, category):
+        params = {
+            'action': 'query',
+            'list': 'categorymembers',
+            'cmtitle': f'Category:{category}',
+            'cmlimit': '100',
+            'cmtype': 'page'
+        }
+        data = self._request(params)
+        if data and 'query' in data:
+            return data['query'].get('categorymembers', [])
+        return []
+
+    def get_page_content(self, title):
+        params = {
+            'action': 'parse',
+            'page': title,
+            'prop': 'text|wikitext|images',
+            'disablelimitreport': '1'
+        }
+        data = self._request(params)
+        if data and 'parse' in data:
+            parse_data = data['parse']
+            wikitext = parse_data.get('wikitext', {}).get('*', '')
+            images = self._extract_images(wikitext, parse_data.get('images', []))
+            text = self._clean_wikitext(wikitext)
+            if not text.strip():
+                text = 'No content available.'
+            return {
+                'title': parse_data.get('title', title),
+                'extract': text,
+                'images': images,
+                'url': self.get_page_url(title)
+            }
+        return None
+
+    def _extract_images(self, wikitext, image_list):
+        import re
+        images = []
+
+        file_pattern = r'\[\[(?:File|Image):([^\]|]+)'
+        matches = re.findall(file_pattern, wikitext, re.IGNORECASE)
+
+        for img_name in image_list:
+            if img_name not in matches:
+                matches.append(img_name)
+
+        for img_name in matches[:5]:
+            img_url = self._get_image_url(img_name)
+            if img_url:
+                images.append({'name': img_name, 'url': img_url})
+
+        return images
+
+    def _get_image_url(self, filename):
+        if not filename.startswith('File:'):
+            filename = f"File:{filename}"
+
+        params = {
+            'action': 'query',
+            'titles': filename,
+            'prop': 'imageinfo',
+            'iiprop': 'url',
+            'iiurlwidth': '400'
+        }
+        data = self._request(params)
+        if data and 'query' in data:
+            pages = data['query'].get('pages', {})
+            for page_id, page_data in pages.items():
+                if page_id != '-1':
+                    imageinfo = page_data.get('imageinfo', [])
+                    if imageinfo:
+                        return imageinfo[0].get('thumburl') or imageinfo[0].get('url')
+        return None
+
+    def _clean_wikitext(self, wikitext):
+        import re
+        text = wikitext
+        text = re.sub(r'\{\{[^}]+\}\}', '', text)
+        text = re.sub(r'\[\[Category:[^\]]+\]\]', '', text)
+        text = re.sub(r'\[\[[^\]|]+\|([^\]]+)\]\]', r'\1', text)
+        text = re.sub(r'\[\[([^\]]+)\]\]', r'\1', text)
+        text = re.sub(r'\[https?://[^\s\]]+ ([^\]]+)\]', r'\1', text)
+        text = re.sub(r'\[https?://[^\]]+\]', '', text)
+        text = re.sub(r'\[\[File:[^\]]+\]\]', '', text)
+        text = re.sub(r'\[\[Image:[^\]]+\]\]', '', text)
+        text = re.sub(r'={2,}([^=]+)={2,}', r'\n\1\n', text)
+        text = re.sub(r"'''?", '', text)
+        text = re.sub(r'<[^>]+>', '', text)
+        text = re.sub(r'__[A-Z]+__', '', text)
+        text = re.sub(r'\n{3,}', '\n\n', text)
+        text = text.strip()
+        return text
+
+    def get_page_url(self, title):
+        return f"{self.wiki_base}/{title.replace(' ', '_')}"
+
+    def get_tutorials(self):
+        return self.get_category_pages('Tutorials')
+
+    def get_tools(self):
+        tools = []
+        tool_names = [
+            'Blender', 'Nifskope', 'Photoshop', 'Gimp_2', 'Paint_Shop_Pro',
+            'Visual_Studio_Code', 'Gmax', 'ZT2_BFB_Tool', 'ZT_Studio'
+        ]
+        for tool in tool_names:
+            page = self.get_page_content(tool)
+            if page:
+                tools.append(page)
+        return tools
+
+    def get_file_formats(self):
+        formats = []
+        format_names = [
+            '.z2f', '.nif', '.dds', '.bfm', '.xml', '.lua', '.beh', '.bf', '.bfb'
+        ]
+        for fmt in format_names:
+            page = self.get_page_content(fmt)
+            if page:
+                formats.append(page)
+        return formats
+
+    def search(self, query):
+        params = {
+            'action': 'query',
+            'list': 'search',
+            'srsearch': query,
+            'srlimit': '20'
+        }
+        data = self._request(params)
+        if data and 'query' in data:
+            return data['query'].get('search', [])
+        return []
+
+    def get_tutorial_categories(self):
+        return [
+            {"name": "All Tutorials", "category": "Tutorials"},
+            {"name": "Blender Tutorials", "category": "Blender_Tutorials"},
+            {"name": "Coding Tutorials", "category": "Coding_Tutorials"},
+            {"name": "NifSkope Tutorials", "category": "Nifskope_Tutorials"},
+            {"name": "Texturing Tutorials", "category": "Paint_Shop_Tutorials"},
+        ]
+
+
+modding_wiki_api = ZT2ModdingWikiAPI()
+
 
 def check_for_updates():
     try:
@@ -1820,6 +2106,54 @@ def get_system_theme():
 
     except Exception:
         return "dark"
+
+
+def check_theme_schedule():
+    if not settings.get("theme_scheduling_enabled", False):
+        return
+
+    try:
+        now = datetime.now()
+        current_time = now.hour * 60 + now.minute
+
+        light_start = settings.get("theme_light_start", "07:00")
+        dark_start = settings.get("theme_dark_start", "19:00")
+
+        light_h, light_m = map(int, light_start.split(":"))
+        dark_h, dark_m = map(int, dark_start.split(":"))
+
+        light_minutes = light_h * 60 + light_m
+        dark_minutes = dark_h * 60 + dark_m
+
+        light_theme = settings.get("theme_light", "litera")
+        dark_theme = settings.get("theme_dark", "darkly")
+
+        current_theme = root.style.theme_use()
+
+        if light_minutes < dark_minutes:
+            should_be_light = light_minutes <= current_time < dark_minutes
+        else:
+            should_be_light = current_time >= light_minutes or current_time < dark_minutes
+
+        target_theme = light_theme if should_be_light else dark_theme
+
+        if current_theme != target_theme:
+            root.style.theme_use(target_theme)
+            settings["theme"] = target_theme
+            save_settings(settings)
+            if 'current_theme_var' in globals():
+                current_theme_var.set(f"Current: {target_theme}")
+            log(f"Theme auto-switched to {target_theme} (scheduled)", text_widget=log_text if 'log_text' in globals() else None)
+    except Exception as e:
+        print(f"Theme schedule check error: {e}")
+
+
+def start_theme_scheduler():
+    def schedule_check():
+        check_theme_schedule()
+        root.after(60000, schedule_check)
+
+    root.after(1000, schedule_check)
 
 
 def set_game_path(lbl_widget=None, status_widget=None):
@@ -2306,6 +2640,128 @@ def install_mods(file_paths, text_widget=None):
         if skipped:
             details += "\n\nSkipped:\n" + "\n".join(skipped)
         messagebox.showinfo("Install Complete", "\n".join(summary) + "\n\n" + details)
+
+
+def install_mod_from_url_dialog():
+    dialog = tk.Toplevel(root)
+    dialog.title("Install Mod from URL")
+    dialog.geometry("500x200")
+    dialog.resizable(False, False)
+    dialog.transient(root)
+    dialog.grab_set()
+
+    ttk.Label(dialog, text="Install Mod from URL",
+              font=("Segoe UI", 12, "bold")).pack(pady=(15, 5))
+
+    ttk.Label(dialog, text="Enter a direct download URL to a .z2f mod file:",
+              bootstyle="secondary").pack(pady=(0, 10))
+
+    url_var = tk.StringVar()
+    url_entry = ttk.Entry(dialog, textvariable=url_var, width=60)
+    url_entry.pack(padx=20, pady=5)
+    url_entry.focus_set()
+
+    status_var = tk.StringVar(value="")
+    status_label = ttk.Label(dialog, textvariable=status_var, bootstyle="info")
+    status_label.pack(pady=5)
+
+    progress = ttk.Progressbar(dialog, mode="indeterminate", length=300)
+    progress.pack(pady=5)
+
+    def do_download():
+        url = url_var.get().strip()
+        if not url:
+            status_var.set("Please enter a URL")
+            return
+
+        if not GAME_PATH:
+            messagebox.showerror("Error", "Game path not set. Please set your Zoo Tycoon 2 folder first.")
+            return
+
+        try:
+            from urllib.parse import urlparse, unquote
+            parsed = urlparse(url)
+            filename = unquote(os.path.basename(parsed.path))
+
+            if not filename:
+                filename = "downloaded_mod.z2f"
+            if not filename.lower().endswith('.z2f'):
+                if '.' not in filename:
+                    filename += '.z2f'
+
+            status_var.set(f"Downloading {filename}...")
+            progress.start()
+            dialog.update()
+
+            def download():
+                try:
+                    response = requests.get(url, stream=True, timeout=60,
+                                          headers={"User-Agent": "ModZT/1.0"})
+                    response.raise_for_status()
+
+                    content_disp = response.headers.get('Content-Disposition', '')
+                    if 'filename=' in content_disp:
+                        import re
+                        match = re.search(r'filename[*]?=["\']?([^"\';\n]+)', content_disp)
+                        if match:
+                            filename_from_header = match.group(1).strip()
+                            if filename_from_header:
+                                nonlocal filename
+                                filename = filename_from_header
+
+                    temp_path = os.path.join(CONFIG_DIR, filename)
+                    with open(temp_path, 'wb') as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            f.write(chunk)
+
+                    return temp_path, None
+                except Exception as e:
+                    return None, str(e)
+
+            def on_complete(result):
+                progress.stop()
+                temp_path, error = result
+
+                if error:
+                    status_var.set(f"Error: {error}")
+                    return
+
+                dest = os.path.join(GAME_PATH, os.path.basename(temp_path))
+                if os.path.exists(dest):
+                    if not messagebox.askyesno("Overwrite?",
+                            f"{os.path.basename(temp_path)} already exists.\nOverwrite?"):
+                        status_var.set("Installation cancelled")
+                        os.remove(temp_path)
+                        return
+
+                try:
+                    shutil.move(temp_path, dest)
+                    detect_existing_mods()
+                    refresh_tree()
+                    increment_stat("mods_installed")
+                    status_var.set(f"Successfully installed: {os.path.basename(dest)}")
+                    log(f"Installed mod from URL: {os.path.basename(dest)}", text_widget=log_text)
+                    messagebox.showinfo("Success", f"Mod installed successfully:\n{os.path.basename(dest)}")
+                    dialog.destroy()
+                except Exception as e:
+                    status_var.set(f"Install error: {e}")
+
+            threading.Thread(target=lambda: root.after(0, lambda: on_complete(download())),
+                           daemon=True).start()
+
+        except Exception as e:
+            progress.stop()
+            status_var.set(f"Error: {e}")
+
+    btn_frame = ttk.Frame(dialog)
+    btn_frame.pack(pady=15)
+
+    ttk.Button(btn_frame, text="Download & Install", command=do_download,
+               bootstyle="success", width=18).pack(side=tk.LEFT, padx=5)
+    ttk.Button(btn_frame, text="Cancel", command=dialog.destroy,
+               bootstyle="secondary", width=10).pack(side=tk.LEFT, padx=5)
+
+    url_entry.bind("<Return>", lambda e: do_download())
 
 
 def export_load_order():
@@ -2881,12 +3337,13 @@ else:
     with open(GAME_PATH_FILE, "r", encoding="utf-8") as f:
         GAME_PATH = f.read().strip()
 
+saved_theme = settings.get("theme", "darkly" if system_theme == "dark" else "litera")
+
 if DND_AVAILABLE:
     root = TkinterDnD.Tk()
-    theme_name = "darkly" if system_theme == "dark" else "litera"
-    root.style = tb.Style(theme=theme_name)
+    root.style = tb.Style(theme=saved_theme)
 else:
-    root = Window(themename="darkly" if system_theme == "dark" else "litera")
+    root = Window(themename=saved_theme)
 
 root.title(f"ModZT v{APP_VERSION}")
 
@@ -2899,7 +3356,6 @@ root.update_idletasks()
 
 if _was_maximized:
     root.state('zoomed')
-
 
 def set_zt1_paths():
     global ZT1_PATH
@@ -3005,13 +3461,13 @@ help_menu = tk.Menu(help_menu_btn, tearoff=0)
 help_menu.add_command(label="About ModZT",
                       command=lambda: messagebox.showinfo(
                           "About",
-                          "ModZT v1.1.6\n"
-                          "Created by Kael\n\n"
+                          "ModZT v1.1.7 Beta\n"
+                          "Created by Songstorm\n\n"
                           "Music: Zoo Tycoon 2 Theme Remaster\n"
                           "by SirGoose"))
 help_menu.add_command(
     label="Open GitHub Page",
-    command=lambda: webbrowser.open("https://github.com/kaelelson05/modzt"))
+    command=lambda: webbrowser.open("https://github.com/songstormstudios/modzt"))
 help_menu.add_command(
     label="Discord Server",
     command=lambda: webbrowser.open("https://discord.gg/9y9DfmpZG4"))
@@ -3066,6 +3522,21 @@ def refresh_ui_language():
             except Exception:
                 pass
 
+    if "schedule_frame" in _translatable_widgets:
+        _translatable_widgets["schedule_frame"].configure(text=t("sched_title"))
+    if "sched_enable_cb" in _translatable_widgets:
+        _translatable_widgets["sched_enable_cb"].configure(text=t("sched_enable"))
+    if "sched_light_lbl" in _translatable_widgets:
+        _translatable_widgets["sched_light_lbl"].configure(text=t("sched_light_theme"))
+    if "sched_dark_lbl" in _translatable_widgets:
+        _translatable_widgets["sched_dark_lbl"].configure(text=t("sched_dark_theme"))
+    if "sched_from_lbl1" in _translatable_widgets:
+        _translatable_widgets["sched_from_lbl1"].configure(text=t("sched_from"))
+    if "sched_from_lbl2" in _translatable_widgets:
+        _translatable_widgets["sched_from_lbl2"].configure(text=t("sched_from"))
+    if "sched_hint_lbl" in _translatable_widgets:
+        _translatable_widgets["sched_hint_lbl"].configure(text=t("sched_time_hint"))
+
 def apply_language(lang_code):
     global current_language
     current_language = lang_code
@@ -3088,11 +3559,6 @@ view_menu.add_cascade(label=t("menu_language"), menu=language_menu)
 view_menu_button["menu"] = view_menu
 view_menu_button.pack(side=tk.RIGHT, padx=4)
 
-achievements_btn = ttk.Button(toolbar, text=t("btn_achievements"), bootstyle="warning-outline",
-                               command=open_achievements_dialog)
-achievements_btn.pack(side=tk.RIGHT, padx=4)
-_translatable_widgets["achievements_btn"] = achievements_btn
-
 tools_menu_btn = ttk.Menubutton(toolbar,
                                 text=t("menu_tools"),
                                 bootstyle="info-outline")
@@ -3102,6 +3568,8 @@ tools_menu.add_command(
     label="Validate Mods",
     command=lambda: messagebox.showinfo("Validate Mods",
                                         "All mods validated successfully."))
+tools_menu.add_command(label="Scan for Conflicts",
+                       command=lambda: scan_mod_conflicts())
 tools_menu.add_command(label="Clean Temporary Files",
                        command=lambda: messagebox.showinfo(
                            "Cleanup", "Temporary files cleaned up."))
@@ -3110,6 +3578,11 @@ tools_menu.add_command(label="Game Unlocks Manager",
                        command=open_game_unlocks_dialog)
 tools_menu_btn["menu"] = tools_menu
 tools_menu_btn.pack(side=tk.RIGHT, padx=4)
+
+achievements_btn = ttk.Button(toolbar, text=t("btn_achievements"), bootstyle="warning-outline",
+                               command=open_achievements_dialog)
+achievements_btn.pack(side=tk.RIGHT, padx=4)
+_translatable_widgets["achievements_btn"] = achievements_btn
 
 ttk.Separator(toolbar, orient="vertical").pack(side=tk.RIGHT, fill=tk.Y, padx=8)
 
@@ -3191,17 +3664,15 @@ notebook = ttk.Notebook(main_frame)
 notebook.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 _translatable_widgets["notebook"] = notebook
 
+main_frame.tkraise()
+
 mods_tab = ttk.Frame(notebook, padding=6)
 notebook.add(mods_tab, text=t("tab_zt2_mods"))
 
 zt1_tab = ttk.Frame(notebook, padding=6)
 notebook.add(zt1_tab, text=t("tab_zt1_mods"))
 
-zt1_toolbar = ttk.Frame(zt1_tab)
-zt1_toolbar.pack(fill=tk.X, pady=4)
-
 zt1_search_var = tk.StringVar()
-zt1_status_filter = tk.StringVar(value="All")
 
 search_frame = ttk.Frame(zt1_tab)
 search_frame.pack(fill="x", padx=6, pady=(4, 0))
@@ -3210,66 +3681,32 @@ ttk.Label(search_frame, text="Search:").pack(side="left")
 search_entry = ttk.Entry(search_frame, textvariable=zt1_search_var)
 search_entry.pack(side="left", fill="x", expand=True, padx=(4, 6))
 
-ttk.Label(search_frame, text="Status:").pack(side="left")
-ttk.OptionMenu(search_frame, zt1_status_filter, "All", "All", "Enabled",
-               "Disabled").pack(side="left")
-
-ttk.Button(search_frame,
-           text="Clear",
-           command=lambda:
-           (zt1_search_var.set(""), zt1_status_filter.set("All"),
-            refresh_zt1_tree())).pack(side="left", padx=(6, 0))
-
-ttk.Button(zt1_toolbar,
-           text="Enable",
-           bootstyle="success",
-           width=10,
-           command=lambda: enable_selected_zt1_mod()).pack(side=tk.LEFT,
-                                                           padx=4)
-ttk.Button(zt1_toolbar,
-           text="Disable",
-           bootstyle="warning",
-           width=10,
-           command=lambda: disable_selected_zt1_mod()).pack(side=tk.LEFT,
-                                                            padx=4)
-ttk.Button(zt1_toolbar,
-           text="Uninstall",
-           width=10,
-           command=lambda: uninstall_selected_mod()).pack(side=tk.LEFT,
-                                                            padx=4)
-ttk.Button(zt1_toolbar,
-           text="Refresh List",
-           width=10,
-           command=lambda: refresh_zt1_tree()).pack(side=tk.LEFT, padx=4)
-ttk.Button(
-    zt1_toolbar,
-    text="Open Mods Folder",
-    width=16,
-    command=lambda: os.startfile(ZT1_MOD_DIR or os.path.join(
-        ZT1_PATH, "dlupdates"))
-    if ZT1_PATH else messagebox.showerror("Error", "ZT1 path not set.")).pack(
-        side=tk.LEFT, padx=4)
-
 zt1_frame = ttk.Frame(zt1_tab)
 zt1_frame.pack(fill=tk.BOTH, expand=True, pady=4)
 
 zt1_tree = ttk.Treeview(
     zt1_frame,
-    columns=("Name", "Status", "Category", "Tags", "Size"),
+    columns=("Name", "Status", "Category", "Size", "Modified"),
     show="headings",
     height=18,
 )
 
-for col in ("Name", "Status", "Category", "Tags", "Size"):
+for col in ("Name", "Status", "Category", "Size", "Modified"):
+    if col == "Size":
+        heading_text = "Size (MB)"
+    elif col == "Modified":
+        heading_text = "Last Modified"
+    else:
+        heading_text = col
     zt1_tree.heading(col,
-                     text=col,
+                     text=heading_text,
                      command=lambda c=col: sort_zt1_tree(c, False))
 
-zt1_tree.column("Name", anchor="w", width=350)
-zt1_tree.column("Status", anchor="center", width=80)
+zt1_tree.column("Name", anchor="w", width=300)
+zt1_tree.column("Status", anchor="center", width=100)
 zt1_tree.column("Category", anchor="center", width=120)
-zt1_tree.column("Tags", anchor="center", width=180)
 zt1_tree.column("Size", anchor="e", width=80)
+zt1_tree.column("Modified", anchor="center", width=150)
 
 scrollbar = ttk.Scrollbar(zt1_frame,
                           orient=tk.VERTICAL,
@@ -3344,13 +3781,40 @@ def set_zt1_mod_tags():
         refresh_zt1_tree()
 
 
+zt1_footer = ttk.Label(zt1_tab,
+                       text="Total mods: 0 | Enabled: 0 | Disabled: 0",
+                       bootstyle="secondary")
+zt1_footer.pack(anchor="w", padx=6, pady=(2, 0))
+
 zt1_mod_btns = ttk.Frame(zt1_tab, padding=6)
 zt1_mod_btns.pack(fill=tk.X)
 
-zt1_footer = ttk.Label(zt1_tab,
-                       text="Total mods: Total 0 | Enabled 0 | Disabled 0",
-                       bootstyle="secondary")
-zt1_footer.pack(anchor="w", padx=6, pady=(2, 0))
+ttk.Button(zt1_mod_btns,
+           text="Enable",
+           bootstyle="success",
+           width=10,
+           command=lambda: enable_selected_zt1_mod()).pack(side=tk.LEFT, padx=4)
+ttk.Button(zt1_mod_btns,
+           text="Disable",
+           bootstyle="warning",
+           width=10,
+           command=lambda: disable_selected_zt1_mod()).pack(side=tk.LEFT, padx=4)
+ttk.Button(zt1_mod_btns,
+           text="Uninstall",
+           bootstyle="danger",
+           width=10,
+           command=lambda: uninstall_selected_mod()).pack(side=tk.LEFT, padx=4)
+ttk.Button(zt1_mod_btns,
+           text="Refresh",
+           bootstyle="info",
+           width=10,
+           command=lambda: refresh_zt1_tree()).pack(side=tk.LEFT, padx=4)
+ttk.Button(zt1_mod_btns,
+           text="Open Folder",
+           bootstyle="secondary",
+           width=12,
+           command=lambda: os.startfile(ZT1_MOD_DIR or os.path.join(ZT1_PATH, "dlupdates"))
+           if ZT1_PATH else messagebox.showerror("Error", "ZT1 path not set.")).pack(side=tk.LEFT, padx=4)
 
 def sort_zt1_tree(col, reverse=False):
     data = [(zt1_tree.set(k, col), k) for k in zt1_tree.get_children("")]
@@ -3394,34 +3858,46 @@ def refresh_zt1_tree(filter_text=""):
     disabled_count = total - enabled_count
 
     cursor.execute(
-        "SELECT name, enabled, category, tags FROM zt1_mods ORDER BY name ASC")
+        "SELECT name, enabled, category FROM zt1_mods ORDER BY enabled DESC, name ASC")
     all_rows = cursor.fetchall()
 
     filter_text = (zt1_search_var.get() or "").strip().lower()
-    status_filter = zt1_status_filter.get().lower()
 
     visible_rows = []
-    for name, enabled, category, tags in all_rows:
+    for name, enabled, category in all_rows:
         status_str = "enabled" if enabled else "disabled"
-        combined = f"{name.lower()} {category.lower() if category else ''} {tags.lower() if tags else ''} {status_str}"
+        combined = f"{name.lower()} {category.lower() if category else ''} {status_str}"
 
         if filter_text and filter_text not in combined:
             continue
-        if status_filter != "all" and status_str != status_filter:
-            continue
 
-        visible_rows.append((name, enabled, category, tags))
+        visible_rows.append((name, enabled, category))
 
-    for name, enabled, category, tags in visible_rows:
+    for name, enabled, category in visible_rows:
         status = "enabled" if enabled else "disabled"
         display_status = "🟢 Enabled" if enabled else "🔴 Disabled"
-        mod_path = os.path.join(ZT1_MOD_DIR, name)
-        size = f"{os.path.getsize(mod_path)/1024:.1f} KB" if os.path.exists(
-            mod_path) else "-"
+
+        mod_path = None
+        if ZT1_MOD_DIR:
+            enabled_path = os.path.join(ZT1_MOD_DIR, name)
+            disabled_path = os.path.join(zt1_mods_disabled_dir() or "", name)
+            if os.path.exists(enabled_path):
+                mod_path = enabled_path
+            elif os.path.exists(disabled_path):
+                mod_path = disabled_path
+
+        if mod_path and os.path.exists(mod_path):
+            size_mb = os.path.getsize(mod_path) / (1024 * 1024)
+            size = f"{size_mb:.2f}"
+            modified = time.strftime("%Y-%m-%d %H:%M:%S",
+                                     time.localtime(os.path.getmtime(mod_path)))
+        else:
+            size = "-"
+            modified = "N/A"
+
         zt1_tree.insert("",
                         tk.END,
-                        values=(name, display_status, category or "—", tags
-                                or "—", size),
+                        values=(name, display_status, category or "—", size, modified),
                         tags=(status, ))
 
     zt1_footer.config(
@@ -3433,7 +3909,6 @@ def refresh_zt1_tree(filter_text=""):
 
 
 zt1_search_var.trace_add("write", lambda *_: refresh_zt1_tree())
-zt1_status_filter.trace_add("write", lambda *_: refresh_zt1_tree())
 
 
 def on_search_zt1(*args):
@@ -3482,16 +3957,6 @@ ttk.Label(search_frame, text="Search:").pack(side=tk.LEFT)
 search_var = tk.StringVar()
 search_entry = ttk.Entry(search_frame, textvariable=search_var)
 search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 6))
-
-ttk.Label(search_frame, text="Status:").pack(side=tk.LEFT)
-zt2_status_filter = tk.StringVar(value="All")
-ttk.OptionMenu(search_frame, zt2_status_filter, "All", "All", "Enabled",
-               "Disabled").pack(side=tk.LEFT)
-
-ttk.Button(search_frame,
-           text="Clear",
-           command=lambda: (search_var.set(""), zt2_status_filter.set("All"),
-                           filter_tree())).pack(side=tk.LEFT, padx=(6, 0))
 
 mods_tree_frame = ttk.Frame(mods_tab)
 mods_tree_frame.pack(fill=tk.BOTH, expand=True, pady=(4, 0))
@@ -3543,8 +4008,11 @@ mods_menu.add_command(label="Enable", command=lambda: enable_selected_mod())
 mods_menu.add_command(label="Disable", command=lambda: disable_selected_mod())
 mods_menu.add_command(label="Uninstall",
                       command=lambda: uninstall_selected_mod())
-mods_menu.add_command(label="Inspect ZIP",
+mods_menu.add_separator()
+mods_menu.add_command(label="View Contents",
                       command=lambda: inspect_selected_mod())
+mods_menu.add_command(label="Check Conflicts",
+                      command=lambda: check_selected_mod_conflicts())
 mods_menu.add_separator()
 mods_menu.add_command(label="Set Category",
                       command=lambda: set_mod_category_dialog())
@@ -3649,6 +4117,7 @@ mods_tree.bind('<Return>', on_mods_key)
 mods_tree.bind('<Control-a>', lambda e: mods_tree.selection_set(mods_tree.get_children()))
 mods_tree.bind('<Escape>', lambda e: mods_tree.selection_remove(mods_tree.get_children()))
 mods_tree.bind('<Control-z>', lambda e: undo_last_action())
+mods_tree.bind('<Double-1>', lambda e: inspect_selected_mod())
 
 mod_btns = ttk.Frame(mods_tab, padding=6)
 mod_btns.pack(fill=tk.X)
@@ -3707,6 +4176,9 @@ notebook.add(multiplayer_tab, text=t("tab_multiplayer"))
 
 modbrowser_tab = ttk.Frame(notebook, padding=6)
 notebook.add(modbrowser_tab, text=t("tab_mod_browser"))
+
+modding_tab = ttk.Frame(notebook, padding=6)
+notebook.add(modding_tab, text="Modding Resources")
 
 themes_tab = ttk.Frame(notebook, padding=10)
 notebook.add(themes_tab, text=t("tab_themes"))
@@ -3828,6 +4300,42 @@ MODZT_THEMES = {
         "category": "Zoo Tycoon",
         "colors": {"bg": "#ffffff", "fg": "#333333", "accent": "#158cba"}
     },
+    "yeti": {
+        "display": "ZT1 Classic",
+        "description": "Cream and brown interface mimicking the original Zoo Tycoon 1 UI.",
+        "category": "Game UI",
+        "colors": {"bg": "#e8d5b7", "fg": "#3d2817", "accent": "#8b6f47"}
+    },
+    "sketchy": {
+        "display": "ZT2 Vanilla",
+        "description": "Green-tinted interface matching Zoo Tycoon 2 base game UI.",
+        "category": "Game UI",
+        "colors": {"bg": "#d4e4bc", "fg": "#2b3d0f", "accent": "#6a9539"}
+    },
+    "spacelab": {
+        "display": "Endangered Species",
+        "description": "Blue conservation theme from the Endangered Species expansion.",
+        "category": "Game UI",
+        "colors": {"bg": "#dae8f5", "fg": "#1a3a52", "accent": "#4a7ba7"}
+    },
+    "materia": {
+        "display": "African Adventure",
+        "description": "Warm savanna browns from the African Adventure expansion.",
+        "category": "Game UI",
+        "colors": {"bg": "#f0e6d2", "fg": "#4a3c28", "accent": "#c17a3b"}
+    },
+    "quartz": {
+        "display": "Marine Mania",
+        "description": "Deep ocean blues from the Marine Mania expansion.",
+        "category": "Game UI",
+        "colors": {"bg": "#d0e5f5", "fg": "#0d2d3f", "accent": "#1e6fa8"}
+    },
+    "zephyr": {
+        "display": "Extinct Animals",
+        "description": "Prehistoric earth tones from the Extinct Animals expansion.",
+        "category": "Game UI",
+        "colors": {"bg": "#ded1b8", "fg": "#3b2f1f", "accent": "#9b7653"}
+    },
 }
 
 themes_list_frame = ttk.Frame(themes_left)
@@ -3932,10 +4440,17 @@ def apply_selected_theme():
 
 themes_tree.bind("<<TreeviewSelect>>", on_theme_select)
 
+def reset_theme_to_default():
+    root.style.theme_use("darkly")
+    current_theme_var.set("Current: darkly")
+    settings["theme"] = "darkly"
+    save_settings(settings)
+    log("Reset theme to default (darkly)", text_widget=log_text)
+
 ttk.Button(apply_frame, text="Apply Theme", command=apply_selected_theme,
            bootstyle="success").pack(side=tk.LEFT, padx=5)
 ttk.Button(apply_frame, text="Reset to Default",
-           command=lambda: (root.style.theme_use("darkly"), current_theme_var.set("Current: darkly")),
+           command=reset_theme_to_default,
            bootstyle="secondary").pack(side=tk.LEFT, padx=5)
 
 info_frame = ttk.LabelFrame(themes_right, text="Tips", padding=10)
@@ -3944,6 +4459,523 @@ ttk.Label(info_frame, text="• Dark themes are easier on the eyes during long s
                            "• Zoo Tycoon themes are inspired by in-game biomes\n"
                            "• Your theme choice is saved automatically",
           justify="left", bootstyle="secondary").pack(anchor="w")
+
+schedule_frame = ttk.LabelFrame(themes_left, text=t("sched_title"), padding=10)
+schedule_frame.pack(fill=tk.X, pady=(15, 0))
+_translatable_widgets["schedule_frame"] = schedule_frame
+
+schedule_enabled_var = tk.BooleanVar(value=settings.get("theme_scheduling_enabled", False))
+
+def toggle_schedule_enabled():
+    enabled = schedule_enabled_var.get()
+    settings["theme_scheduling_enabled"] = enabled
+    save_settings(settings)
+    state = "normal" if enabled else "disabled"
+    light_theme_combo.configure(state="readonly" if enabled else "disabled")
+    dark_theme_combo.configure(state="readonly" if enabled else "disabled")
+    light_time_entry.configure(state=state)
+    dark_time_entry.configure(state=state)
+    if enabled:
+        check_theme_schedule()
+    log(f"Theme scheduling {'enabled' if enabled else 'disabled'}", text_widget=log_text)
+
+sched_enable_cb = ttk.Checkbutton(schedule_frame, text=t("sched_enable"),
+                variable=schedule_enabled_var, command=toggle_schedule_enabled,
+                bootstyle="round-toggle")
+sched_enable_cb.pack(anchor="w", pady=(0, 10))
+_translatable_widgets["sched_enable_cb"] = sched_enable_cb
+
+schedule_grid = ttk.Frame(schedule_frame)
+schedule_grid.pack(fill=tk.X)
+
+sched_light_lbl = ttk.Label(schedule_grid, text=t("sched_light_theme"))
+sched_light_lbl.grid(row=0, column=0, sticky="w", pady=2)
+_translatable_widgets["sched_light_lbl"] = sched_light_lbl
+
+light_theme_var = tk.StringVar(value=settings.get("theme_light", "litera"))
+light_themes = ["litera", "flatly", "journal", "cosmo", "morph", "minty", "sandstone", "lumen"]
+light_theme_combo = ttk.Combobox(schedule_grid, textvariable=light_theme_var,
+                                  values=light_themes, width=15, state="readonly" if schedule_enabled_var.get() else "disabled")
+light_theme_combo.grid(row=0, column=1, padx=5, pady=2)
+
+sched_from_lbl1 = ttk.Label(schedule_grid, text=t("sched_from"))
+sched_from_lbl1.grid(row=0, column=2, padx=5)
+_translatable_widgets["sched_from_lbl1"] = sched_from_lbl1
+
+light_time_var = tk.StringVar(value=settings.get("theme_light_start", "07:00"))
+light_time_entry = ttk.Entry(schedule_grid, textvariable=light_time_var, width=6,
+                              state="normal" if schedule_enabled_var.get() else "disabled")
+light_time_entry.grid(row=0, column=3, pady=2)
+
+sched_dark_lbl = ttk.Label(schedule_grid, text=t("sched_dark_theme"))
+sched_dark_lbl.grid(row=1, column=0, sticky="w", pady=2)
+_translatable_widgets["sched_dark_lbl"] = sched_dark_lbl
+
+dark_theme_var = tk.StringVar(value=settings.get("theme_dark", "darkly"))
+dark_themes = ["darkly", "superhero", "solar", "cyborg", "vapor"]
+dark_theme_combo = ttk.Combobox(schedule_grid, textvariable=dark_theme_var,
+                                 values=dark_themes, width=15, state="readonly" if schedule_enabled_var.get() else "disabled")
+dark_theme_combo.grid(row=1, column=1, padx=5, pady=2)
+
+sched_from_lbl2 = ttk.Label(schedule_grid, text=t("sched_from"))
+sched_from_lbl2.grid(row=1, column=2, padx=5)
+_translatable_widgets["sched_from_lbl2"] = sched_from_lbl2
+
+dark_time_var = tk.StringVar(value=settings.get("theme_dark_start", "19:00"))
+dark_time_entry = ttk.Entry(schedule_grid, textvariable=dark_time_var, width=6,
+                             state="normal" if schedule_enabled_var.get() else "disabled")
+dark_time_entry.grid(row=1, column=3, pady=2)
+
+def save_schedule_settings(*args):
+    settings["theme_light"] = light_theme_var.get()
+    settings["theme_dark"] = dark_theme_var.get()
+    settings["theme_light_start"] = light_time_var.get()
+    settings["theme_dark_start"] = dark_time_var.get()
+    save_settings(settings)
+
+light_theme_var.trace_add("write", save_schedule_settings)
+dark_theme_var.trace_add("write", save_schedule_settings)
+light_time_var.trace_add("write", save_schedule_settings)
+dark_time_var.trace_add("write", save_schedule_settings)
+
+sched_hint_lbl = ttk.Label(schedule_frame, text=t("sched_time_hint"),
+          bootstyle="secondary", font=("Segoe UI", 9))
+sched_hint_lbl.pack(anchor="w", pady=(8, 0))
+_translatable_widgets["sched_hint_lbl"] = sched_hint_lbl
+
+advanced_frame = ttk.LabelFrame(themes_left, text="Advanced Customization", padding=10)
+advanced_frame.pack(fill=tk.X, pady=(15, 0))
+
+font_row = ttk.Frame(advanced_frame)
+font_row.pack(fill=tk.X, pady=(0, 8))
+
+ttk.Label(font_row, text="Font Family:").pack(side=tk.LEFT)
+font_family_var = tk.StringVar(value=settings.get("font_family", "Segoe UI"))
+
+import tkinter.font as tkfont
+available_fonts = sorted(set(tkfont.families()))
+common_fonts = ["Segoe UI", "Arial", "Helvetica", "Verdana", "Tahoma", "Calibri",
+                "Consolas", "Courier New", "Georgia", "Times New Roman"]
+font_list = [f for f in common_fonts if f in available_fonts] + \
+            [f for f in available_fonts if f not in common_fonts]
+
+font_family_combo = ttk.Combobox(font_row, textvariable=font_family_var,
+                                  values=font_list, width=20, state="readonly")
+font_family_combo.pack(side=tk.LEFT, padx=(5, 0))
+
+font_size_row = ttk.Frame(advanced_frame)
+font_size_row.pack(fill=tk.X, pady=(0, 8))
+
+ttk.Label(font_size_row, text="Font Size:").pack(side=tk.LEFT)
+font_size_var = tk.IntVar(value=settings.get("font_size", 10))
+font_size_spin = ttk.Spinbox(font_size_row, from_=8, to=18, width=5,
+                              textvariable=font_size_var)
+font_size_spin.pack(side=tk.LEFT, padx=(5, 10))
+
+ttk.Label(font_size_row, text="pt", bootstyle="secondary").pack(side=tk.LEFT)
+
+scale_row = ttk.Frame(advanced_frame)
+scale_row.pack(fill=tk.X, pady=(0, 8))
+
+ttk.Label(scale_row, text="UI Scale:").pack(side=tk.LEFT)
+ui_scale_var = tk.StringVar(value=settings.get("ui_scale", "100%"))
+ui_scale_combo = ttk.Combobox(scale_row, textvariable=ui_scale_var,
+                               values=["90%", "100%", "110%", "125%", "150%"],
+                               width=8, state="readonly")
+ui_scale_combo.pack(side=tk.LEFT, padx=(5, 0))
+
+compact_row = ttk.Frame(advanced_frame)
+compact_row.pack(fill=tk.X, pady=(0, 8))
+
+compact_mode_var = tk.BooleanVar(value=settings.get("compact_mode", False))
+ttk.Checkbutton(compact_row, text="Compact Mode (reduce padding)",
+                variable=compact_mode_var).pack(side=tk.LEFT)
+
+row_height_row = ttk.Frame(advanced_frame)
+row_height_row.pack(fill=tk.X, pady=(0, 8))
+
+ttk.Label(row_height_row, text="List Row Height:").pack(side=tk.LEFT)
+row_height_var = tk.IntVar(value=settings.get("row_height", 24))
+row_height_spin = ttk.Spinbox(row_height_row, from_=18, to=40, width=5,
+                               textvariable=row_height_var)
+row_height_spin.pack(side=tk.LEFT, padx=(5, 10))
+
+ttk.Label(row_height_row, text="px", bootstyle="secondary").pack(side=tk.LEFT)
+
+custom_btn_row = ttk.Frame(advanced_frame)
+custom_btn_row.pack(fill=tk.X, pady=(10, 0))
+
+def apply_custom_settings():
+    try:
+        font_family = font_family_var.get()
+        font_size = font_size_var.get()
+        row_height = row_height_var.get()
+        ui_scale = ui_scale_var.get()
+        compact = compact_mode_var.get()
+
+        settings["font_family"] = font_family
+        settings["font_size"] = font_size
+        settings["row_height"] = row_height
+        settings["ui_scale"] = ui_scale
+        settings["compact_mode"] = compact
+        save_settings(settings)
+
+        scale_factor = float(ui_scale.replace("%", "")) / 100.0
+
+        scaled_font_size = int(font_size * scale_factor)
+        scaled_row_height = int(row_height * scale_factor)
+        default_font = (font_family, scaled_font_size)
+
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=scaled_row_height, font=default_font)
+        style.configure("Treeview.Heading", font=(font_family, scaled_font_size, "bold"))
+
+        style.configure("TLabel", font=default_font)
+        style.configure("TButton", font=default_font)
+        style.configure("TCheckbutton", font=default_font)
+        style.configure("TRadiobutton", font=default_font)
+        style.configure("TEntry", font=default_font)
+        style.configure("TCombobox", font=default_font)
+        style.configure("TLabelframe.Label", font=default_font)
+        style.configure("TNotebook.Tab", font=default_font)
+
+        root.tk.call('tk', 'scaling', scale_factor * 1.333)
+
+        mods_tree.configure(style="Treeview")
+        zt1_tree.configure(style="Treeview")
+
+        log(f"Applied custom settings: {font_family} {font_size}pt @ {ui_scale}, row height {row_height}px", text_widget=log_text)
+        messagebox.showinfo("Settings Applied",
+                           f"Custom settings applied:\n\n"
+                           f"Font: {font_family} {scaled_font_size}pt (base {font_size}pt)\n"
+                           f"Row Height: {scaled_row_height}px (base {row_height}px)\n"
+                           f"UI Scale: {ui_scale}\n"
+                           f"Compact Mode: {'On' if compact else 'Off'}\n\n"
+                           "Some changes may require restart for full effect.")
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to apply settings: {e}")
+
+def reset_custom_settings():
+    font_family_var.set("Segoe UI")
+    font_size_var.set(10)
+    row_height_var.set(24)
+    ui_scale_var.set("100%")
+    compact_mode_var.set(False)
+
+    settings["font_family"] = "Segoe UI"
+    settings["font_size"] = 10
+    settings["row_height"] = 24
+    settings["ui_scale"] = "100%"
+    settings["compact_mode"] = False
+    save_settings(settings)
+
+    default_font = ("Segoe UI", 10)
+    style = ttk.Style()
+    style.configure("Treeview", rowheight=24, font=default_font)
+    style.configure("Treeview.Heading", font=("Segoe UI", 10, "bold"))
+    style.configure("TLabel", font=default_font)
+    style.configure("TButton", font=default_font)
+    style.configure("TCheckbutton", font=default_font)
+    style.configure("TRadiobutton", font=default_font)
+    style.configure("TEntry", font=default_font)
+    style.configure("TCombobox", font=default_font)
+    style.configure("TLabelframe.Label", font=default_font)
+    style.configure("TNotebook.Tab", font=default_font)
+
+    root.tk.call('tk', 'scaling', 1.333)
+
+    log("Reset custom settings to defaults", text_widget=log_text)
+    messagebox.showinfo("Settings Reset", "Custom settings have been reset to defaults.")
+
+ttk.Button(custom_btn_row, text="Apply",
+           command=apply_custom_settings,
+           bootstyle="success").pack(side=tk.LEFT, padx=(0, 5))
+
+ttk.Button(custom_btn_row, text="Reset to Defaults",
+           command=reset_custom_settings,
+           bootstyle="secondary").pack(side=tk.LEFT)
+
+preview_frame = ttk.LabelFrame(advanced_frame, text="Preview", padding=8)
+preview_frame.pack(fill=tk.X, pady=(10, 0))
+
+font_preview_label = ttk.Label(preview_frame,
+                                text="The quick brown fox jumps over the lazy dog. 0123456789",
+                                font=(font_family_var.get(), font_size_var.get()))
+font_preview_label.pack(anchor="w")
+
+def update_font_preview(*args):
+    try:
+        font_preview_label.configure(font=(font_family_var.get(), font_size_var.get()))
+    except:
+        pass
+
+font_family_var.trace_add("write", update_font_preview)
+font_size_var.trace_add("write", update_font_preview)
+
+
+modding_header = ttk.Frame(modding_tab)
+modding_header.pack(fill=tk.X, pady=(0, 10))
+
+ttk.Label(modding_header, text="Modding Resources",
+          font=("Segoe UI", 14, "bold")).pack(side=tk.LEFT)
+
+ttk.Button(modding_header, text="Open Wiki",
+           command=lambda: webbrowser.open("https://zt2modding.fandom.com/wiki/Zoo_Tycoon_2_Modding_Wiki"),
+           bootstyle="info-outline").pack(side=tk.RIGHT, padx=4)
+
+modding_paned = ttk.PanedWindow(modding_tab, orient=tk.HORIZONTAL)
+modding_paned.pack(fill=tk.BOTH, expand=True)
+
+modding_left = ttk.Frame(modding_paned, padding=5)
+modding_paned.add(modding_left, weight=1)
+
+category_frame = ttk.Frame(modding_left)
+category_frame.pack(fill=tk.X, pady=(0, 8))
+
+ttk.Label(category_frame, text="Category:").pack(side=tk.LEFT)
+modding_category_var = tk.StringVar(value="Tutorials")
+modding_category_combo = ttk.Combobox(category_frame, textvariable=modding_category_var,
+                                       values=["Tutorials", "Blender", "Coding", "NifSkope", "Tools", "File Formats"],
+                                       state="readonly", width=20)
+modding_category_combo.pack(side=tk.LEFT, padx=(5, 10))
+
+ttk.Button(category_frame, text="Refresh",
+           command=lambda: refresh_modding_list(),
+           bootstyle="secondary").pack(side=tk.LEFT)
+
+modding_search_frame = ttk.Frame(modding_left)
+modding_search_frame.pack(fill=tk.X, pady=(0, 8))
+
+ttk.Label(modding_search_frame, text="Search:").pack(side=tk.LEFT)
+modding_search_var = tk.StringVar()
+modding_search_entry = ttk.Entry(modding_search_frame, textvariable=modding_search_var)
+modding_search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(5, 5))
+
+ttk.Button(modding_search_frame, text="Search Wiki",
+           command=lambda: search_modding_wiki(),
+           bootstyle="primary").pack(side=tk.LEFT)
+
+modding_list_frame = ttk.Frame(modding_left)
+modding_list_frame.pack(fill=tk.BOTH, expand=True)
+
+modding_tree = ttk.Treeview(modding_list_frame, columns=("Title",), show="headings", height=20)
+modding_tree.heading("Title", text="Article Title")
+modding_tree.column("Title", width=300)
+
+modding_tree_scroll = ttk.Scrollbar(modding_list_frame, orient="vertical", command=modding_tree.yview)
+modding_tree.configure(yscrollcommand=modding_tree_scroll.set)
+
+modding_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+modding_tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+modding_right = ttk.Frame(modding_paned, padding=5)
+modding_paned.add(modding_right, weight=1)
+
+ttk.Label(modding_right, text="Article Preview",
+          font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(0, 5))
+
+modding_title_var = tk.StringVar(value="Select an article to view")
+ttk.Label(modding_right, textvariable=modding_title_var,
+          font=("Segoe UI", 12, "bold"), wraplength=400).pack(anchor="w", pady=(0, 10))
+
+modding_preview_frame = ttk.Frame(modding_right)
+modding_preview_frame.pack(fill=tk.BOTH, expand=True)
+
+modding_preview_text = tk.Text(modding_preview_frame, height=15, wrap=tk.WORD,
+                                bg="#2b2b2b", fg="#e0e0e0", font=("Segoe UI", 10),
+                                state="disabled", padx=10, pady=10)
+modding_preview_scroll = ttk.Scrollbar(modding_preview_frame, orient="vertical",
+                                         command=modding_preview_text.yview)
+modding_preview_text.configure(yscrollcommand=modding_preview_scroll.set)
+
+modding_preview_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+modding_preview_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+modding_btn_frame = ttk.Frame(modding_right)
+modding_btn_frame.pack(fill=tk.X, pady=(10, 0))
+
+modding_current_url = [None]
+modding_image_cache = {}
+
+def load_image_from_url(url, max_width=380):
+    try:
+        from io import BytesIO
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        image_data = BytesIO(response.content)
+        img = Image.open(image_data)
+
+        if img.width > max_width:
+            ratio = max_width / img.width
+            new_height = int(img.height * ratio)
+            img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
+
+        return ImageTk.PhotoImage(img)
+    except Exception as e:
+        print(f"[ModZT] Error loading image from {url}: {e}")
+        return None
+
+def open_current_article():
+    if modding_current_url[0]:
+        webbrowser.open(modding_current_url[0])
+
+ttk.Button(modding_btn_frame, text="Open in Browser",
+           command=open_current_article,
+           bootstyle="info").pack(side=tk.LEFT, padx=4)
+
+ttk.Button(modding_btn_frame, text="Copy Link",
+           command=lambda: copy_article_link(),
+           bootstyle="secondary").pack(side=tk.LEFT, padx=4)
+
+modding_status_var = tk.StringVar(value="Select a category and click Refresh to load articles")
+ttk.Label(modding_tab, textvariable=modding_status_var,
+          bootstyle="secondary").pack(anchor="w", pady=(5, 0))
+
+
+def copy_article_link():
+    if modding_current_url[0]:
+        root.clipboard_clear()
+        root.clipboard_append(modding_current_url[0])
+        messagebox.showinfo("Copied", "Article link copied to clipboard!")
+
+
+def refresh_modding_list():
+    category = modding_category_var.get()
+    modding_tree.delete(*modding_tree.get_children())
+    modding_status_var.set(f"Loading {category}...")
+
+    def fetch_articles():
+        try:
+            articles = []
+            if category == "Tutorials":
+                articles = modding_wiki_api.get_category_pages("Tutorials")
+            elif category == "Blender":
+                articles = modding_wiki_api.get_category_pages("Blender_Tutorials")
+            elif category == "Coding":
+                articles = modding_wiki_api.get_category_pages("Coding_Tutorials")
+            elif category == "NifSkope":
+                articles = modding_wiki_api.get_category_pages("Nifskope_Tutorials")
+            elif category == "Tools":
+                tool_names = ['Blender', 'Nifskope', 'Photoshop', 'Gimp_2', 'Paint_Shop_Pro',
+                              'Visual_Studio_Code', 'Gmax', 'ZT2_BFB_Tool', 'ZT_Studio']
+                articles = [{"title": name.replace("_", " "), "pageid": 0} for name in tool_names]
+            elif category == "File Formats":
+                format_names = ['.z2f', '.nif', '.dds', '.bfm', '.xml', '.lua', '.beh', '.bf', '.bfb']
+                articles = [{"title": name, "pageid": 0} for name in format_names]
+
+            def update_ui():
+                for article in articles:
+                    title = article.get("title", "Unknown")
+                    modding_tree.insert("", tk.END, values=(title,), tags=(title,))
+                modding_status_var.set(f"Found {len(articles)} articles in {category}")
+
+            root.after(0, update_ui)
+
+        except Exception as e:
+            root.after(0, lambda: modding_status_var.set(f"Error loading articles: {e}"))
+
+    threading.Thread(target=fetch_articles, daemon=True).start()
+
+
+def search_modding_wiki():
+    query = modding_search_var.get().strip()
+    if not query:
+        messagebox.showinfo("Search", "Please enter a search term.")
+        return
+
+    modding_tree.delete(*modding_tree.get_children())
+    modding_status_var.set(f"Searching for '{query}'...")
+
+    def do_search():
+        try:
+            results = modding_wiki_api.search(query)
+
+            def update_ui():
+                for result in results:
+                    title = result.get("title", "Unknown")
+                    modding_tree.insert("", tk.END, values=(title,), tags=(title,))
+                modding_status_var.set(f"Found {len(results)} results for '{query}'")
+
+            root.after(0, update_ui)
+
+        except Exception as e:
+            root.after(0, lambda: modding_status_var.set(f"Search error: {e}"))
+
+    threading.Thread(target=do_search, daemon=True).start()
+
+
+def on_modding_article_select(event):
+    selected = modding_tree.selection()
+    if not selected:
+        return
+
+    item = modding_tree.item(selected[0])
+    title = item["tags"][0] if item["tags"] else item["values"][0]
+
+    modding_title_var.set(title)
+    modding_preview_text.config(state="normal")
+    modding_preview_text.delete("1.0", tk.END)
+    modding_preview_text.insert("1.0", "Loading article...")
+    modding_preview_text.config(state="disabled")
+
+    def fetch_content():
+        try:
+            page = modding_wiki_api.get_page_content(title)
+
+            loaded_images = []
+            if page and page.get('images'):
+                for img_data in page['images']:
+                    img_url = img_data.get('url')
+                    if img_url:
+                        photo = load_image_from_url(img_url)
+                        if photo:
+                            loaded_images.append({'name': img_data.get('name', ''), 'photo': photo})
+
+            def update_preview():
+                global modding_image_cache
+                modding_image_cache.clear()
+
+                if page:
+                    modding_current_url[0] = page.get("url", modding_wiki_api.get_page_url(title))
+                    extract = page.get("extract", "No description available.")
+
+                    modding_preview_text.config(state="normal")
+                    modding_preview_text.delete("1.0", tk.END)
+
+                    modding_preview_text.insert("1.0", extract if extract else "No preview available.\n\nClick 'Open in Browser' to view the full article.")
+
+                    if loaded_images:
+                        modding_preview_text.insert(tk.END, "\n\n\n\n")
+                        for i, img in enumerate(loaded_images):
+                            modding_image_cache[f"img_{i}"] = img['photo']
+                            modding_preview_text.image_create(tk.END, image=img['photo'])
+                            modding_preview_text.insert(tk.END, f"\n{img['']}\n\n")
+
+                    modding_preview_text.config(state="disabled")
+                else:
+                    modding_current_url[0] = modding_wiki_api.get_page_url(title)
+                    modding_preview_text.config(state="normal")
+                    modding_preview_text.delete("1.0", tk.END)
+                    modding_preview_text.insert("1.0", "Could not load preview.\n\nClick 'Open in Browser' to view the article.")
+                    modding_preview_text.config(state="disabled")
+
+            root.after(0, update_preview)
+
+        except Exception as e:
+            def show_error():
+                modding_preview_text.config(state="normal")
+                modding_preview_text.delete("1.0", tk.END)
+                modding_preview_text.insert("1.0", f"Error loading article: {e}")
+                modding_preview_text.config(state="disabled")
+            root.after(0, show_error)
+
+    threading.Thread(target=fetch_content, daemon=True).start()
+
+
+modding_tree.bind("<<TreeviewSelect>>", on_modding_article_select)
+modding_category_combo.bind("<<ComboboxSelected>>", lambda e: refresh_modding_list())
+modding_search_entry.bind("<Return>", lambda e: search_modding_wiki())
 
 
 shots_toolbar = ttk.Frame(shots_tab)
@@ -4684,49 +5716,6 @@ def list_sessions():
     return sessions
 
 
-def parse_zoo_stats(save_path):
-    stats = {
-        "money": None,
-        "animals": None,
-        "species": None,
-        "guests": None,
-        "rating": None,
-        "zoo_name": None
-    }
-
-    if not os.path.isfile(save_path):
-        return stats
-
-    try:
-        if zipfile.is_zipfile(save_path):
-            with zipfile.ZipFile(save_path, 'r') as zf:
-                for name in zf.namelist():
-                    if name.lower().endswith('.xml'):
-                        try:
-                            content = zf.read(name).decode('utf-8', errors='ignore')
-
-                            import re
-
-                            money_match = re.search(r'<cash[^>]*>(\d+(?:\.\d+)?)</cash>', content, re.I)
-                            if money_match:
-                                stats["money"] = float(money_match.group(1))
-
-                            name_match = re.search(r'<zooname[^>]*>([^<]+)</zooname>', content, re.I)
-                            if name_match:
-                                stats["zoo_name"] = name_match.group(1)
-
-                            rating_match = re.search(r'<rating[^>]*>(\d+(?:\.\d+)?)</rating>', content, re.I)
-                            if rating_match:
-                                stats["rating"] = float(rating_match.group(1))
-
-                        except Exception:
-                            pass
-    except Exception:
-        pass
-
-    return stats
-
-
 def take_turn(session_id, new_save_path, note=""):
     session = load_session(session_id)
     if not session:
@@ -5388,7 +6377,7 @@ instructions = ttk.Label(async_frame, text="""How to play:
 2. Export session and share with friends
 3. Friends import the session and load the save
 4. After playing, submit your turn with the updated save
-5. Export again and pass to the next player!""",
+5. Export again and pass to the next player""",
     justify="left", bootstyle="secondary", font=("Segoe UI", 9))
 instructions.pack(anchor="w")
 
@@ -5419,36 +6408,12 @@ quickpick_combo.pack(side=tk.RIGHT, padx=4)
 quickpick_combo.bind("<<ComboboxSelected>>", on_quickpick_select)
 ttk.Label(modbrowser_header, text="Featured:", bootstyle="secondary").pack(side=tk.RIGHT)
 
-browse_frame = ttk.LabelFrame(modbrowser_tab, text="Browse by Category", padding=6)
-browse_frame.pack(fill=tk.X, pady=(0, 8))
-
-modbrowser_category_var = tk.StringVar(value="Animals")
-modbrowser_category_combo = ttk.Combobox(
-    browse_frame,
-    textvariable=modbrowser_category_var,
-    values=["Animals", "Foliage", "Objects", "Scenery", "Buildings", "Packs"],
-    state="readonly",
-    width=12
-)
-modbrowser_category_combo.pack(side=tk.LEFT, padx=(0, 8))
-
-ttk.Button(browse_frame, text="Browse", command=lambda: browse_zt2dl_category(),
-           bootstyle="success", width=10).pack(side=tk.LEFT, padx=2)
-
-ttk.Separator(browse_frame, orient="vertical").pack(side=tk.LEFT, padx=12, fill=tk.Y, pady=2)
-
-ttk.Button(browse_frame, text="Recent Additions", command=lambda: load_recent_zt2dl(),
-           bootstyle="info-outline").pack(side=tk.LEFT, padx=2)
-
-ttk.Button(browse_frame, text="Surprise Me!", command=lambda: load_random_zt2dl_mod(),
-           bootstyle="warning-outline").pack(side=tk.LEFT, padx=2)
-
-search_frame = ttk.LabelFrame(modbrowser_tab, text="Search", padding=6)
-search_frame.pack(fill=tk.X, pady=(0, 8))
+search_toolbar = ttk.Frame(modbrowser_tab)
+search_toolbar.pack(fill=tk.X, pady=(0, 8))
 
 modbrowser_search_var = tk.StringVar()
-modbrowser_search_entry = ttk.Entry(search_frame, textvariable=modbrowser_search_var, width=40)
-modbrowser_search_entry.pack(side=tk.LEFT, padx=(0, 8))
+modbrowser_search_entry = ttk.Entry(search_toolbar, textvariable=modbrowser_search_var, width=35)
+modbrowser_search_entry.pack(side=tk.LEFT, padx=(0, 4))
 
 def on_modbrowser_search(event=None):
     query = modbrowser_search_var.get().strip()
@@ -5456,11 +6421,51 @@ def on_modbrowser_search(event=None):
         search_zt2dl_mods(query)
 
 modbrowser_search_entry.bind("<Return>", on_modbrowser_search)
-ttk.Button(search_frame, text="Search", command=on_modbrowser_search,
-           bootstyle="info", width=10).pack(side=tk.LEFT, padx=2)
 
-ttk.Label(search_frame, text="Tip: Search for animal names, creators, or mod types",
-          bootstyle="secondary", font=("Segoe UI", 8)).pack(side=tk.LEFT, padx=(12, 0))
+ttk.Button(search_toolbar, text="Search", command=on_modbrowser_search,
+           bootstyle="info", width=8).pack(side=tk.LEFT, padx=2)
+
+ttk.Separator(search_toolbar, orient="vertical").pack(side=tk.LEFT, padx=8, fill=tk.Y, pady=2)
+
+modbrowser_category_var = tk.StringVar(value="Animals")
+modbrowser_category_combo = ttk.Combobox(search_toolbar, textvariable=modbrowser_category_var,
+    values=["Animals", "Foliage", "Objects", "Scenery", "Buildings", "Packs"],
+    state="readonly", width=10)
+modbrowser_category_combo.pack(side=tk.LEFT, padx=(0, 4))
+
+ttk.Button(search_toolbar, text="Browse", command=lambda: browse_zt2dl_category(),
+           bootstyle="success", width=8).pack(side=tk.LEFT, padx=2)
+
+ttk.Button(search_toolbar, text="Recent", command=lambda: load_recent_zt2dl(),
+           bootstyle="info-outline", width=7).pack(side=tk.LEFT, padx=2)
+
+ttk.Button(search_toolbar, text="Random", command=lambda: load_random_zt2dl_mod(),
+           bootstyle="warning-outline", width=7).pack(side=tk.LEFT, padx=2)
+
+def open_moddb_zt2():
+    webbrowser.open("https://www.moddb.com/games/zoo-tycoon-2/downloads")
+    log("Opened Mod DB", text_widget=log_text)
+
+def open_zt2_roundtable():
+    webbrowser.open("https://thezt2roundtable.com/downloads-f169/")
+    log("Opened ZT2 Round Table", text_widget=log_text)
+
+def open_nexus_mods_zt2():
+    webbrowser.open("https://www.nexusmods.com/zootycoon2")
+    log("Opened Nexus Mods", text_widget=log_text)
+
+ttk.Separator(search_toolbar, orient="vertical").pack(side=tk.LEFT, padx=8, fill=tk.Y, pady=2)
+
+external_btn = ttk.Menubutton(search_toolbar, text="More Sources", bootstyle="secondary-outline")
+external_menu = tk.Menu(external_btn, tearoff=0)
+external_menu.add_command(label="Mod DB", command=open_moddb_zt2)
+external_menu.add_command(label="ZT2 Round Table", command=open_zt2_roundtable)
+external_menu.add_command(label="Nexus Mods", command=open_nexus_mods_zt2)
+external_btn["menu"] = external_menu
+external_btn.pack(side=tk.LEFT, padx=2)
+
+ttk.Button(search_toolbar, text="Install URL", command=install_mod_from_url_dialog,
+           bootstyle="success-outline", width=10).pack(side=tk.LEFT, padx=2)
 
 modbrowser_split = ttk.PanedWindow(modbrowser_tab, orient=tk.HORIZONTAL)
 modbrowser_split.pack(fill=tk.BOTH, expand=True)
@@ -5639,6 +6644,7 @@ def search_zt2dl_mods(query):
 
     threading.Thread(target=lambda: root.after(0, lambda: on_complete(fetch())),
                      daemon=True).start()
+
 
 def load_recent_zt2dl():
     modbrowser_category_var.set("Recent")
@@ -6531,6 +7537,154 @@ def open_mod_folder():
     messagebox.showinfo("Not Found", f"Could not find {mod} on disk.")
 
 
+def parse_z2f_contents(z2f_path):
+    contents = {
+        "animals": [],
+        "objects": [],
+        "buildings": [],
+        "scenery": [],
+        "foliage": [],
+        "fences": [],
+        "paths": [],
+        "guests": [],
+        "staff": [],
+        "other": [],
+        "files": [],
+        "total_size": 0,
+        "compressed_size": 0
+    }
+
+    try:
+        with zipfile.ZipFile(z2f_path, 'r') as zf:
+            for info in zf.infolist():
+                contents["total_size"] += info.file_size
+                contents["compressed_size"] += info.compress_size
+                contents["files"].append({
+                    "name": info.filename,
+                    "size": info.file_size,
+                    "compressed": info.compress_size
+                })
+
+                if info.filename.lower().endswith('.xml'):
+                    try:
+                        xml_data = zf.read(info.filename).decode('utf-8', errors='ignore')
+                        if xml_data.startswith('\ufeff'):
+                            xml_data = xml_data[1:]
+
+                        root_elem = ET.fromstring(xml_data)
+
+                        entity_info = extract_entity_info(root_elem, info.filename)
+                        if entity_info:
+                            category = entity_info.get("category", "other")
+                            if category in contents:
+                                contents[category].append(entity_info)
+                            else:
+                                contents["other"].append(entity_info)
+                    except ET.ParseError:
+                        pass
+                    except Exception:
+                        pass
+    except zipfile.BadZipFile:
+        return None
+
+    return contents
+
+
+def extract_entity_info(root_elem, filename):
+    info = {
+        "filename": filename,
+        "name": None,
+        "codename": None,
+        "type": None,
+        "category": "other",
+        "icon": None,
+        "description": None
+    }
+
+    root_tag = root_elem.tag.lower() if root_elem.tag else ""
+
+    if root_tag == "bfaitype" or root_elem.find(".//BFAIType") is not None:
+        info["category"] = "animals"
+        info["type"] = "Animal"
+    elif root_tag == "bfbuildingtype" or root_elem.find(".//BFBuildingType") is not None:
+        info["category"] = "buildings"
+        info["type"] = "Building"
+    elif root_tag == "bfscenerytype" or root_elem.find(".//BFSceneryType") is not None:
+        info["category"] = "scenery"
+        info["type"] = "Scenery"
+    elif root_tag == "bffencetype" or root_elem.find(".//BFFenceType") is not None:
+        info["category"] = "fences"
+        info["type"] = "Fence"
+    elif root_tag == "bfpathtype" or root_elem.find(".//BFPathType") is not None:
+        info["category"] = "paths"
+        info["type"] = "Path"
+    elif root_tag == "bffoliagetype" or root_elem.find(".//BFFoliageType") is not None:
+        info["category"] = "foliage"
+        info["type"] = "Foliage"
+    elif root_tag == "bfguesttype" or root_elem.find(".//BFGuestType") is not None:
+        info["category"] = "guests"
+        info["type"] = "Guest"
+    elif root_tag == "bfstafftype" or root_elem.find(".//BFStaffType") is not None:
+        info["category"] = "staff"
+        info["type"] = "Staff"
+    elif root_tag == "bfunittype" or root_elem.find(".//BFUnitType") is not None:
+        info["category"] = "objects"
+        info["type"] = "Object"
+    else:
+        path_lower = filename.lower()
+        if "/animals/" in path_lower or "\\animals\\" in path_lower:
+            info["category"] = "animals"
+            info["type"] = "Animal"
+        elif "/buildings/" in path_lower or "\\buildings\\" in path_lower:
+            info["category"] = "buildings"
+            info["type"] = "Building"
+        elif "/scenery/" in path_lower or "\\scenery\\" in path_lower:
+            info["category"] = "scenery"
+            info["type"] = "Scenery"
+        elif "/foliage/" in path_lower or "\\foliage\\" in path_lower:
+            info["category"] = "foliage"
+            info["type"] = "Foliage"
+        elif "/fences/" in path_lower or "\\fences\\" in path_lower:
+            info["category"] = "fences"
+            info["type"] = "Fence"
+        elif "/paths/" in path_lower or "\\paths\\" in path_lower:
+            info["category"] = "paths"
+            info["type"] = "Path"
+        else:
+            return None
+
+    for tag in ["codename", "Codename", "cCodename", "ccodename"]:
+        elem = root_elem.find(f".//{tag}")
+        if elem is not None and elem.text:
+            info["codename"] = elem.text.strip()
+            break
+
+    if not info["codename"]:
+        type_attr = root_elem.get("Type") or root_elem.get("type")
+        if type_attr:
+            info["codename"] = type_attr
+        else:
+            base = os.path.basename(filename)
+            info["codename"] = os.path.splitext(base)[0]
+
+    for tag in ["cIconName", "ciconname", "IconName", "Name", "name", "cName"]:
+        elem = root_elem.find(f".//{tag}")
+        if elem is not None and elem.text:
+            info["name"] = elem.text.strip()
+            break
+
+    if not info["name"]:
+        info["name"] = info["codename"]
+
+    for tag in ["cDescription", "Description", "description"]:
+        elem = root_elem.find(f".//{tag}")
+        if elem is not None and elem.text:
+            info["description"] = elem.text.strip()
+            break
+
+    return info
+
+
 def inspect_selected_mod():
     mod = get_selected_mod()
     if not mod:
@@ -6541,50 +7695,609 @@ def inspect_selected_mod():
         messagebox.showerror("Error", f"Cannot find file for '{mod}'.")
         return
 
-    dlg = tk.Toplevel(root)
-    dlg.title(f"Inspect: {mod}")
-    dlg.geometry("700x700")
-
-    frame = ttk.Frame(dlg, padding=8)
-    frame.pack(fill=tk.BOTH, expand=True)
-
-    ttk.Label(frame,
-              text=f"📦 Contents of {mod}",
-              font=("Segoe UI", 12, "bold")).pack(anchor="w", pady=(0, 8))
-
-    tree = ttk.Treeview(frame, columns=("size", "compressed"), show="headings")
-    tree.heading("size", text="Size (KB)")
-    tree.heading("compressed", text="Compressed (KB)")
-    tree.column("size", width=100, anchor="e")
-    tree.column("compressed", width=120, anchor="e")
-    tree.pack(fill=tk.BOTH, expand=True)
-
-    scrollbar = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
-    tree.configure(yscrollcommand=scrollbar.set)
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-    try:
-        with zipfile.ZipFile(path, 'r') as zf:
-            for info in zf.infolist():
-                size_kb = info.file_size / 1024
-                comp_kb = info.compress_size / 1024
-                tree.insert("",
-                            tk.END,
-                            values=(info.filename, f"{size_kb:.1f}",
-                                    f"{comp_kb:.1f}"))
-    except zipfile.BadZipFile:
+    contents = parse_z2f_contents(path)
+    if contents is None:
         messagebox.showerror("Error", "This mod file is not a valid Z2F file.")
-        dlg.destroy()
         return
+
+    dlg = tk.Toplevel(root)
+    dlg.title(f"Z2F Contents: {mod}")
+    dlg.geometry("900x700")
+
+    main_frame = ttk.Frame(dlg, padding=8)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    header = ttk.Frame(main_frame)
+    header.pack(fill=tk.X, pady=(0, 10))
+
+    ttk.Label(header,
+              text=f"Contents of {mod}",
+              font=("Segoe UI", 14, "bold")).pack(side=tk.LEFT)
+
+    total_entities = sum(len(contents[cat]) for cat in
+                         ["animals", "objects", "buildings", "scenery", "foliage", "fences", "paths"])
+    size_mb = contents["total_size"] / (1024 * 1024)
+    comp_mb = contents["compressed_size"] / (1024 * 1024)
+
+    ttk.Label(header,
+              text=f"Size: {size_mb:.2f} MB ({comp_mb:.2f} MB compressed)",
+              bootstyle="secondary").pack(side=tk.RIGHT)
+
+    summary_frame = ttk.Frame(main_frame)
+    summary_frame.pack(fill=tk.X, pady=(0, 10))
+
+    categories = [
+        ("Animals", "animals", "success"),
+        ("Buildings", "buildings", "info"),
+        ("Scenery", "scenery", "warning"),
+        ("Foliage", "foliage", "success"),
+        ("Fences", "fences", "secondary"),
+        ("Paths", "paths", "secondary"),
+        ("Objects", "objects", "primary"),
+    ]
+
+    for i, (label, key, style) in enumerate(categories):
+        count = len(contents[key])
+        if count > 0:
+            card = ttk.Frame(summary_frame)
+            card.pack(side=tk.LEFT, padx=4)
+            ttk.Label(card, text=str(count), font=("Segoe UI", 16, "bold")).pack()
+            ttk.Label(card, text=label, bootstyle=style).pack()
+
+    notebook = ttk.Notebook(main_frame)
+    notebook.pack(fill=tk.BOTH, expand=True, pady=(10, 0))
+
+    content_tab = ttk.Frame(notebook, padding=6)
+    notebook.add(content_tab, text="Content")
+
+    content_tree = ttk.Treeview(content_tab,
+                                 columns=("Type", "Name", "Codename"),
+                                 show="headings", height=15)
+    content_tree.heading("Type", text="Type")
+    content_tree.heading("Name", text="Display Name")
+    content_tree.heading("Codename", text="Codename")
+    content_tree.column("Type", width=100)
+    content_tree.column("Name", width=300)
+    content_tree.column("Codename", width=300)
+
+    content_scroll = ttk.Scrollbar(content_tab, orient="vertical", command=content_tree.yview)
+    content_tree.configure(yscrollcommand=content_scroll.set)
+
+    content_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    content_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+    type_icons = {
+        "animals": "Animal",
+        "buildings": "Building",
+        "scenery": "Scenery",
+        "foliage": "Foliage",
+        "fences": "Fence",
+        "paths": "Path",
+        "objects": "Object",
+        "guests": "Guest",
+        "staff": "Staff",
+        "other": "Other"
+    }
+
+    for cat_key, cat_label in type_icons.items():
+        for entity in contents[cat_key]:
+            content_tree.insert("", tk.END,
+                              values=(cat_label,
+                                     entity.get("name", "Unknown"),
+                                     entity.get("codename", "Unknown")))
+
+    files_tab = ttk.Frame(notebook, padding=6)
+    notebook.add(files_tab, text=f"Files ({len(contents['files'])})")
+
+    files_tree = ttk.Treeview(files_tab,
+                               columns=("Filename", "Size", "Compressed"),
+                               show="headings", height=15)
+    files_tree.heading("Filename", text="Filename")
+    files_tree.heading("Size", text="Size (KB)")
+    files_tree.heading("Compressed", text="Compressed (KB)")
+    files_tree.column("Filename", width=500)
+    files_tree.column("Size", width=100, anchor="e")
+    files_tree.column("Compressed", width=100, anchor="e")
+
+    files_scroll = ttk.Scrollbar(files_tab, orient="vertical", command=files_tree.yview)
+    files_tree.configure(yscrollcommand=files_scroll.set)
+
+    files_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    files_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+    for f in contents["files"]:
+        size_kb = f["size"] / 1024
+        comp_kb = f["compressed"] / 1024
+        files_tree.insert("", tk.END,
+                         values=(f["name"], f"{size_kb:.1f}", f"{comp_kb:.1f}"))
+
+    detail_frame = ttk.LabelFrame(main_frame, text="Details", padding=8)
+    detail_frame.pack(fill=tk.X, pady=(10, 0))
+
+    detail_text = tk.Text(detail_frame, height=4, state="disabled",
+                          bg="#2b2b2b", fg="#e0e0e0", font=("Consolas", 9), wrap=tk.WORD)
+    detail_text.pack(fill=tk.X)
+
+    def on_content_select(event):
+        selected = content_tree.selection()
+        if not selected:
+            return
+        item = content_tree.item(selected[0])
+        values = item["values"]
+
+        detail_text.config(state="normal")
+        detail_text.delete("1.0", tk.END)
+        detail_text.insert("1.0", f"Type: {values[0]}\nDisplay Name: {values[1]}\nCodename: {values[2]}")
+        detail_text.config(state="disabled")
+
+    content_tree.bind("<<TreeviewSelect>>", on_content_select)
 
     btns = ttk.Frame(dlg, padding=6)
     btns.pack(fill=tk.X)
+
     ttk.Button(btns,
                text="Extract to Folder",
-               command=lambda: extract_zip_contents(path)).pack(side=tk.LEFT,
-                                                                padx=4)
-    ttk.Button(btns, text="Close", command=dlg.destroy).pack(side=tk.RIGHT,
-                                                             padx=4)
+               command=lambda: extract_zip_contents(path),
+               bootstyle="info").pack(side=tk.LEFT, padx=4)
+
+    ttk.Button(btns,
+               text="Copy Content List",
+               command=lambda: copy_content_list(contents),
+               bootstyle="secondary").pack(side=tk.LEFT, padx=4)
+
+    ttk.Button(btns, text="Close", command=dlg.destroy).pack(side=tk.RIGHT, padx=4)
+
+
+def copy_content_list(contents):
+    lines = ["Content Summary", "=" * 40, ""]
+
+    categories = [
+        ("Animals", "animals"),
+        ("Buildings", "buildings"),
+        ("Scenery", "scenery"),
+        ("Foliage", "foliage"),
+        ("Fences", "fences"),
+        ("Paths", "paths"),
+        ("Objects", "objects"),
+    ]
+
+    for label, key in categories:
+        if contents[key]:
+            lines.append(f"{label} ({len(contents[key])}):")
+            for entity in contents[key]:
+                name = entity.get("name", "Unknown")
+                codename = entity.get("codename", "")
+                if name != codename:
+                    lines.append(f"  - {name} ({codename})")
+                else:
+                    lines.append(f"  - {name}")
+            lines.append("")
+
+    text = "\n".join(lines)
+    root.clipboard_clear()
+    root.clipboard_append(text)
+    messagebox.showinfo("Copied", "Content list copied to clipboard!")
+
+
+def scan_mod_conflicts():
+    if not GAME_PATH or not os.path.isdir(GAME_PATH):
+        messagebox.showwarning("No Game Path", "Please set your Zoo Tycoon 2 game path first.")
+        return
+
+    cursor.execute("SELECT name, enabled FROM mods")
+    all_mods = cursor.fetchall()
+
+    if not all_mods:
+        messagebox.showinfo("No Mods", "No mods found to scan.")
+        return
+
+    progress_dlg = tk.Toplevel(root)
+    progress_dlg.title("Scanning for Conflicts")
+    progress_dlg.geometry("400x120")
+    progress_dlg.transient(root)
+    progress_dlg.grab_set()
+
+    ttk.Label(progress_dlg, text="Scanning mods for file conflicts...",
+              font=("Segoe UI", 11)).pack(pady=(20, 10))
+
+    progress_var = tk.DoubleVar(value=0)
+    progress_bar = ttk.Progressbar(progress_dlg, variable=progress_var,
+                                    maximum=100, length=350)
+    progress_bar.pack(pady=10)
+
+    status_var = tk.StringVar(value="Initializing...")
+    ttk.Label(progress_dlg, textvariable=status_var).pack()
+
+    progress_dlg.update()
+
+    file_index = {}
+    mod_count = len(all_mods)
+
+    for i, (mod_name, enabled) in enumerate(all_mods):
+        progress_var.set((i / mod_count) * 100)
+        status_var.set(f"Scanning: {mod_name[:40]}...")
+        progress_dlg.update()
+
+        mod_path = find_mod_file(mod_name)
+        if not mod_path or not os.path.isfile(mod_path):
+            continue
+
+        try:
+            with zipfile.ZipFile(mod_path, 'r') as zf:
+                for info in zf.infolist():
+                    file_path = info.filename.lower().replace('\\', '/')
+
+                    if file_path.endswith('/'):
+                        continue
+
+                    if file_path not in file_index:
+                        file_index[file_path] = []
+
+                    file_index[file_path].append({
+                        "mod": mod_name,
+                        "size": info.file_size,
+                        "enabled": enabled == 1,
+                        "original_path": info.filename
+                    })
+        except zipfile.BadZipFile:
+            continue
+        except Exception:
+            continue
+
+    progress_dlg.destroy()
+
+    conflicts = {}
+    for file_path, mods in file_index.items():
+        if len(mods) > 1:
+            conflicts[file_path] = mods
+
+    show_conflict_results(conflicts, len(all_mods))
+
+
+def show_conflict_results(conflicts, total_mods):
+    dlg = tk.Toplevel(root)
+    dlg.title("Mod Conflict Scanner")
+    dlg.geometry("1000x700")
+
+    main_frame = ttk.Frame(dlg, padding=10)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    header = ttk.Frame(main_frame)
+    header.pack(fill=tk.X, pady=(0, 10))
+
+    ttk.Label(header, text="Mod Conflict Scanner",
+              font=("Segoe UI", 14, "bold")).pack(side=tk.LEFT)
+
+    conflict_count = len(conflicts)
+    affected_mods = set()
+    for file_path, mods in conflicts.items():
+        for mod_info in mods:
+            affected_mods.add(mod_info["mod"])
+
+    if conflict_count == 0:
+        summary_text = f"No conflicts found among {total_mods} mods!"
+        summary_style = "success"
+    else:
+        summary_text = f"Found {conflict_count} file conflicts affecting {len(affected_mods)} mods"
+        summary_style = "warning"
+
+    ttk.Label(header, text=summary_text, bootstyle=summary_style).pack(side=tk.RIGHT)
+
+    if conflict_count == 0:
+        ttk.Label(main_frame,
+                  text="All mods are compatible - no file overwrites detected.",
+                  font=("Segoe UI", 12)).pack(pady=50)
+        ttk.Button(main_frame, text="Close", command=dlg.destroy).pack()
+        return
+
+    filter_frame = ttk.Frame(main_frame)
+    filter_frame.pack(fill=tk.X, pady=(0, 10))
+
+    filter_var = tk.StringVar(value="all")
+    ttk.Label(filter_frame, text="Show:").pack(side=tk.LEFT, padx=(0, 5))
+    ttk.Radiobutton(filter_frame, text="All Conflicts", variable=filter_var,
+                    value="all").pack(side=tk.LEFT, padx=5)
+    ttk.Radiobutton(filter_frame, text="Enabled Mods Only", variable=filter_var,
+                    value="enabled").pack(side=tk.LEFT, padx=5)
+    ttk.Radiobutton(filter_frame, text="Critical (XML files)", variable=filter_var,
+                    value="critical").pack(side=tk.LEFT, padx=5)
+
+    paned = ttk.PanedWindow(main_frame, orient=tk.HORIZONTAL)
+    paned.pack(fill=tk.BOTH, expand=True)
+
+    left_frame = ttk.Frame(paned, padding=5)
+    paned.add(left_frame, weight=1)
+
+    ttk.Label(left_frame, text="Conflicting Files",
+              font=("Segoe UI", 11, "bold")).pack(anchor="w")
+
+    conflict_tree = ttk.Treeview(left_frame,
+                                  columns=("File", "Mods", "Type"),
+                                  show="headings", height=20)
+    conflict_tree.heading("File", text="File Path")
+    conflict_tree.heading("Mods", text="# Mods")
+    conflict_tree.heading("Type", text="Type")
+    conflict_tree.column("File", width=350)
+    conflict_tree.column("Mods", width=60, anchor="center")
+    conflict_tree.column("Type", width=80)
+
+    conflict_scroll = ttk.Scrollbar(left_frame, orient="vertical",
+                                     command=conflict_tree.yview)
+    conflict_tree.configure(yscrollcommand=conflict_scroll.set)
+
+    conflict_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    conflict_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+    right_frame = ttk.Frame(paned, padding=5)
+    paned.add(right_frame, weight=1)
+
+    ttk.Label(right_frame, text="Affected Mods",
+              font=("Segoe UI", 11, "bold")).pack(anchor="w")
+
+    detail_tree = ttk.Treeview(right_frame,
+                                columns=("Mod", "Status", "Size"),
+                                show="headings", height=10)
+    detail_tree.heading("Mod", text="Mod Name")
+    detail_tree.heading("Status", text="Status")
+    detail_tree.heading("Size", text="File Size")
+    detail_tree.column("Mod", width=250)
+    detail_tree.column("Status", width=80)
+    detail_tree.column("Size", width=80, anchor="e")
+
+    detail_scroll = ttk.Scrollbar(right_frame, orient="vertical",
+                                   command=detail_tree.yview)
+    detail_tree.configure(yscrollcommand=detail_scroll.set)
+
+    detail_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, pady=(5, 0))
+    detail_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=(5, 0))
+
+    info_frame = ttk.LabelFrame(right_frame, text="Conflict Info", padding=8)
+    info_frame.pack(fill=tk.X, pady=(10, 0))
+
+    info_text = tk.Text(info_frame, height=6, state="disabled",
+                        bg="#2b2b2b", fg="#e0e0e0", font=("Consolas", 9), wrap=tk.WORD)
+    info_text.pack(fill=tk.X)
+
+    conflicts_data = conflicts
+
+    def get_file_type(filepath):
+        ext = os.path.splitext(filepath)[1].lower()
+        if ext == '.xml':
+            return "XML"
+        elif ext in ['.dds', '.tga', '.png', '.bmp']:
+            return "Texture"
+        elif ext in ['.nif', '.bfm']:
+            return "Model"
+        elif ext in ['.wav', '.mp3', '.ogg']:
+            return "Audio"
+        elif ext == '.lua':
+            return "Script"
+        elif ext == '.ini':
+            return "Config"
+        else:
+            return "Other"
+
+    def populate_conflict_tree(filter_type="all"):
+        conflict_tree.delete(*conflict_tree.get_children())
+
+        for file_path, mods in conflicts_data.items():
+            if filter_type == "enabled":
+                enabled_mods = [m for m in mods if m["enabled"]]
+                if len(enabled_mods) < 2:
+                    continue
+                display_mods = enabled_mods
+            elif filter_type == "critical":
+                if not file_path.endswith('.xml'):
+                    continue
+                display_mods = mods
+            else:
+                display_mods = mods
+
+            file_type = get_file_type(file_path)
+            display_path = file_path
+            if len(display_path) > 50:
+                display_path = "..." + display_path[-47:]
+
+            item_id = conflict_tree.insert("", tk.END,
+                                           values=(display_path, len(display_mods), file_type),
+                                           tags=(file_path,))
+
+    def on_conflict_select(event):
+        selected = conflict_tree.selection()
+        if not selected:
+            return
+
+        item = conflict_tree.item(selected[0])
+        file_path = item["tags"][0] if item["tags"] else None
+
+        if not file_path or file_path not in conflicts_data:
+            return
+
+        mods = conflicts_data[file_path]
+
+        detail_tree.delete(*detail_tree.get_children())
+
+        for mod_info in mods:
+            status = "Enabled" if mod_info["enabled"] else "Disabled"
+            size_kb = mod_info["size"] / 1024
+            detail_tree.insert("", tk.END,
+                              values=(mod_info["mod"], status, f"{size_kb:.1f} KB"),
+                              tags=("enabled" if mod_info["enabled"] else "disabled",))
+
+        detail_tree.tag_configure("enabled", foreground="#2ecc71")
+        detail_tree.tag_configure("disabled", foreground="#95a5a6")
+
+        info_text.config(state="normal")
+        info_text.delete("1.0", tk.END)
+
+        info_lines = [
+            f"File: {file_path}",
+            f"Type: {get_file_type(file_path)}",
+            f"Conflicting mods: {len(mods)}",
+            "",
+            "Note: The last loaded mod will overwrite earlier ones.",
+            "Load order depends on alphabetical filename order."
+        ]
+        info_text.insert("1.0", "\n".join(info_lines))
+        info_text.config(state="disabled")
+
+    conflict_tree.bind("<<TreeviewSelect>>", on_conflict_select)
+
+    def on_filter_change(*args):
+        populate_conflict_tree(filter_var.get())
+
+    filter_var.trace_add("write", on_filter_change)
+
+    populate_conflict_tree()
+
+    btn_frame = ttk.Frame(dlg, padding=8)
+    btn_frame.pack(fill=tk.X)
+
+    def export_conflicts():
+        filepath = filedialog.asksaveasfilename(
+            title="Save Conflict Report",
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+        )
+        if not filepath:
+            return
+
+        lines = ["Conflict Report", "=" * 50, "",
+                 f"Total conflicts: {len(conflicts_data)}",
+                 f"Affected mods: {len(affected_mods)}", ""]
+
+        for file_path, mods in sorted(conflicts_data.items()):
+            lines.append(f"\nFile: {file_path}")
+            lines.append(f"Type: {get_file_type(file_path)}")
+            lines.append("Mods:")
+            for mod_info in mods:
+                status = "[ENABLED]" if mod_info["enabled"] else "[disabled]"
+                lines.append(f"  - {mod_info['mod']} {status}")
+
+        try:
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write("\n".join(lines))
+            messagebox.showinfo("Exported", f"Conflict report saved to:\n{filepath}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to save report:\n{e}")
+
+    ttk.Button(btn_frame, text="Export Report",
+               command=export_conflicts,
+               bootstyle="info").pack(side=tk.LEFT, padx=4)
+
+    ttk.Button(btn_frame, text="Rescan",
+               command=lambda: [dlg.destroy(), scan_mod_conflicts()],
+               bootstyle="secondary").pack(side=tk.LEFT, padx=4)
+
+    ttk.Button(btn_frame, text="Close",
+               command=dlg.destroy).pack(side=tk.RIGHT, padx=4)
+
+
+def check_selected_mod_conflicts():
+    mod = get_selected_mod()
+    if mod:
+        check_mod_conflicts_for(mod)
+
+
+def check_mod_conflicts_for(mod_name):
+    mod_path = find_mod_file(mod_name)
+    if not mod_path or not os.path.isfile(mod_path):
+        messagebox.showerror("Error", f"Cannot find file for '{mod_name}'.")
+        return
+
+    target_files = set()
+    try:
+        with zipfile.ZipFile(mod_path, 'r') as zf:
+            for info in zf.infolist():
+                if not info.filename.endswith('/'):
+                    target_files.add(info.filename.lower().replace('\\', '/'))
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to read mod:\n{e}")
+        return
+
+    cursor.execute("SELECT name FROM mods WHERE name != ?", (mod_name,))
+    other_mods = [row[0] for row in cursor.fetchall()]
+
+    conflicts = {}
+
+    for other_mod in other_mods:
+        other_path = find_mod_file(other_mod)
+        if not other_path or not os.path.isfile(other_path):
+            continue
+
+        try:
+            with zipfile.ZipFile(other_path, 'r') as zf:
+                for info in zf.infolist():
+                    if info.filename.endswith('/'):
+                        continue
+                    file_path = info.filename.lower().replace('\\', '/')
+                    if file_path in target_files:
+                        if other_mod not in conflicts:
+                            conflicts[other_mod] = []
+                        conflicts[other_mod].append(info.filename)
+        except Exception:
+            continue
+
+    if not conflicts:
+        messagebox.showinfo("No Conflicts",
+                           f"'{mod_name}' has no file conflicts with other mods.")
+        return
+
+    dlg = tk.Toplevel(root)
+    dlg.title(f"Conflicts for: {mod_name}")
+    dlg.geometry("700x500")
+
+    main_frame = ttk.Frame(dlg, padding=10)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    ttk.Label(main_frame,
+              text=f"Conflicts for: {mod_name}",
+              font=("Segoe UI", 12, "bold")).pack(anchor="w", pady=(0, 5))
+
+    ttk.Label(main_frame,
+              text=f"Found conflicts with {len(conflicts)} other mod(s)",
+              bootstyle="warning").pack(anchor="w", pady=(0, 10))
+
+    tree = ttk.Treeview(main_frame, columns=("Mod", "Files"),
+                        show="headings", height=15)
+    tree.heading("Mod", text="Conflicting Mod")
+    tree.heading("Files", text="# Conflicting Files")
+    tree.column("Mod", width=400)
+    tree.column("Files", width=150, anchor="center")
+
+    scroll = ttk.Scrollbar(main_frame, orient="vertical", command=tree.yview)
+    tree.configure(yscrollcommand=scroll.set)
+
+    tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+    for other_mod, files in sorted(conflicts.items(), key=lambda x: -len(x[1])):
+        tree.insert("", tk.END, values=(other_mod, len(files)), tags=(other_mod,))
+
+    detail_frame = ttk.LabelFrame(dlg, text="Conflicting Files", padding=8)
+    detail_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+
+    detail_text = tk.Text(detail_frame, height=8, state="disabled",
+                          bg="#2b2b2b", fg="#e0e0e0", font=("Consolas", 9))
+    detail_text.pack(fill=tk.X)
+
+    def on_select(event):
+        selected = tree.selection()
+        if not selected:
+            return
+        item = tree.item(selected[0])
+        other_mod = item["tags"][0] if item["tags"] else None
+        if other_mod and other_mod in conflicts:
+            detail_text.config(state="normal")
+            detail_text.delete("1.0", tk.END)
+            detail_text.insert("1.0", "\n".join(conflicts[other_mod][:50]))
+            if len(conflicts[other_mod]) > 50:
+                detail_text.insert(tk.END, f"\n... and {len(conflicts[other_mod]) - 50} more")
+            detail_text.config(state="disabled")
+
+    tree.bind("<<TreeviewSelect>>", on_select)
+
+    ttk.Button(dlg, text="Close", command=dlg.destroy).pack(pady=10)
 
 
 def extract_zip_contents(path):
@@ -6770,12 +8483,10 @@ def update_status():
 
 
 search_var.trace_add('write', lambda *_: filter_tree())
-zt2_status_filter.trace_add('write', lambda *_: filter_tree())
 
 
 def filter_tree(*_):
     query = search_var.get().strip().lower()
-    status_filter = zt2_status_filter.get().lower()
 
     for row in mods_tree.get_children():
         mods_tree.delete(row)
@@ -6790,9 +8501,6 @@ def filter_tree(*_):
 
         combined = f"{name.lower()} {category.lower() if category else ''} {status_str}"
         if query and query not in combined:
-            continue
-
-        if status_filter != "all" and status_str != status_filter:
             continue
 
         path = find_mod_file(name)
@@ -6923,5 +8631,7 @@ refresh_saves_list()
 refresh_sessions()
 
 start_background_music(volume=0.3)
+
+start_theme_scheduler()
 
 root.mainloop()
