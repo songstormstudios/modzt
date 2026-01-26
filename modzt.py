@@ -1,3 +1,4 @@
+﻿import argparse
 import glob
 import hashlib
 import io
@@ -46,401 +47,29 @@ except ImportError:
     print("[!] pygame not installed. Background music disabled.")
     print("    Install with: pip install pygame")
 
-TRANSLATIONS = {
-    "en": {
-        "lang_name": "English",
-        "tab_zt2_mods": "ZT2 Mods",
-        "tab_zt1_mods": "ZT1 Mods",
-        "tab_bundles": "Bundles",
-        "tab_saved_games": "Saved Games",
-        "tab_screenshots": "Screenshots",
-        "tab_multiplayer": "Multiplayer",
-        "tab_mod_browser": "Mod Browser",
-        "tab_themes": "Themes",
+try:
+    from pypresence import Presence
+    DISCORD_AVAILABLE = True
+except ImportError:
+    DISCORD_AVAILABLE = False
+    print("[!] pypresence not installed. Discord integration disabled.")
+    print("    Install with: pip install pypresence")
 
-        "menu_game": "Game",
-        "menu_mods": "Mods",
-        "menu_tools": "Tools",
-        "menu_view": "View",
-        "menu_help": "Help",
+def _load_translations():
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    translations_file = os.path.join(base_path, "translations.json")
+    if os.path.isfile(translations_file):
+        try:
+            with open(translations_file, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"[!] Failed to load translations: {e}")
+    return {"en": {"lang_name": "English"}}
 
-        "menu_toggle_theme": "Toggle Theme",
-        "menu_toggle_music": "Toggle Music",
-        "menu_compact_mode": "Compact Mode",
-        "menu_expanded_mode": "Expanded Mode",
-        "menu_language": "Language",
-
-        "btn_install": "Install Mods",
-        "btn_enable": "Enable",
-        "btn_disable": "Disable",
-        "btn_enable_all": "Enable All",
-        "btn_disable_all": "Disable All",
-        "btn_refresh": "Refresh",
-        "btn_delete": "Delete",
-        "btn_search": "Search",
-        "btn_browse": "Browse",
-        "btn_download": "Download",
-        "btn_apply": "Apply",
-        "btn_save": "Save",
-        "btn_cancel": "Cancel",
-        "btn_close": "Close",
-        "btn_launch_game": "Launch Game",
-        "btn_achievements": "Achievements",
-
-        "mb_quick_picks": "Quick Picks...",
-        "mb_featured": "Featured:",
-        "mb_browse_category": "Browse by Category",
-        "mb_search": "Search",
-        "mb_recent": "Recent Additions",
-        "mb_surprise": "Surprise Me!",
-        "mb_wiki_page": "Wiki Page",
-        "mb_mod_details": "Mod Details",
-        "mb_select_mod": "Select a mod to view details",
-        "mb_description": "Description:",
-        "mb_download_links": "Download Links:",
-        "mb_search_tip": "Tip: Search for animal names, creators, or mod types",
-
-        "shots_select_album": "Select Album:",
-        "shots_open_folder": "Open Folder",
-
-        "saves_preview": "Preview",
-        "saves_open_folder": "Open Folder",
-
-        "themes_select": "Select Theme:",
-        "themes_apply": "Apply Theme",
-
-        "msg_no_mods": "No mods installed",
-        "msg_loading": "Loading...",
-        "msg_success": "Success",
-        "msg_error": "Error",
-        "msg_confirm_delete": "Are you sure you want to delete this?",
-        "msg_language_changed": "Language changed. Some changes require restart.",
-
-        "ach_title": "Achievements",
-        "ach_unlocked": "Achievement Unlocked!",
-        "ach_progress": "Progress",
-    },
-    "es": {
-        "lang_name": "Español",
-        "tab_zt2_mods": "Mods ZT2",
-        "tab_zt1_mods": "Mods ZT1",
-        "tab_bundles": "Paquetes",
-        "tab_saved_games": "Partidas Guardadas",
-        "tab_screenshots": "Capturas",
-        "tab_multiplayer": "Multijugador",
-        "tab_mod_browser": "Explorador de Mods",
-        "tab_themes": "Temas",
-        "menu_game": "Juego",
-        "menu_mods": "Mods",
-        "menu_tools": "Herramientas",
-        "menu_view": "Ver",
-        "menu_help": "Ayuda",
-        "menu_toggle_theme": "Cambiar Tema",
-        "menu_toggle_music": "Cambiar Música",
-        "menu_compact_mode": "Modo Compacto",
-        "menu_expanded_mode": "Modo Expandido",
-        "menu_language": "Idioma",
-        "btn_install": "Instalar Mods",
-        "btn_enable": "Activar",
-        "btn_disable": "Desactivar",
-        "btn_enable_all": "Activar Todo",
-        "btn_disable_all": "Desactivar Todo",
-        "btn_refresh": "Actualizar",
-        "btn_delete": "Eliminar",
-        "btn_search": "Buscar",
-        "btn_browse": "Explorar",
-        "btn_download": "Descargar",
-        "btn_apply": "Aplicar",
-        "btn_save": "Guardar",
-        "btn_cancel": "Cancelar",
-        "btn_close": "Cerrar",
-        "btn_launch_game": "Iniciar Juego",
-        "btn_achievements": "Logros",
-        "mb_quick_picks": "Selección Rápida...",
-        "mb_featured": "Destacados:",
-        "mb_browse_category": "Explorar por Categoría",
-        "mb_search": "Buscar",
-        "mb_recent": "Añadidos Recientes",
-        "mb_surprise": "¡Sorpréndeme!",
-        "mb_wiki_page": "Página Wiki",
-        "mb_mod_details": "Detalles del Mod",
-        "mb_select_mod": "Selecciona un mod para ver detalles",
-        "mb_description": "Descripción:",
-        "mb_download_links": "Enlaces de Descarga:",
-        "mb_search_tip": "Consejo: Busca nombres de animales, creadores o tipos de mod",
-        "shots_select_album": "Seleccionar Álbum:",
-        "shots_open_folder": "Abrir Carpeta",
-        "saves_preview": "Vista Previa",
-        "saves_open_folder": "Abrir Carpeta",
-        "themes_select": "Seleccionar Tema:",
-        "themes_apply": "Aplicar Tema",
-        "msg_no_mods": "No hay mods instalados",
-        "msg_loading": "Cargando...",
-        "msg_success": "Éxito",
-        "msg_error": "Error",
-        "msg_confirm_delete": "¿Estás seguro de que quieres eliminar esto?",
-        "msg_language_changed": "Idioma cambiado. Algunos cambios requieren reinicio.",
-        "ach_title": "Logros",
-        "ach_unlocked": "¡Logro Desbloqueado!",
-        "ach_progress": "Progreso",
-    },
-    "fr": {
-        "lang_name": "Français",
-        "tab_zt2_mods": "Mods ZT2",
-        "tab_zt1_mods": "Mods ZT1",
-        "tab_bundles": "Paquets",
-        "tab_saved_games": "Sauvegardes",
-        "tab_screenshots": "Captures d'écran",
-        "tab_multiplayer": "Multijoueur",
-        "tab_mod_browser": "Navigateur de Mods",
-        "tab_themes": "Thèmes",
-        "menu_game": "Jeu",
-        "menu_mods": "Mods",
-        "menu_tools": "Outils",
-        "menu_view": "Affichage",
-        "menu_help": "Aide",
-        "menu_toggle_theme": "Changer de Thème",
-        "menu_toggle_music": "Changer la Musique",
-        "menu_compact_mode": "Mode Compact",
-        "menu_expanded_mode": "Mode Étendu",
-        "menu_language": "Langue",
-        "btn_install": "Installer Mods",
-        "btn_enable": "Activer",
-        "btn_disable": "Désactiver",
-        "btn_enable_all": "Tout Activer",
-        "btn_disable_all": "Tout Désactiver",
-        "btn_refresh": "Actualiser",
-        "btn_delete": "Supprimer",
-        "btn_search": "Rechercher",
-        "btn_browse": "Parcourir",
-        "btn_download": "Télécharger",
-        "btn_apply": "Appliquer",
-        "btn_save": "Sauvegarder",
-        "btn_cancel": "Annuler",
-        "btn_close": "Fermer",
-        "btn_launch_game": "Lancer le Jeu",
-        "btn_achievements": "Succès",
-        "mb_quick_picks": "Sélection Rapide...",
-        "mb_featured": "En vedette:",
-        "mb_browse_category": "Parcourir par Catégorie",
-        "mb_search": "Rechercher",
-        "mb_recent": "Ajouts Récents",
-        "mb_surprise": "Surprenez-moi!",
-        "mb_wiki_page": "Page Wiki",
-        "mb_mod_details": "Détails du Mod",
-        "mb_select_mod": "Sélectionnez un mod pour voir les détails",
-        "mb_description": "Description:",
-        "mb_download_links": "Liens de Téléchargement:",
-        "mb_search_tip": "Conseil: Recherchez des noms d'animaux, créateurs ou types de mods",
-        "shots_select_album": "Sélectionner Album:",
-        "shots_open_folder": "Ouvrir Dossier",
-        "saves_preview": "Aperçu",
-        "saves_open_folder": "Ouvrir Dossier",
-        "themes_select": "Sélectionner Thème:",
-        "themes_apply": "Appliquer Thème",
-        "msg_no_mods": "Aucun mod installé",
-        "msg_loading": "Chargement...",
-        "msg_success": "Succès",
-        "msg_error": "Erreur",
-        "msg_confirm_delete": "Êtes-vous sûr de vouloir supprimer ceci?",
-        "msg_language_changed": "Langue changée. Certains changements nécessitent un redémarrage.",
-        "ach_title": "Succès",
-        "ach_unlocked": "Succès Débloqué!",
-        "ach_progress": "Progression",
-    },
-    "de": {
-        "lang_name": "Deutsch",
-        "tab_zt2_mods": "ZT2 Mods",
-        "tab_zt1_mods": "ZT1 Mods",
-        "tab_bundles": "Pakete",
-        "tab_saved_games": "Spielstände",
-        "tab_screenshots": "Screenshots",
-        "tab_multiplayer": "Mehrspieler",
-        "tab_mod_browser": "Mod-Browser",
-        "tab_themes": "Designs",
-        "menu_game": "Spiel",
-        "menu_mods": "Mods",
-        "menu_tools": "Werkzeuge",
-        "menu_view": "Ansicht",
-        "menu_help": "Hilfe",
-        "menu_toggle_theme": "Design wechseln",
-        "menu_toggle_music": "Musik umschalten",
-        "menu_compact_mode": "Kompaktmodus",
-        "menu_expanded_mode": "Erweiterter Modus",
-        "menu_language": "Sprache",
-        "btn_install": "Mods Installieren",
-        "btn_enable": "Aktivieren",
-        "btn_disable": "Deaktivieren",
-        "btn_enable_all": "Alle Aktivieren",
-        "btn_disable_all": "Alle Deaktivieren",
-        "btn_refresh": "Aktualisieren",
-        "btn_delete": "Löschen",
-        "btn_search": "Suchen",
-        "btn_browse": "Durchsuchen",
-        "btn_download": "Herunterladen",
-        "btn_apply": "Anwenden",
-        "btn_save": "Speichern",
-        "btn_cancel": "Abbrechen",
-        "btn_close": "Schließen",
-        "btn_launch_game": "Spiel Starten",
-        "btn_achievements": "Erfolge",
-        "mb_quick_picks": "Schnellauswahl...",
-        "mb_featured": "Empfohlen:",
-        "mb_browse_category": "Nach Kategorie durchsuchen",
-        "mb_search": "Suchen",
-        "mb_recent": "Neueste Ergänzungen",
-        "mb_surprise": "Überrasch mich!",
-        "mb_wiki_page": "Wiki-Seite",
-        "mb_mod_details": "Mod-Details",
-        "mb_select_mod": "Wähle einen Mod für Details",
-        "mb_description": "Beschreibung:",
-        "mb_download_links": "Download-Links:",
-        "mb_search_tip": "Tipp: Suche nach Tiernamen, Erstellern oder Mod-Typen",
-        "shots_select_album": "Album Auswählen:",
-        "shots_open_folder": "Ordner Öffnen",
-        "saves_preview": "Vorschau",
-        "saves_open_folder": "Ordner Öffnen",
-        "themes_select": "Design Auswählen:",
-        "themes_apply": "Design Anwenden",
-        "msg_no_mods": "Keine Mods installiert",
-        "msg_loading": "Laden...",
-        "msg_success": "Erfolg",
-        "msg_error": "Fehler",
-        "msg_confirm_delete": "Sind Sie sicher, dass Sie dies löschen möchten?",
-        "msg_language_changed": "Sprache geändert. Einige Änderungen erfordern Neustart.",
-        "ach_title": "Erfolge",
-        "ach_unlocked": "Erfolg Freigeschaltet!",
-        "ach_progress": "Fortschritt",
-    },
-    "pt": {
-        "lang_name": "Português",
-        "tab_zt2_mods": "Mods ZT2",
-        "tab_zt1_mods": "Mods ZT1",
-        "tab_bundles": "Pacotes",
-        "tab_saved_games": "Jogos Salvos",
-        "tab_screenshots": "Capturas de Tela",
-        "tab_multiplayer": "Multijogador",
-        "tab_mod_browser": "Navegador de Mods",
-        "tab_themes": "Temas",
-        "menu_game": "Jogo",
-        "menu_mods": "Mods",
-        "menu_tools": "Ferramentas",
-        "menu_view": "Visualizar",
-        "menu_help": "Ajuda",
-        "menu_toggle_theme": "Alternar Tema",
-        "menu_toggle_music": "Alternar Música",
-        "menu_compact_mode": "Modo Compacto",
-        "menu_expanded_mode": "Modo Expandido",
-        "menu_language": "Idioma",
-        "btn_install": "Instalar Mods",
-        "btn_enable": "Ativar",
-        "btn_disable": "Desativar",
-        "btn_enable_all": "Ativar Todos",
-        "btn_disable_all": "Desativar Todos",
-        "btn_refresh": "Atualizar",
-        "btn_delete": "Excluir",
-        "btn_search": "Pesquisar",
-        "btn_browse": "Navegar",
-        "btn_download": "Baixar",
-        "btn_apply": "Aplicar",
-        "btn_save": "Salvar",
-        "btn_cancel": "Cancelar",
-        "btn_close": "Fechar",
-        "btn_launch_game": "Iniciar Jogo",
-        "btn_achievements": "Conquistas",
-        "mb_quick_picks": "Seleção Rápida...",
-        "mb_featured": "Destaque:",
-        "mb_browse_category": "Navegar por Categoria",
-        "mb_search": "Pesquisar",
-        "mb_recent": "Adições Recentes",
-        "mb_surprise": "Surpreenda-me!",
-        "mb_wiki_page": "Página Wiki",
-        "mb_mod_details": "Detalhes do Mod",
-        "mb_select_mod": "Selecione um mod para ver detalhes",
-        "mb_description": "Descrição:",
-        "mb_download_links": "Links de Download:",
-        "mb_search_tip": "Dica: Pesquise nomes de animais, criadores ou tipos de mods",
-        "shots_select_album": "Selecionar Álbum:",
-        "shots_open_folder": "Abrir Pasta",
-        "saves_preview": "Visualizar",
-        "saves_open_folder": "Abrir Pasta",
-        "themes_select": "Selecionar Tema:",
-        "themes_apply": "Aplicar Tema",
-        "msg_no_mods": "Nenhum mod instalado",
-        "msg_loading": "Carregando...",
-        "msg_success": "Sucesso",
-        "msg_error": "Erro",
-        "msg_confirm_delete": "Tem certeza de que deseja excluir isso?",
-        "msg_language_changed": "Idioma alterado. Algumas alterações requerem reinício.",
-        "ach_title": "Conquistas",
-        "ach_unlocked": "Conquista Desbloqueada!",
-        "ach_progress": "Progresso",
-    },
-    "it": {
-        "lang_name": "Italiano",
-        "tab_zt2_mods": "Mod ZT2",
-        "tab_zt1_mods": "Mod ZT1",
-        "tab_bundles": "Pacchetti",
-        "tab_saved_games": "Salvataggi",
-        "tab_screenshots": "Screenshot",
-        "tab_multiplayer": "Multigiocatore",
-        "tab_mod_browser": "Browser Mod",
-        "tab_themes": "Temi",
-        "menu_game": "Gioco",
-        "menu_mods": "Mod",
-        "menu_tools": "Strumenti",
-        "menu_view": "Visualizza",
-        "menu_help": "Aiuto",
-        "menu_toggle_theme": "Cambia Tema",
-        "menu_toggle_music": "Cambia Musica",
-        "menu_compact_mode": "Modalità Compatta",
-        "menu_expanded_mode": "Modalità Estesa",
-        "menu_language": "Lingua",
-        "btn_install": "Installa Mod",
-        "btn_enable": "Attiva",
-        "btn_disable": "Disattiva",
-        "btn_enable_all": "Attiva Tutti",
-        "btn_disable_all": "Disattiva Tutti",
-        "btn_refresh": "Aggiorna",
-        "btn_delete": "Elimina",
-        "btn_search": "Cerca",
-        "btn_browse": "Sfoglia",
-        "btn_download": "Scarica",
-        "btn_apply": "Applica",
-        "btn_save": "Salva",
-        "btn_cancel": "Annulla",
-        "btn_close": "Chiudi",
-        "btn_launch_game": "Avvia Gioco",
-        "btn_achievements": "Obiettivi",
-        "mb_quick_picks": "Selezione Rapida...",
-        "mb_featured": "In evidenza:",
-        "mb_browse_category": "Sfoglia per Categoria",
-        "mb_search": "Cerca",
-        "mb_recent": "Aggiunte Recenti",
-        "mb_surprise": "Sorprendimi!",
-        "mb_wiki_page": "Pagina Wiki",
-        "mb_mod_details": "Dettagli Mod",
-        "mb_select_mod": "Seleziona un mod per vedere i dettagli",
-        "mb_description": "Descrizione:",
-        "mb_download_links": "Link di Download:",
-        "mb_search_tip": "Suggerimento: Cerca nomi di animali, creatori o tipi di mod",
-        "shots_select_album": "Seleziona Album:",
-        "shots_open_folder": "Apri Cartella",
-        "saves_preview": "Anteprima",
-        "saves_open_folder": "Apri Cartella",
-        "themes_select": "Seleziona Tema:",
-        "themes_apply": "Applica Tema",
-        "msg_no_mods": "Nessun mod installato",
-        "msg_loading": "Caricamento...",
-        "msg_success": "Successo",
-        "msg_error": "Errore",
-        "msg_confirm_delete": "Sei sicuro di voler eliminare questo?",
-        "msg_language_changed": "Lingua cambiata. Alcune modifiche richiedono il riavvio.",
-        "ach_title": "Obiettivi",
-        "ach_unlocked": "Obiettivo Sbloccato!",
-        "ach_progress": "Progresso",
-    },
-}
+TRANSLATIONS = _load_translations()
 
 current_language = "en"
 
@@ -475,7 +104,7 @@ def start_background_music(volume=0.3):
         pygame.mixer.music.load(music_file)
         pygame.mixer.music.set_volume(volume)
         pygame.mixer.music.play(-1)
-        print(f"[✔] Background music started")
+        print(f"[[OK]] Background music started")
         return True
     except Exception as e:
         print(f"[!] Failed to play music: {e}")
@@ -507,6 +136,215 @@ def toggle_background_music():
             pygame.mixer.music.unpause()
         log("Background music playing", log_text)
 
+
+DISCORD_CLIENT_ID = "1461867284149698685"
+discord_rpc = None
+discord_connected = False
+discord_start_time = None
+
+def init_discord_rpc():
+    global discord_rpc, discord_connected, discord_start_time
+    
+    if not DISCORD_AVAILABLE:
+        return False
+    
+    try:
+        discord_rpc = Presence(DISCORD_CLIENT_ID)
+        discord_rpc.connect()
+        discord_connected = True
+        discord_start_time = int(time.time())
+        print("[Discord] Rich Presence connected!")
+        update_discord_presence("browsing")
+        return True
+    except Exception as e:
+        print(f"[Discord] Failed to connect: {e}")
+        discord_connected = False
+        return False
+
+def disconnect_discord_rpc():
+    global discord_rpc, discord_connected
+    
+    if discord_rpc and discord_connected:
+        try:
+            discord_rpc.clear()
+            discord_rpc.close()
+            print("[Discord] Rich Presence disconnected")
+        except Exception as e:
+            print(f"[Discord] Error disconnecting: {e}")
+        finally:
+            discord_connected = False
+            discord_rpc = None
+
+def update_discord_presence(state="browsing", details=None, mod_count=None, profile_name=None):
+    global discord_rpc, discord_connected, discord_start_time
+    
+    if not DISCORD_AVAILABLE or not discord_connected or not discord_rpc:
+        return
+    
+    current_settings = load_settings()
+    if not current_settings.get("discord_rpc_enabled", False):
+        return
+    
+    try:
+        presence_data = {
+            "large_image": "zt2_logo",
+            "large_text": "Zoo Tycoon 2 Mod Manager",
+            "small_image": "modzt_icon",
+            "small_text": f"ModZT v{APP_VERSION}",
+        }
+        
+        if discord_start_time:
+            presence_data["start"] = discord_start_time
+        
+        if state == "browsing":
+            presence_data["state"] = "Browsing mods"
+            if mod_count is not None and current_settings.get("discord_show_mod_count", True):
+                presence_data["details"] = f"{mod_count} mods installed"
+            else:
+                presence_data["details"] = "Managing mods"
+                
+        elif state == "playing_zt2":
+            presence_data["state"] = "Playing Zoo Tycoon 2"
+            parts = []
+            if mod_count is not None and current_settings.get("discord_show_mod_count", True):
+                parts.append(f"{mod_count} mods active")
+            if profile_name and current_settings.get("discord_show_profile", True):
+                parts.append(f"Profile: {profile_name}")
+            presence_data["details"] = " | ".join(parts) if parts else "Enjoying the zoo!"
+            
+        elif state == "playing_zt1":
+            presence_data["state"] = "Playing Zoo Tycoon 1"
+            presence_data["details"] = "Classic zoo management"
+            
+        elif state == "playing_openzt2":
+            presence_data["state"] = "Playing OpenZT2"
+            presence_data["details"] = "Zoo Tycoon 2 Reimplementation"
+            
+        elif state == "downloading":
+            presence_data["state"] = "Downloading mods"
+            if details:
+                presence_data["details"] = details
+                
+        elif state == "creating_bundle":
+            presence_data["state"] = "Creating mod bundle"
+            if details:
+                presence_data["details"] = details
+        
+        discord_rpc.update(**presence_data)
+        
+    except Exception as e:
+        print(f"[Discord] Failed to update presence: {e}")
+        discord_connected = False
+
+def get_enabled_mod_count():
+    try:
+        cursor.execute("SELECT COUNT(*) FROM mods WHERE enabled = 1")
+        return cursor.fetchone()[0]
+    except Exception:
+        return 0
+
+def get_current_profile_name():
+    return None
+
+def open_discord_settings_dialog():
+    if not DISCORD_AVAILABLE:
+        messagebox.showinfo(
+            "Discord Integration",
+            "Discord integration requires pypresence.\n\n"
+            "Install with: pip install pypresence"
+        )
+        return
+    
+    current_settings = load_settings()
+    dlg = tk.Toplevel(root)
+    dlg.title("Discord Integration")
+    dlg.geometry("450x350")
+    dlg.transient(root)
+    dlg.grab_set()
+    
+    dlg.update_idletasks()
+    x = root.winfo_x() + (root.winfo_width() - 450) // 2
+    y = root.winfo_y() + (root.winfo_height() - 350) // 2
+    dlg.geometry(f"+{x}+{y}")
+    
+    main_frame = ttk.Frame(dlg, padding=20)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    ttk.Label(main_frame, text="🎮 Discord Rich Presence", font=("Segoe UI", 14, "bold")).pack(pady=(0, 10))
+    ttk.Label(main_frame, text="Show your Zoo Tycoon 2 activity on Discord", 
+              font=("Segoe UI", 10)).pack(pady=(0, 20))
+    
+    status_frame = ttk.LabelFrame(main_frame, text="Status", padding=10)
+    status_frame.pack(fill=tk.X, pady=(0, 15))
+    
+    if discord_connected:
+        status_text = "✅ Connected to Discord"
+        status_style = "success"
+    else:
+        status_text = "❌ Not connected"
+        status_style = "danger"
+    
+    status_label = ttk.Label(status_frame, text=status_text, bootstyle=status_style)
+    status_label.pack()
+    
+    settings_frame = ttk.LabelFrame(main_frame, text="Settings", padding=10)
+    settings_frame.pack(fill=tk.X, pady=(0, 15))
+    
+    enabled_var = tk.BooleanVar(value=current_settings.get("discord_rpc_enabled", False))
+    show_mods_var = tk.BooleanVar(value=current_settings.get("discord_show_mod_count", True))
+    show_profile_var = tk.BooleanVar(value=current_settings.get("discord_show_profile", True))
+    
+    ttk.Checkbutton(settings_frame, text="Enable Discord Rich Presence", 
+                    variable=enabled_var, bootstyle="success-round-toggle").pack(anchor=tk.W, pady=2)
+    ttk.Checkbutton(settings_frame, text="Show mod count", 
+                    variable=show_mods_var, bootstyle="info-round-toggle").pack(anchor=tk.W, pady=2, padx=(20, 0))
+    ttk.Checkbutton(settings_frame, text="Show profile name", 
+                    variable=show_profile_var, bootstyle="info-round-toggle").pack(anchor=tk.W, pady=2, padx=(20, 0))
+    
+    preview_frame = ttk.LabelFrame(main_frame, text="Preview", padding=10)
+    preview_frame.pack(fill=tk.X, pady=(0, 15))
+    
+    mod_count = get_enabled_mod_count()
+    preview_text = f"Playing Zoo Tycoon 2\n{mod_count} mods active"
+    ttk.Label(preview_frame, text=preview_text, font=("Segoe UI", 10), 
+              justify=tk.CENTER).pack()
+    
+    btn_frame = ttk.Frame(main_frame)
+    btn_frame.pack(fill=tk.X)
+    
+    def save_and_close():
+        current_settings["discord_rpc_enabled"] = enabled_var.get()
+        current_settings["discord_show_mod_count"] = show_mods_var.get()
+        current_settings["discord_show_profile"] = show_profile_var.get()
+        save_settings(current_settings)
+        
+        if enabled_var.get():
+            if not discord_connected:
+                init_discord_rpc()
+            else:
+                update_discord_presence("browsing", mod_count=get_enabled_mod_count())
+        else:
+            disconnect_discord_rpc()
+        
+        dlg.destroy()
+        messagebox.showinfo("Discord", "Discord settings saved!")
+    
+    def test_connection():
+        if init_discord_rpc():
+            status_label.config(text="✅ Connected to Discord", bootstyle="success")
+            messagebox.showinfo("Discord", "Successfully connected to Discord!")
+        else:
+            status_label.config(text="❌ Connection failed", bootstyle="danger")
+            messagebox.showerror("Discord", "Failed to connect to Discord.\n\nMake sure Discord is running.")
+    
+    ttk.Button(btn_frame, text="Test Connection", command=test_connection,
+               bootstyle="info-outline").pack(side=tk.LEFT)
+    ttk.Button(btn_frame, text="Cancel", command=dlg.destroy,
+               bootstyle="secondary-outline").pack(side=tk.RIGHT, padx=(5, 0))
+    ttk.Button(btn_frame, text="Save", command=save_and_close,
+               bootstyle="success").pack(side=tk.RIGHT)
+
+
 if platform.system() == "Windows":
     import ctypes
     try:
@@ -514,17 +352,18 @@ if platform.system() == "Windows":
     except Exception:
         pass
 
-APP_VERSION = "1.1.6"
-SETTINGS_FILE = "settings.json"
+APP_VERSION = "1.1.8"
 CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".zt2_manager")
+SETTINGS_FILE = os.path.join(CONFIG_DIR, "settings.json")
 os.makedirs(CONFIG_DIR, exist_ok=True)
 GAME_PATH_FILE = os.path.join(CONFIG_DIR, "game_path.txt")
 ZT1_EXE_FILE = os.path.join(CONFIG_DIR, "zt1_exe_path.txt")
+OPENZT2_EXE_FILE = os.path.join(CONFIG_DIR, "openzt2_exe_path.txt")
 ZT1_MOD_DIR_FILE = os.path.join(CONFIG_DIR, "zt1_mod_dir.txt")
 DB_FILE = os.path.join(CONFIG_DIR, "mods.db")
 ICON_FILE = os.path.join(CONFIG_DIR, "modzt.ico")
 BANNER_FILE = os.path.join(CONFIG_DIR, "banner.png")
-GITHUB_REPO = "kaelelson05/modzt"
+GITHUB_REPO = "songstormstudios/modzt"
 
 ZT2DL_API_BASE = "https://zt2downloadlibrary.fandom.com/api.php"
 ZT2DL_WIKI_BASE = "https://zt2downloadlibrary.fandom.com/wiki"
@@ -532,6 +371,7 @@ ZT2DL_CACHE_TTL = 600
 
 GAME_PATH = None
 ZT1_PATH = None
+OPENZT2_PATH = None
 ZT1_MOD_DIR = None
 ZT2_EXE = None
 
@@ -542,6 +382,10 @@ if os.path.isfile(GAME_PATH_FILE):
 if os.path.isfile(ZT1_EXE_FILE):
     with open(ZT1_EXE_FILE, "r", encoding="utf-8") as f:
         ZT1_PATH = f.read().strip()
+
+if os.path.isfile(OPENZT2_EXE_FILE):
+    with open(OPENZT2_EXE_FILE, "r", encoding="utf-8") as f:
+        OPENZT2_PATH = f.read().strip()
 
 if os.path.isfile(ZT1_MOD_DIR_FILE):
     with open(ZT1_MOD_DIR_FILE, "r", encoding="utf-8") as f:
@@ -576,34 +420,6 @@ def get_zt2_options_xml_path():
                      "Default Profile", "options.xml")
     return p if os.path.isfile(p) else None
 
-
-UNLOCK_TUTORIALS = {
-    "Base Game Tutorials": [
-        ("Tutorial1", "Tutorial 1"),
-        ("Tutorial2", "Tutorial 2"),
-        ("Tutorial3", "Tutorial 3"),
-    ],
-    "Endangered Species Tutorials": [
-        ("xp1_Tutorial1", "ES Tutorial 1"),
-        ("xp1_Tutorial2", "ES Tutorial 2"),
-        ("xp1_Tutorial3", "ES Tutorial 3"),
-    ],
-    "African Adventure Tutorials": [
-        ("xp2_Tutorial1", "AA Tutorial 1"),
-        ("xp2_Tutorial2", "AA Tutorial 2"),
-        ("xp2_Tutorial3", "AA Tutorial 3"),
-        ("xp2_Tutorial4", "AA Tutorial 4"),
-        ("xp2_Tutorial5", "AA Tutorial 5"),
-    ],
-    "Marine Mania Tutorials": [
-        ("cp1_tutorial1", "MM Tutorial 1"),
-    ],
-    "Extinct Animals Tutorials": [
-        ("cp2tutorialone", "EA Tutorial 1"),
-        ("cp2tutorialtwo", "EA Tutorial 2"),
-        ("cp2tutorialthree", "EA Tutorial 3"),
-    ],
-}
 
 UNLOCK_CAMPAIGNS = {
     "Zookeeper Training": [
@@ -730,7 +546,16 @@ DEFAULT_SETTINGS = {
     "theme": "flatly",
     "window_geometry": "1200x882+78+78",
     "window_maximized": False,
-    "language": "en"
+    "language": "en",
+    "theme_scheduling_enabled": False,
+    "theme_light": "litera",
+    "theme_dark": "darkly",
+    "theme_light_start": "07:00",
+    "theme_dark_start": "19:00",
+    "close_on_game_launch": False,
+    "discord_rpc_enabled": False,
+    "discord_show_mod_count": True,
+    "discord_show_profile": True
 }
 
 THEMES = {
@@ -943,6 +768,16 @@ CREATE TABLE IF NOT EXISTS zt1_mods (
 )
 """)
 conn.commit()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS favorites (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mod_name TEXT UNIQUE,
+    game TEXT DEFAULT 'ZT2',
+    added_at TEXT
+)
+""")
+conn.commit()
 try:
     cursor.execute("ALTER TABLE mods ADD COLUMN hash TEXT")
 except sqlite3.OperationalError:
@@ -992,6 +827,18 @@ CREATE TABLE IF NOT EXISTS achievements (
 """)
 conn.commit()
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS scheduled_profiles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bundle_name TEXT,
+    day_of_week TEXT,
+    time_of_day TEXT,
+    enabled INTEGER DEFAULT 1,
+    FOREIGN KEY(bundle_name) REFERENCES bundles(name)
+)
+""")
+conn.commit()
+
 
 def ensure_category_column():
     cursor.execute("PRAGMA table_info(mods)")
@@ -1025,10 +872,280 @@ def ensure_db_schema():
         if "tags" not in cols:
             cursor.execute(
                 f"ALTER TABLE {table} ADD COLUMN tags TEXT DEFAULT ''")
+        if "author" not in cols:
+            cursor.execute(
+                f"ALTER TABLE {table} ADD COLUMN author TEXT DEFAULT ''")
     conn.commit()
 
 
 ensure_db_schema()
+
+def run_cli_mode():
+    parser = argparse.ArgumentParser(
+        prog="modzt",
+        description="ModZT CLI",
+        epilog="Run without arguments to launch the GUI."
+    )
+    
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    
+    list_parser = subparsers.add_parser("list", help="List all mods")
+    list_parser.add_argument("--game", choices=["zt1", "zt2", "all"], default="all", help="Which game's mods to list")
+    list_parser.add_argument("--enabled", action="store_true", help="Show only enabled mods")
+    list_parser.add_argument("--disabled", action="store_true", help="Show only disabled mods")
+    list_parser.add_argument("--favorites", action="store_true", help="Show only favorite mods")
+    list_parser.add_argument("--json", action="store_true", help="Output as JSON")
+    
+    enable_parser = subparsers.add_parser("enable", help="Enable mod(s)")
+    enable_parser.add_argument("mods", nargs="+", help="Mod name(s) to enable")
+    enable_parser.add_argument("--game", choices=["zt1", "zt2"], default="zt2", help="Which game (default: zt2)")
+    
+    disable_parser = subparsers.add_parser("disable", help="Disable mod(s)")
+    disable_parser.add_argument("mods", nargs="+", help="Mod name(s) to disable")
+    disable_parser.add_argument("--game", choices=["zt1", "zt2"], default="zt2", help="Which game (default: zt2)")
+    
+    fav_parser = subparsers.add_parser("favorite", help="Add/remove mod from favorites")
+    fav_parser.add_argument("mods", nargs="+", help="Mod name(s)")
+    fav_parser.add_argument("--game", choices=["zt1", "zt2"], default="zt2", help="Which game (default: zt2)")
+    fav_parser.add_argument("--remove", action="store_true", help="Remove from favorites")
+    
+    bundle_parser = subparsers.add_parser("bundle", help="Bundle operations")
+    bundle_parser.add_argument("action", choices=["list", "apply", "create"], help="Bundle action")
+    bundle_parser.add_argument("--name", help="Bundle name (for apply/create)")
+    bundle_parser.add_argument("--mods", nargs="*", help="Mod names (for create)")
+    
+    subparsers.add_parser("status", help="Show mod counts and status")
+    
+    subparsers.add_parser("version", help="Show version information")
+    
+    args = parser.parse_args()
+    
+    if not args.command:
+        return False
+    
+    if args.command == "version":
+        print(f"ModZT v{APP_VERSION}")
+        print(f"Config: {CONFIG_DIR}")
+        print(f"Database: {DB_FILE}")
+        return True
+    
+    elif args.command == "status":
+        cursor.execute("SELECT COUNT(*), SUM(enabled) FROM mods")
+        zt2_total, zt2_enabled = cursor.fetchone()
+        zt2_enabled = zt2_enabled or 0
+        cursor.execute("SELECT COUNT(*), SUM(enabled) FROM zt1_mods")
+        zt1_total, zt1_enabled = cursor.fetchone()
+        zt1_enabled = zt1_enabled or 0
+        cursor.execute("SELECT COUNT(*) FROM favorites")
+        fav_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM bundles")
+        bundle_count = cursor.fetchone()[0]
+        
+        print(f"ModZT Status")
+        print(f"=" * 40)
+        print(f"Zoo Tycoon 2: {zt2_total} mods ({zt2_enabled} enabled, {zt2_total - zt2_enabled} disabled)")
+        print(f"Zoo Tycoon 1: {zt1_total} mods ({zt1_enabled} enabled, {zt1_total - zt1_enabled} disabled)")
+        print(f"Favorites: {fav_count}")
+        print(f"Bundles: {bundle_count}")
+        if GAME_PATH:
+            print(f"ZT2 Path: {GAME_PATH}")
+        if ZT1_PATH:
+            print(f"ZT1 Path: {ZT1_PATH}")
+        return True
+    
+    elif args.command == "list":
+        mods = []
+        if args.game in ("zt2", "all"):
+            query = "SELECT name, enabled FROM mods"
+            filters = []
+            if args.enabled:
+                filters.append("enabled=1")
+            if args.disabled:
+                filters.append("enabled=0")
+            if filters:
+                query += " WHERE " + " OR ".join(filters)
+            query += " ORDER BY name"
+            cursor.execute(query)
+            for name, enabled in cursor.fetchall():
+                if args.favorites:
+                    cursor.execute("SELECT id FROM favorites WHERE mod_name=? AND game='ZT2'", (name,))
+                    if not cursor.fetchone():
+                        continue
+                mods.append({"name": name, "enabled": bool(enabled), "game": "ZT2"})
+        
+        if args.game in ("zt1", "all"):
+            query = "SELECT name, enabled FROM zt1_mods"
+            filters = []
+            if args.enabled:
+                filters.append("enabled=1")
+            if args.disabled:
+                filters.append("enabled=0")
+            if filters:
+                query += " WHERE " + " OR ".join(filters)
+            query += " ORDER BY name"
+            cursor.execute(query)
+            for name, enabled in cursor.fetchall():
+                if args.favorites:
+                    cursor.execute("SELECT id FROM favorites WHERE mod_name=? AND game='ZT1'", (name,))
+                    if not cursor.fetchone():
+                        continue
+                mods.append({"name": name, "enabled": bool(enabled), "game": "ZT1"})
+        
+        if args.json:
+            print(json.dumps(mods, indent=2))
+        else:
+            for m in mods:
+                status = "[ON]" if m["enabled"] else "[OFF]"
+                print(f"{status} [{m['game']}] {m['name']}")
+            print(f"\nTotal: {len(mods)} mods")
+        return True
+    
+    elif args.command == "enable":
+        game = args.game.upper()
+        count = 0
+        for mod_name in args.mods:
+            if game == "ZT2":
+                cursor.execute("SELECT name FROM mods WHERE name LIKE ?", (f"%{mod_name}%",))
+            else:
+                cursor.execute("SELECT name FROM zt1_mods WHERE name LIKE ?", (f"%{mod_name}%",))
+            matches = cursor.fetchall()
+            if not matches:
+                print(f"[!] Mod not found: {mod_name}")
+                continue
+            for (name,) in matches:
+                if game == "ZT2":
+                    cursor.execute("UPDATE mods SET enabled=1 WHERE name=?", (name,))
+                else:
+                    cursor.execute("UPDATE zt1_mods SET enabled=1 WHERE name=?", (name,))
+                print(f"[+] Enabled: {name}")
+                count += 1
+        conn.commit()
+        print(f"\nEnabled {count} mod(s)")
+        return True
+    
+    elif args.command == "disable":
+        game = args.game.upper()
+        count = 0
+        for mod_name in args.mods:
+            if game == "ZT2":
+                cursor.execute("SELECT name FROM mods WHERE name LIKE ?", (f"%{mod_name}%",))
+            else:
+                cursor.execute("SELECT name FROM zt1_mods WHERE name LIKE ?", (f"%{mod_name}%",))
+            matches = cursor.fetchall()
+            if not matches:
+                print(f"[!] Mod not found: {mod_name}")
+                continue
+            for (name,) in matches:
+                if game == "ZT2":
+                    cursor.execute("UPDATE mods SET enabled=0 WHERE name=?", (name,))
+                else:
+                    cursor.execute("UPDATE zt1_mods SET enabled=0 WHERE name=?", (name,))
+                print(f"[-] Disabled: {name}")
+                count += 1
+        conn.commit()
+        print(f"\nDisabled {count} mod(s)")
+        return True
+    
+    elif args.command == "favorite":
+        game = args.game.upper()
+        count = 0
+        for mod_name in args.mods:
+            if game == "ZT2":
+                cursor.execute("SELECT name FROM mods WHERE name LIKE ?", (f"%{mod_name}%",))
+            else:
+                cursor.execute("SELECT name FROM zt1_mods WHERE name LIKE ?", (f"%{mod_name}%",))
+            matches = cursor.fetchall()
+            if not matches:
+                print(f"[!] Mod not found: {mod_name}")
+                continue
+            for (name,) in matches:
+                if args.remove:
+                    cursor.execute("DELETE FROM favorites WHERE mod_name=? AND game=?", (name, game))
+                    print(f"[-] Removed from favorites: {name}")
+                else:
+                    cursor.execute("INSERT OR REPLACE INTO favorites (mod_name, game, added_at) VALUES (?, ?, ?)",
+                                  (name, game, datetime.now().isoformat()))
+                    print(f"[+] Added to favorites: {name}")
+                count += 1
+        conn.commit()
+        print(f"\nUpdated {count} favorite(s)")
+        return True
+    
+    elif args.command == "bundle":
+        if args.action == "list":
+            cursor.execute("SELECT name FROM bundles ORDER BY name")
+            bundles = cursor.fetchall()
+            if not bundles:
+                print("No bundles found.")
+            else:
+                for (name,) in bundles:
+                    cursor.execute("SELECT COUNT(*) FROM bundle_mods WHERE bundle_id=(SELECT id FROM bundles WHERE name=?)", (name,))
+                    count = cursor.fetchone()[0]
+                    print(f"  {name} ({count} mods)")
+            return True
+        
+        elif args.action == "apply":
+            if not args.name:
+                print("[!] Bundle name required (--name)")
+                return True
+            cursor.execute("SELECT id FROM bundles WHERE name=?", (args.name,))
+            bundle = cursor.fetchone()
+            if not bundle:
+                print(f"[!] Bundle not found: {args.name}")
+                return True
+            cursor.execute("UPDATE mods SET enabled=0")
+            cursor.execute("""SELECT mod_name FROM bundle_mods WHERE bundle_id=?""", (bundle[0],))
+            mods = cursor.fetchall()
+            for (mod_name,) in mods:
+                cursor.execute("UPDATE mods SET enabled=1 WHERE name=?", (mod_name,))
+                print(f"[+] Enabled: {mod_name}")
+            conn.commit()
+            print(f"\nApplied bundle '{args.name}' with {len(mods)} mods")
+            return True
+        
+        elif args.action == "create":
+            if not args.name:
+                print("[!] Bundle name required (--name)")
+                return True
+            if not args.mods:
+                print("[!] At least one mod required (--mods)")
+                return True
+            cursor.execute("INSERT OR IGNORE INTO bundles (name) VALUES (?)", (args.name,))
+            cursor.execute("SELECT id FROM bundles WHERE name=?", (args.name,))
+            bundle_id = cursor.fetchone()[0]
+            count = 0
+            for mod_name in args.mods:
+                cursor.execute("SELECT name FROM mods WHERE name LIKE ?", (f"%{mod_name}%",))
+                matches = cursor.fetchall()
+                for (name,) in matches:
+                    cursor.execute("INSERT OR IGNORE INTO bundle_mods (bundle_id, mod_name) VALUES (?, ?)", (bundle_id, name))
+                    print(f"[+] Added to bundle: {name}")
+                    count += 1
+            conn.commit()
+            print(f"\nCreated bundle '{args.name}' with {count} mods")
+            return True
+    
+    return False
+
+if len(sys.argv) > 1:
+    if sys.argv[1] in ("--help", "-h"):
+        run_cli_mode()
+        sys.exit(0)
+    if run_cli_mode():
+        conn.close()
+        sys.exit(0)
+
+from modules.wiki_api import ZT2DownloadLibraryAPI
+
+zt2dl_api = None
+
+
+def init_wiki_apis():
+    global zt2dl_api
+    zt2dl_api = ZT2DownloadLibraryAPI(ZT2DL_API_BASE, ZT2DL_WIKI_BASE, ZT2DL_CACHE_TTL, cursor, conn)
+
+
+init_wiki_apis()
 
 
 def log(msg, text_widget=None):
@@ -1057,7 +1174,7 @@ def get_game_path():
     if new_path:
         GAME_PATH = new_path
         settings["game_path"] = new_path
-        with open("settings.json", "w") as f:
+        with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
             json.dump(settings, f, indent=4)
         return GAME_PATH
     else:
@@ -1424,7 +1541,7 @@ def open_achievements_dialog():
                           bootstyle="info").pack(side=tk.RIGHT, padx=10)
 
             if is_unlocked:
-                ttk.Label(ach_frame, text="✓",
+                ttk.Label(ach_frame, text="[x]",
                           font=("Segoe UI", 14, "bold"),
                           bootstyle="success").pack(side=tk.RIGHT, padx=10)
 
@@ -1434,141 +1551,6 @@ def open_achievements_dialog():
     btn_frame.pack(fill=tk.X, pady=(15, 0))
     ttk.Button(btn_frame, text="Close", command=dialog.destroy,
                bootstyle="secondary").pack(side=tk.RIGHT)
-
-class ZT2DownloadLibraryAPI:
-
-    def __init__(self):
-        self.api_base = ZT2DL_API_BASE
-        self.wiki_base = ZT2DL_WIKI_BASE
-        self.last_request_time = 0
-        self.min_request_interval = 0.5
-
-    def _rate_limit(self):
-        import time
-        elapsed = time.time() - self.last_request_time
-        if elapsed < self.min_request_interval:
-            time.sleep(self.min_request_interval - elapsed)
-        self.last_request_time = time.time()
-
-    def _get_cached(self, cache_key):
-        cursor.execute(
-            "SELECT data, cached_at FROM zt2dl_cache WHERE cache_key=?",
-            (cache_key,)
-        )
-        row = cursor.fetchone()
-        if row:
-            data, cached_at = row
-            try:
-                cached_time = datetime.fromisoformat(cached_at)
-                if (datetime.now() - cached_time).total_seconds() < ZT2DL_CACHE_TTL:
-                    return json.loads(data)
-            except Exception:
-                pass
-        return None
-
-    def _set_cache(self, cache_key, data):
-        cursor.execute(
-            "INSERT OR REPLACE INTO zt2dl_cache (cache_key, data, cached_at) VALUES (?, ?, ?)",
-            (cache_key, json.dumps(data), datetime.now().isoformat())
-        )
-        conn.commit()
-
-    def _request(self, params, use_cache=True):
-        """Make API request with caching"""
-        cache_key = f"zt2dl:{json.dumps(params, sort_keys=True)}"
-
-        if use_cache:
-            cached = self._get_cached(cache_key)
-            if cached:
-                return cached
-
-        self._rate_limit()
-
-        params['format'] = 'json'
-        response = requests.get(self.api_base, params=params, timeout=15)
-        response.raise_for_status()
-        data = response.json()
-
-        if use_cache:
-            self._set_cache(cache_key, data)
-
-        return data
-
-    def get_categories(self):
-        return [
-            {"name": "Animals", "title": "Category:Animals"},
-            {"name": "Foliage", "title": "Category:Foliage"},
-            {"name": "Objects", "title": "Category:Objects"},
-            {"name": "Scenery", "title": "Category:Scenery"},
-            {"name": "Buildings", "title": "Category:Building_Sets"},
-            {"name": "Packs", "title": "Category:Packs"},
-            {"name": "Recent", "title": "Special:RecentChanges"},
-        ]
-
-    def get_category_members(self, category, limit=50):
-        params = {
-            'action': 'query',
-            'list': 'categorymembers',
-            'cmtitle': category,
-            'cmlimit': limit,
-            'cmtype': 'page|subcat',
-            'cmprop': 'title|type'
-        }
-        data = self._request(params)
-        return data.get('query', {}).get('categorymembers', [])
-
-    def search_mods(self, query, limit=25):
-        params = {
-            'action': 'query',
-            'list': 'search',
-            'srsearch': query,
-            'srlimit': limit,
-            'srnamespace': 0,
-            'srprop': 'snippet|titlesnippet'
-        }
-        data = self._request(params, use_cache=False)
-        return data.get('query', {}).get('search', [])
-
-    def get_page_content(self, title):
-        params = {
-            'action': 'parse',
-            'page': title,
-            'prop': 'text|links|externallinks|images',
-            'disablelimitreport': 'true'
-        }
-        data = self._request(params)
-        return data.get('parse', {})
-
-    def get_page_info(self, title):
-        params = {
-            'action': 'query',
-            'titles': title,
-            'prop': 'info|images|categories',
-            'inprop': 'url'
-        }
-        data = self._request(params)
-        pages = data.get('query', {}).get('pages', {})
-        for page_id, page_data in pages.items():
-            if page_id != '-1':
-                return page_data
-        return None
-
-    def get_recent_downloads(self, limit=30):
-        params = {
-            'action': 'query',
-            'list': 'recentchanges',
-            'rcnamespace': 0,
-            'rclimit': limit,
-            'rctype': 'new|edit',
-            'rcprop': 'title|timestamp|user'
-        }
-        data = self._request(params, use_cache=False)
-        return data.get('query', {}).get('recentchanges', [])
-
-    def get_page_url(self, title):
-        return f"{self.wiki_base}/{title.replace(' ', '_')}"
-
-zt2dl_api = ZT2DownloadLibraryAPI()
 
 
 def check_for_updates():
@@ -1609,16 +1591,14 @@ def monitor_game_crash(proc, game_name="ZT2", timeout=10):
     except Exception as e:
         exit_code = -999
         with open(crash_log, "a", encoding="utf-8") as f:
-            f.write(
-                f"[{datetime.datetime.now()}] Exception monitoring {game_name}: {e}\n"
-            )
+            f.write(f"[{datetime.now()}] Exception monitoring {game_name}: {e}\n")
 
     elapsed = time.time() - start_time
     if exit_code != 0 or elapsed < timeout:
         with open(crash_log, "a", encoding="utf-8") as f:
             f.write("------ Game Crash Detected ------\n")
             f.write(f"Game: {game_name}\n")
-            f.write(f"Time: {datetime.datetime.now()}\n")
+            f.write(f"Time: {datetime.now()}\n")
             f.write(f"Exit Code: {exit_code}\n")
             f.write(f"Ran for: {elapsed:.1f}s\n\n")
 
@@ -1822,6 +1802,91 @@ def get_system_theme():
         return "dark"
 
 
+def check_theme_schedule():
+    if not settings.get("theme_scheduling_enabled", False):
+        return
+
+    try:
+        now = datetime.now()
+        current_time = now.hour * 60 + now.minute
+
+        light_start = settings.get("theme_light_start", "07:00")
+        dark_start = settings.get("theme_dark_start", "19:00")
+
+        light_h, light_m = map(int, light_start.split(":"))
+        dark_h, dark_m = map(int, dark_start.split(":"))
+
+        light_minutes = light_h * 60 + light_m
+        dark_minutes = dark_h * 60 + dark_m
+
+        light_theme = settings.get("theme_light", "litera")
+        dark_theme = settings.get("theme_dark", "darkly")
+
+        current_theme = root.style.theme_use()
+
+        if light_minutes < dark_minutes:
+            should_be_light = light_minutes <= current_time < dark_minutes
+        else:
+            should_be_light = current_time >= light_minutes or current_time < dark_minutes
+
+        target_theme = light_theme if should_be_light else dark_theme
+
+        if current_theme != target_theme:
+            try:
+                root.style.theme_use(target_theme)
+            except Exception as theme_err:
+                print(f"Theme apply skipped (widget destroyed): {theme_err}")
+                return
+            settings["theme"] = target_theme
+            save_settings(settings)
+            if 'current_theme_var' in globals():
+                current_theme_var.set(f"Current: {target_theme}")
+            log(f"Theme auto-switched to {target_theme} (scheduled)", text_widget=log_text if 'log_text' in globals() else None)
+    except Exception as e:
+        print(f"Theme schedule check error: {e}")
+
+
+def start_theme_scheduler():
+    def schedule_check():
+        check_theme_schedule()
+        try:
+            check_scheduled_profiles_on_timer()
+        except Exception as e:
+            print(f"[!] Scheduled profiles check error: {e}")
+        root.after(60000, schedule_check)
+
+    root.after(1000, schedule_check)
+
+def check_scheduled_profiles_on_timer():
+    from datetime import datetime
+    now = datetime.now()
+    current_day = now.strftime("%A")
+    current_time = now.strftime("%H:%M")
+    is_weekday = now.weekday() < 5
+    
+    cursor.execute("SELECT bundle_name, day_of_week, time_of_day FROM scheduled_profiles WHERE enabled = 1")
+    for row in cursor.fetchall():
+        bundle, day, time_str = row
+        
+        day_match = False
+        if day == "Every Day":
+            day_match = True
+        elif day == "Weekdays" and is_weekday:
+            day_match = True
+        elif day == "Weekends" and not is_weekday:
+            day_match = True
+        elif day == current_day:
+            day_match = True
+        
+        if day_match and time_str == current_time:
+            print(f"[i] Applying scheduled profile: {bundle}")
+            try:
+                apply_bundle(bundle, text_widget=log_text)
+                refresh_tree()
+            except Exception as e:
+                print(f"[!] Failed to apply scheduled bundle {bundle}: {e}")
+
+
 def set_game_path(lbl_widget=None, status_widget=None):
     global GAME_PATH
 
@@ -1869,11 +1934,16 @@ def set_game_path(lbl_widget=None, status_widget=None):
         refresh_tree()
     except Exception as e:
         print(f"refresh_tree() failed: {e}")
+    try:
+        if 'populate_xp_icons_async' in globals() and 'xp_icons_holder' in globals():
+            populate_xp_icons_async(xp_icons_holder)
+    except Exception:
+        pass
 
 
 def launch_game(params=None):
-    settings = load_settings()
-    game_path = settings.get("game_path")
+    current_settings = load_settings()
+    game_path = current_settings.get("game_path")
 
     if not GAME_PATH:
         messagebox.showerror("Error", "Set game path first!")
@@ -1884,6 +1954,8 @@ def launch_game(params=None):
         messagebox.showerror("Error", f"zt.exe not found in: {GAME_PATH}")
         return
 
+    should_close = current_settings.get("close_on_game_launch", False)
+
     try:
         cmd = [exe_path]
         if params:
@@ -1892,16 +1964,33 @@ def launch_game(params=None):
             elif isinstance(params, (list, tuple)):
                 cmd += list(params)
 
-        proc = subprocess.Popen(cmd, cwd=GAME_PATH, shell=False)
-        log("🎮 Launched Zoo Tycoon 2", text_widget=log_text)
+        try:
+            mod_count = get_enabled_mod_count()
+            profile_name = get_current_profile_name()
+            update_discord_presence("playing_zt2", mod_count=mod_count, profile_name=profile_name)
+        except Exception as discord_err:
+            print(f"[!] Discord presence error: {discord_err}")
 
-        threading.Thread(target=monitor_game_crash,
+        proc = subprocess.Popen(cmd, cwd=GAME_PATH, shell=False)
+        log("Launched Zoo Tycoon 2", text_widget=log_text)
+
+        def monitor_and_reset_discord(proc, game_name):
+            monitor_game_crash(proc, game_name)
+            try:
+                update_discord_presence("browsing", mod_count=get_enabled_mod_count())
+            except Exception:
+                pass
+
+        threading.Thread(target=monitor_and_reset_discord,
                          args=(proc, "ZT2"),
                          daemon=True).start()
+        
+        if should_close:
+            log("Closing ModZT (close on launch enabled)...", text_widget=log_text)
+            root.after(1000, lambda: root.destroy())
 
     except Exception as e:
         messagebox.showerror("Error", f"Failed to launch ZT2: {e}")
-
 
 def mods_disabled_dir():
     if not GAME_PATH:
@@ -2157,7 +2246,7 @@ def enable_mod(mod_name, text_widget=None, record=True):
             mods_tree.item(iid, tags=("enabled", ))
             break
 
-    update_status()
+    update_status_bar()
 
 
 def disable_mod(mod_name, text_widget=None, record=True):
@@ -2201,7 +2290,7 @@ def disable_mod(mod_name, text_widget=None, record=True):
             mods_tree.item(iid, tags=("disabled", ))
             break
 
-    update_status()
+    update_status_bar()
 
 
 def uninstall_mod(mod_name, text_widget=None, record=True):
@@ -2246,7 +2335,7 @@ def uninstall_mod(mod_name, text_widget=None, record=True):
         log(f"Mod {mod_name} not found on disk, record removed from DB.",
             text_widget)
     refresh_tree()
-    update_status()
+    update_status_bar()
 
 
 def install_mods(file_paths, text_widget=None):
@@ -2308,6 +2397,128 @@ def install_mods(file_paths, text_widget=None):
         messagebox.showinfo("Install Complete", "\n".join(summary) + "\n\n" + details)
 
 
+def install_mod_from_url_dialog():
+    dialog = tk.Toplevel(root)
+    dialog.title("Install Mod from URL")
+    dialog.geometry("500x200")
+    dialog.resizable(False, False)
+    dialog.transient(root)
+    dialog.grab_set()
+
+    ttk.Label(dialog, text="Install Mod from URL",
+              font=("Segoe UI", 12, "bold")).pack(pady=(15, 5))
+
+    ttk.Label(dialog, text="Enter a direct download URL to a .z2f mod file:",
+              bootstyle="secondary").pack(pady=(0, 10))
+
+    url_var = tk.StringVar()
+    url_entry = ttk.Entry(dialog, textvariable=url_var, width=60)
+    url_entry.pack(padx=20, pady=5)
+    url_entry.focus_set()
+
+    status_var = tk.StringVar(value="")
+    status_label = ttk.Label(dialog, textvariable=status_var, bootstyle="info")
+    status_label.pack(pady=5)
+
+    progress = ttk.Progressbar(dialog, mode="indeterminate", length=300)
+    progress.pack(pady=5)
+
+    def do_download():
+        url = url_var.get().strip()
+        if not url:
+            status_var.set("Please enter a URL")
+            return
+
+        if not GAME_PATH:
+            messagebox.showerror("Error", "Game path not set. Please set your Zoo Tycoon 2 folder first.")
+            return
+
+        try:
+            from urllib.parse import urlparse, unquote
+            parsed = urlparse(url)
+            filename = unquote(os.path.basename(parsed.path))
+
+            if not filename:
+                filename = "downloaded_mod.z2f"
+            if not filename.lower().endswith('.z2f'):
+                if '.' not in filename:
+                    filename += '.z2f'
+
+            status_var.set(f"Downloading {filename}...")
+            progress.start()
+            dialog.update()
+
+            def download():
+                try:
+                    response = requests.get(url, stream=True, timeout=60,
+                                          headers={"User-Agent": "ModZT/1.0"})
+                    response.raise_for_status()
+
+                    content_disp = response.headers.get('Content-Disposition', '')
+                    if 'filename=' in content_disp:
+                        import re
+                        match = re.search(r'filename[*]?=["\']?([^"\';\n]+)', content_disp)
+                        if match:
+                            filename_from_header = match.group(1).strip()
+                            if filename_from_header:
+                                nonlocal filename
+                                filename = filename_from_header
+
+                    temp_path = os.path.join(CONFIG_DIR, filename)
+                    with open(temp_path, 'wb') as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            f.write(chunk)
+
+                    return temp_path, None
+                except Exception as e:
+                    return None, str(e)
+
+            def on_complete(result):
+                progress.stop()
+                temp_path, error = result
+
+                if error:
+                    status_var.set(f"Error: {error}")
+                    return
+
+                dest = os.path.join(GAME_PATH, os.path.basename(temp_path))
+                if os.path.exists(dest):
+                    if not messagebox.askyesno("Overwrite?",
+                            f"{os.path.basename(temp_path)} already exists.\nOverwrite?"):
+                        status_var.set("Installation cancelled")
+                        os.remove(temp_path)
+                        return
+
+                try:
+                    shutil.move(temp_path, dest)
+                    detect_existing_mods()
+                    refresh_tree()
+                    increment_stat("mods_installed")
+                    status_var.set(f"Successfully installed: {os.path.basename(dest)}")
+                    log(f"Installed mod from URL: {os.path.basename(dest)}", text_widget=log_text)
+                    messagebox.showinfo("Success", f"Mod installed successfully:\n{os.path.basename(dest)}")
+                    dialog.destroy()
+                except Exception as e:
+                    status_var.set(f"Install error: {e}")
+
+            threading.Thread(target=lambda: root.after(0, lambda: on_complete(download())),
+                           daemon=True).start()
+
+        except Exception as e:
+            progress.stop()
+            status_var.set(f"Error: {e}")
+
+    btn_frame = ttk.Frame(dialog)
+    btn_frame.pack(pady=15)
+
+    ttk.Button(btn_frame, text="Download & Install", command=do_download,
+               bootstyle="success", width=18).pack(side=tk.LEFT, padx=5)
+    ttk.Button(btn_frame, text="Cancel", command=dialog.destroy,
+               bootstyle="secondary", width=10).pack(side=tk.LEFT, padx=5)
+
+    url_entry.bind("<Return>", lambda e: do_download())
+
+
 def export_load_order():
     cursor.execute("SELECT name, enabled FROM mods")
     rows = cursor.fetchall()
@@ -2357,11 +2568,15 @@ def watch_mods(root, refresh_func, interval=5):
                                 (enabled, mod_name))
                     conn.commit()
                     refresh_func()
-                    update_status()
+                    update_status_bar()
 
                     refresh_tree()
 
-                root.after(0, update_db_and_refresh)
+                try:
+                    if root.winfo_exists():
+                        root.after(0, update_db_and_refresh)
+                except Exception:
+                    pass
                 last_snapshot = found
             time.sleep(interval)
 
@@ -2417,7 +2632,6 @@ def bundle_create_dialog():
                text="Cancel",
                command=dlg.destroy,
                bootstyle="secondary").pack(side=tk.RIGHT)
-
 
 def open_game_unlocks_dialog():
     options_path = get_zt2_options_xml_path()
@@ -2500,7 +2714,6 @@ def open_game_unlocks_dialog():
                     col = 0
                     row += 1
 
-    create_category_section(scrollable_frame, "Tutorials", UNLOCK_TUTORIALS, "completed")
     create_category_section(scrollable_frame, "Campaigns", UNLOCK_CAMPAIGNS, "completed")
     create_category_section(scrollable_frame, "Unlockable Items", UNLOCK_ITEMS, "true")
 
@@ -2876,17 +3089,21 @@ if not os.path.isfile(GAME_PATH_FILE):
         save_game_path(GAME_PATH)
         settings["game_path"] = GAME_PATH
         save_settings(settings)
-        print(f"[✔] Auto-detected Zoo Tycoon 2 installation: {GAME_PATH}")
+        print(f"[[OK]] Auto-detected Zoo Tycoon 2 installation: {GAME_PATH}")
 else:
     with open(GAME_PATH_FILE, "r", encoding="utf-8") as f:
         GAME_PATH = f.read().strip()
 
+saved_theme = settings.get("theme", "darkly" if system_theme == "dark" else "litera")
+
 if DND_AVAILABLE:
     root = TkinterDnD.Tk()
-    theme_name = "darkly" if system_theme == "dark" else "litera"
-    root.style = tb.Style(theme=theme_name)
+    root.style = tb.Style(theme=saved_theme)
 else:
-    root = Window(themename="darkly" if system_theme == "dark" else "litera")
+    root = Window(themename=saved_theme)
+
+root.style.configure("Treeview", rowheight=30, font=("Segoe UI", 10))
+root.style.configure("Treeview.Heading", font=("Segoe UI", 10, "bold"))
 
 root.title(f"ModZT v{APP_VERSION}")
 
@@ -2899,7 +3116,6 @@ root.update_idletasks()
 
 if _was_maximized:
     root.state('zoomed')
-
 
 def set_zt1_paths():
     global ZT1_PATH
@@ -2951,43 +3167,546 @@ def launch_zt1():
         return
 
     exe_path = os.path.join(ZT1_PATH, "zoo.exe")
+    
+    current_settings = load_settings()
+    should_close = current_settings.get("close_on_game_launch", False)
+    
     try:
-        subprocess.Popen([exe_path], cwd=ZT1_PATH, shell=False)
-        log("🎮 Launched Zoo Tycoon 1", text_widget=log_text)
+        try:
+            update_discord_presence("playing_zt1")
+        except Exception as discord_err:
+            print(f"[!] Discord presence error: {discord_err}")
+
+        proc = subprocess.Popen([exe_path], cwd=ZT1_PATH, shell=False)
+        log("Launched Zoo Tycoon 1", text_widget=log_text)
+        
+        def monitor_zt1_and_reset_discord(proc):
+            proc.wait()
+            try:
+                update_discord_presence("browsing", mod_count=get_enabled_mod_count())
+            except Exception:
+                pass
+
+        threading.Thread(target=monitor_zt1_and_reset_discord,
+                         args=(proc,),
+                         daemon=True).start()
+        
+        if should_close:
+            log("Closing ModZT (close on launch enabled)...", text_widget=log_text)
+            root.after(1000, lambda: root.destroy())
     except Exception as e:
         messagebox.showerror("Error", f"Failed to launch ZT1: {e}")
 
+def set_openzt2_path():
+    global OPENZT2_PATH
+    
+    messagebox.showinfo(
+        "Set OpenZT2 Path",
+        "Please select the OpenZT2 executable (OpenZT2.exe)."
+    )
+    
+    exe_path = filedialog.askopenfilename(
+        title="Select OpenZT2 Executable",
+        filetypes=[("Executable Files", "*.exe"), ("All Files", "*.*")]
+    )
+    
+    if not exe_path:
+        return
+        
+    OPENZT2_PATH = exe_path
+    with open(OPENZT2_EXE_FILE, "w", encoding="utf-8") as f:
+        f.write(OPENZT2_PATH)
+        
+    if 'log_text' in globals():
+        log(f"OpenZT2 path set: {OPENZT2_PATH}", text_widget=log_text)
+    messagebox.showinfo("Success", f"OpenZT2 path saved!\n\nPath: {OPENZT2_PATH}")
 
-banner = ttk.Frame(root, padding=12, bootstyle="dark")
+def launch_openzt2():
+    global OPENZT2_PATH
+    
+    if not OPENZT2_PATH or not os.path.isfile(OPENZT2_PATH):
+        messagebox.showerror(
+            "Error",
+            "OpenZT2 path not set or executable missing.\nUse 'Set OpenZT2 Path' first.")
+        return
+
+    current_settings = load_settings()
+    should_close = current_settings.get("close_on_game_launch", False)
+    
+    try:
+        try:
+            update_discord_presence("playing_openzt2")
+        except Exception as discord_err:
+            print(f"[!] Discord presence error: {discord_err}")
+
+        game_dir = os.path.dirname(OPENZT2_PATH)
+        proc = subprocess.Popen([OPENZT2_PATH], cwd=game_dir, shell=False)
+        if 'log_text' in globals():
+            log("Launched OpenZT2", text_widget=log_text)
+        
+        def monitor_openzt2_and_reset_discord(proc):
+            proc.wait()
+            try:
+                update_discord_presence("browsing", mod_count=get_enabled_mod_count())
+            except Exception:
+                pass
+
+        threading.Thread(target=monitor_openzt2_and_reset_discord,
+                         args=(proc,),
+                         daemon=True).start()
+        
+        if should_close:
+            if 'log_text' in globals():
+                log("Closing ModZT (close on launch enabled)...", text_widget=log_text)
+            root.after(1000, lambda: root.destroy())
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to launch OpenZT2: {e}")
+
+
+def detect_installed_xps(game_path):
+    xps = []
+    try:
+        if not game_path:
+            print("[XP Detection] game_path is empty or None")
+            return []
+        xp_dir = os.path.join(game_path, "xp")
+        print(f"[XP Detection] Looking for XP folder at: {xp_dir}")
+        if not os.path.isdir(xp_dir):
+            print(f"[XP Detection] XP folder not found: {xp_dir}")
+            return []
+
+        print(f"[XP Detection] Found XP folder, scanning contents...")
+        
+        loose_icons = {}
+        expansion_entries = set()
+        
+        for filename in os.listdir(xp_dir):
+            full = os.path.join(xp_dir, filename)
+            if os.path.isfile(full) and filename.lower().endswith('_icon.dds'):
+                base = filename.rsplit('_icon.dds', 1)[0]
+                loose_icons[base] = full
+                expansion_entries.add(base)
+                print(f"[XP Detection] Found loose icon: {base} -> {filename}")
+            elif os.path.isdir(full):
+                expansion_entries.add(filename)
+            elif filename.lower().endswith('.xp'):
+                expansion_entries.add(filename)
+        
+        print(f"[XP Detection] Found {len(expansion_entries)} expansion entries")
+        
+        for entry in sorted(expansion_entries):
+            full = os.path.join(xp_dir, entry)
+            print(f"[XP Detection] Processing entry: {entry} (isdir={os.path.isdir(full)})")
+            icon = None
+            
+            if entry in loose_icons:
+                icon = loose_icons[entry]
+                print(f"[XP Detection] Using loose icon for {entry}: {icon}")
+            else:
+                if os.path.isdir(full):
+                    for fname in ("icon.dds", "logo.dds", "banner.dds", "xp.dds",
+                                  "Icon.dds", "Logo.dds", "Banner.dds", "XP.dds",
+                                  "icon.png", "logo.png", "banner.png", "xp.png", 
+                                  "xp_icon.bmp", "icon.bmp",
+                                  "Icon.png", "Logo.png", "Banner.png", "ICON.PNG", "LOGO.PNG"):
+                        candidate = os.path.join(full, fname)
+                        if os.path.isfile(candidate):
+                            print(f"[XP Detection] Found icon for {entry}: {candidate}")
+                            icon = candidate
+                            break
+                    
+                    if not icon:
+                        for ext in ("*.dds", "*.DDS", "*.png", "*.PNG", "*.bmp", "*.BMP", "*.ico", "*.ICO", "*.jpg", "*.JPG", "*.jpeg", "*.JPEG"):
+                            found = glob.glob(os.path.join(full, ext))
+                            if found:
+                                print(f"[XP Detection] Found image via glob {ext} for {entry}: {found[0]}")
+                                icon = found[0]
+                                break
+                    
+                    if not icon:
+                        for subdir in ("icons", "icon", "images", "image", "textures", "texture", "Assets", "assets"):
+                            subdir_path = os.path.join(full, subdir)
+                            if os.path.isdir(subdir_path):
+                                for ext in ("*.dds", "*.DDS", "*.png", "*.PNG", "*.bmp", "*.BMP", "*.ico", "*.ICO"):
+                                    found = glob.glob(os.path.join(subdir_path, ext))
+                                    if found:
+                                        print(f"[XP Detection] Found image in subdir {subdir} for {entry}: {found[0]}")
+                                        icon = found[0]
+                                        break
+                            if icon:
+                                break
+
+            display_name = entry.replace("_", " ")
+            xps.append({"id": entry, "name": display_name, "path": full, "icon": icon, "modded": False})
+            print(f"[XP Detection] Added XP: {display_name} (icon: {icon})")
+        
+        modded_xps = detect_modded_expansions(game_path)
+        xps.extend(modded_xps)
+        
+    except Exception as e:
+        print(f"[XP Detection] Error during detection: {e}")
+        return []
+    return xps
+
+
+def detect_modded_expansions(game_path):
+    modded_xps = []
+    
+    if not game_path or not os.path.isdir(game_path):
+        return []
+    
+    import zipfile
+    
+    cache_dir = os.path.join(CONFIG_DIR, "mod_xp_icons")
+    os.makedirs(cache_dir, exist_ok=True)
+    
+    def scan_z2f_for_xpinfo(z2f_path):
+        try:
+            if not zipfile.is_zipfile(z2f_path):
+                return None
+            
+            with zipfile.ZipFile(z2f_path, 'r') as zf:
+                namelist = zf.namelist()
+                
+                xpinfo_entries = [n for n in namelist if 'xpinfo' in n.lower()]
+                if not xpinfo_entries:
+                    return None
+                
+                print(f"[Z2F Scan] Found xpInfo in: {z2f_path}")
+                
+                icon_patterns = [
+                    'xpinfo/icon', 'xpInfo/icon', 'xpInfo/Icon', 'XPINFO/ICON',
+                    'xpinfo/logo', 'xpInfo/logo', 'xpInfo/Logo',
+                    'xpinfo/banner', 'xpInfo/banner',
+                ]
+                
+                icon_path = None
+                for entry in namelist:
+                    entry_lower = entry.lower()
+                    if 'xpinfo' in entry_lower:
+                        for ext in ['.dds', '.png', '.bmp', '.jpg', '.tga']:
+                            if entry_lower.endswith(ext):
+                                if any(p in entry_lower for p in ['icon', 'logo', 'banner', 'xp.']):
+                                    base_name = os.path.splitext(os.path.basename(z2f_path))[0]
+                                    cache_filename = f"{base_name}_{hashlib.md5(entry.encode()).hexdigest()[:8]}{ext}"
+                                    cache_path = os.path.join(cache_dir, cache_filename)
+                                    
+                                    if not os.path.exists(cache_path):
+                                        try:
+                                            with zf.open(entry) as src:
+                                                with open(cache_path, 'wb') as dst:
+                                                    dst.write(src.read())
+                                            print(f"[Z2F Scan] Extracted icon: {entry} -> {cache_path}")
+                                        except Exception as e:
+                                            print(f"[Z2F Scan] Failed to extract icon: {e}")
+                                            continue
+                                    
+                                    icon_path = cache_path
+                                    break
+                    if icon_path:
+                        break
+                
+                xp_name = None
+                for entry in namelist:
+                    if 'xpinfo' in entry.lower() and entry.lower().endswith('.xml'):
+                        try:
+                            with zf.open(entry) as f:
+                                content = f.read().decode('utf-8', errors='ignore')
+                                import re
+                                name_match = re.search(r'<name[^>]*>([^<]+)</name>', content, re.IGNORECASE)
+                                if name_match:
+                                    xp_name = name_match.group(1).strip()
+                                    print(f"[Z2F Scan] Found expansion name: {xp_name}")
+                        except:
+                            pass
+                        break
+                
+                return {
+                    "has_xpinfo": True,
+                    "icon_path": icon_path,
+                    "xp_name": xp_name
+                }
+                
+        except Exception as e:
+            print(f"[Z2F Scan] Error scanning {z2f_path}: {e}")
+            return None
+    
+    try:
+        print(f"[Modded XP Detection] Scanning z2f files in: {game_path}")
+        
+        for filename in os.listdir(game_path):
+            if filename.lower().endswith('.z2f'):
+                full_path = os.path.join(game_path, filename)
+                result = scan_z2f_for_xpinfo(full_path)
+                
+                if result and result.get("has_xpinfo"):
+                    base_name = os.path.splitext(filename)[0]
+                    display_name = result.get("xp_name") or base_name.replace("_", " ").replace("-", " ")
+                    
+                    modded_xps.append({
+                        "id": f"mod_z2f_{base_name}",
+                        "name": f" {display_name}",
+                        "path": full_path,
+                        "icon": result.get("icon_path"),
+                        "modded": True
+                    })
+                    print(f"[Modded XP Detection] Added modded expansion: {display_name}")
+        
+        xp_dir = os.path.join(game_path, "xp")
+        if os.path.isdir(xp_dir):
+            for filename in os.listdir(xp_dir):
+                if filename.lower().endswith('.z2f'):
+                    full_path = os.path.join(xp_dir, filename)
+                    result = scan_z2f_for_xpinfo(full_path)
+                    
+                    if result and result.get("has_xpinfo"):
+                        base_name = os.path.splitext(filename)[0]
+                        display_name = result.get("xp_name") or base_name.replace("_", " ").replace("-", " ")
+                        
+                        if not any(x["id"] == f"mod_z2f_{base_name}" for x in modded_xps):
+                            modded_xps.append({
+                                "id": f"mod_z2f_{base_name}",
+                                "name": f" {display_name}",
+                                "path": full_path,
+                                "icon": result.get("icon_path"),
+                                "modded": True
+                            })
+                            print(f"[Modded XP Detection] Added modded expansion from xp/: {display_name}")
+        
+        if os.path.isdir(xp_dir):
+            for entry in os.listdir(xp_dir):
+                full = os.path.join(xp_dir, entry)
+                if os.path.isdir(full):
+                    xpinfo_folder = None
+                    for subentry in os.listdir(full):
+                        if subentry.lower() == 'xpinfo':
+                            xpinfo_folder = os.path.join(full, subentry)
+                            break
+                    
+                    if xpinfo_folder and os.path.isdir(xpinfo_folder):
+                        icon = find_expansion_icon(xpinfo_folder) or find_expansion_icon(full)
+                        display_name = entry.replace("_", " ").replace("-", " ")
+                        
+                        if not any(x["id"] == f"mod_{entry}" for x in modded_xps):
+                            modded_xps.append({
+                                "id": f"mod_{entry}",
+                                "name": f" {display_name}",
+                                "path": full,
+                                "icon": icon,
+                                "modded": True
+                            })
+                            print(f"[Modded XP Detection] Added unpacked modded expansion: {display_name}")
+                    
+    except Exception as e:
+        print(f"[Modded XP Detection] Error: {e}")
+        import traceback
+        traceback.print_exc()
+    
+    return modded_xps
+
+
+def find_expansion_icon(folder_path):
+    if not os.path.isdir(folder_path):
+        return None
+    
+    icon_names = [
+        "icon.dds", "icon.png", "icon.bmp", "icon.jpg",
+        "logo.dds", "logo.png", "logo.bmp", "logo.jpg",
+        "banner.dds", "banner.png", "banner.bmp",
+        "xp.dds", "xp.png", "xp_icon.dds", "xp_icon.png",
+        "Icon.dds", "Icon.png", "Logo.dds", "Logo.png",
+        "ICON.DDS", "ICON.PNG", "LOGO.DDS", "LOGO.PNG",
+    ]
+    
+    for name in icon_names:
+        candidate = os.path.join(folder_path, name)
+        if os.path.isfile(candidate):
+            return candidate
+
+    for subdir in ["icons", "icon", "images", "textures", "assets", "Assets"]:
+        subdir_path = os.path.join(folder_path, subdir)
+        if os.path.isdir(subdir_path):
+            for ext in ["*.dds", "*.png", "*.bmp", "*.jpg"]:
+                found = glob.glob(os.path.join(subdir_path, ext))
+                if found:
+                    return found[0]
+    
+    for ext in ["*.dds", "*.png", "*.bmp", "*.jpg"]:
+        found = glob.glob(os.path.join(folder_path, ext))
+        if found:
+            return found[0]
+    
+    return None
+
+
+xp_icon_cache = {}
+
+def load_xp_thumbnail(icon_path, size=(48, 48)):
+    if not icon_path or not os.path.isfile(icon_path):
+        print(f"[XP Thumbnail] Icon path invalid: {icon_path}")
+        return None
+    try:
+        cache_dir = os.path.join(CONFIG_DIR, "exp_icons")
+        os.makedirs(cache_dir, exist_ok=True)
+        key = hashlib.md5(icon_path.encode('utf-8')).hexdigest() + f"_{size[0]}x{size[1]}.png"
+        cached = os.path.join(cache_dir, key)
+        if os.path.isfile(cached):
+            print(f"[XP Thumbnail] Using cached thumbnail: {cached}")
+            img = Image.open(cached)
+        else:
+            ext = os.path.splitext(icon_path)[1].lower()
+            print(f"[XP Thumbnail] Loading {ext} image: {icon_path}")
+            if ext == '.dds':
+                img = None
+                try:
+                    print(f"[XP Thumbnail] Attempting to load DDS via imageio...")
+                    import imageio
+                    arr = imageio.imread(icon_path)
+                    img = Image.fromarray(arr)
+                    print(f"[XP Thumbnail] Successfully loaded DDS via imageio")
+                except Exception as e:
+                    print(f"[XP Thumbnail] imageio failed: {e}, trying PIL fallback...")
+                    try:
+                        img = Image.open(icon_path).convert("RGBA")
+                        print(f"[XP Thumbnail] Successfully loaded DDS via PIL")
+                    except Exception as e2:
+                        print(f"[XP Thumbnail] PIL also failed: {e2}")
+                        print("[!] DDS image support unavailable for:", icon_path)
+                        return None
+            else:
+                print(f"[XP Thumbnail] Loading {ext} via PIL...")
+                img = Image.open(icon_path).convert("RGBA")
+
+            print(f"[XP Thumbnail] Resizing to {size}...")
+            img.thumbnail(size, Image.LANCZOS)
+            img.save(cached)
+            print(f"[XP Thumbnail] Cached to: {cached}")
+        tkimg = ImageTk.PhotoImage(img)
+        xp_icon_cache[icon_path] = tkimg
+        print(f"[XP Thumbnail] Successfully created PhotoImage for: {icon_path}")
+        return tkimg
+    except Exception as e:
+        print(f"[XP Thumbnail] Exception loading thumbnail: {e}")
+        return None
+
+
+def create_xp_tooltip(widget, text):
+    tip_window = [None]
+    
+    def show_tip(event):
+        if tip_window[0]:
+            return
+        x, y = event.x_root + 10, event.y_root + 10
+        tip_window[0] = tw = tk.Toplevel(widget)
+        tw.wm_overrideredirect(True)
+        tw.wm_geometry(f"+{x}+{y}")
+        label = ttk.Label(tw, text=text, justify="left", padding=5,
+                         background="#333333", foreground="#ffffff",
+                         font=("Segoe UI", 9))
+        label.pack()
+    
+    def hide_tip(event):
+        if tip_window[0]:
+            tip_window[0].destroy()
+            tip_window[0] = None
+    
+    widget.bind("<Enter>", show_tip)
+    widget.bind("<Leave>", hide_tip)
+
+
+banner = ttk.Frame(root, padding=(20, 10), bootstyle="dark")
 banner.pack(fill=tk.X)
 
 if os.path.isfile(BANNER_FILE):
     try:
         img = Image.open(BANNER_FILE)
-        img.thumbnail((72, 72), Image.LANCZOS)
+        img.thumbnail((64, 64), Image.LANCZOS)
         banner_img = ImageTk.PhotoImage(img)
-        logo_label = ttk.Label(banner, image=banner_img)
+        logo_label = ttk.Label(banner, image=banner_img, bootstyle="inverse-dark")
         logo_label.image = banner_img
-        logo_label.pack(side=tk.LEFT, padx=(0, 12))
+        logo_label.pack(side=tk.LEFT, padx=(0, 15))
     except Exception as e:
         print("Banner load failed:", e)
 
 _tt = ttk.Label(banner,
                 text="ModZT",
-                font=("Segoe UI", 20, "bold"),
+                font=("Segoe UI", 24, "bold"),
                 bootstyle="inverse-dark")
 _tt.pack(side=tk.LEFT)
 
+xp_icons_holder = ttk.Frame(banner)
+xp_icons_holder.pack(side=tk.RIGHT)
+
+
+
+def populate_xp_icons_async(holder_frame):
+    
+    def worker():
+        try:
+            game_path = GAME_PATH
+            if not game_path:
+                game_path = settings.get("game_path", "")
+            
+            print(f"[populate_xp_icons_async] Using game_path: {game_path}")
+            all_xps = detect_installed_xps(game_path)
+            xps = [xp for xp in all_xps if not xp.get("modded", False)]
+            print(f"[populate_xp_icons_async] Detected {len(all_xps)} expansions, showing {len(xps)} official")
+
+            def ui_task():
+                print(f"[populate_xp_icons_async] UI task starting, clearing holder...")
+                for widget in holder_frame.winfo_children():
+                    widget.destroy()
+
+                print(f"[populate_xp_icons_async] Adding {len(xps)} expansion icons...")
+                for i, xp in enumerate(xps):
+                    print(f"[populate_xp_icons_async] Loading icon {i+1}/{len(xps)}: {xp['name']}")
+                    tkimg = load_xp_thumbnail(xp.get("icon"))
+                    if tkimg:
+                        print(f"[populate_xp_icons_async] [x] Loaded image for {xp['name']}")
+                        lbl = ttk.Label(holder_frame, image=tkimg)
+                        lbl.image = tkimg
+                        lbl.pack(side=tk.RIGHT, padx=4)
+                        path = xp.get("path")
+                        if path:
+                            if os.path.isdir(path):
+                                lbl.bind("<Button-1>", lambda e, p=path: os.startfile(p))
+                            elif os.path.isfile(path):
+                                lbl.bind("<Button-1>", lambda e, p=path: os.startfile(os.path.dirname(p)))
+                        print(f"[populate_xp_icons_async] [x] Packed label for {xp['name']}")
+                    else:
+                        print(f"[populate_xp_icons_async] [OK] Failed to load image for {xp['name']}, using text fallback")
+                        lbl = ttk.Label(holder_frame, text=xp.get("name"), font=("Segoe UI", 8), bootstyle="inverse-dark")
+                        lbl.pack(side=tk.RIGHT, padx=6)
+                        path = xp.get("path")
+                        if path:
+                            if os.path.isdir(path):
+                                lbl.bind("<Button-1>", lambda e, p=path: os.startfile(p))
+                            elif os.path.isfile(path):
+                                lbl.bind("<Button-1>", lambda e, p=path: os.startfile(os.path.dirname(p)))
+                print(f"[populate_xp_icons_async] UI task complete - {len(xps)} expansion icons added")
+
+            if 'root' in globals():
+                root.after(10, ui_task)
+        except Exception as e:
+            print(f"[populate_xp_icons_async] Error in worker: {e}")
+            import traceback
+            traceback.print_exc()
+
+    t = threading.Thread(target=worker, daemon=True)
+    t.start()
+
 toolbar = ttk.Frame(root, padding=6)
 toolbar.pack(side=tk.TOP, fill=tk.X)
+
+_translatable_widgets = {}
 
 def toggle_theme():
     if root.style.theme_use() == 'darkly':
         root.style.theme_use('litera')
     else:
         root.style.theme_use('darkly')
+    update_sidebar_theme()
     log("Toggled theme", text_widget=log_text)
-
 
 def toggle_ui_mode():
     ui_mode["compact"] = not ui_mode["compact"]
@@ -2996,40 +3715,6 @@ def toggle_ui_mode():
     new_label = t("menu_expanded_mode") if ui_mode["compact"] else t("menu_compact_mode")
     view_menu.entryconfig(2, label=new_label)
     log(f"Switched to {mode} mode", text_widget=log_text)
-
-_translatable_widgets = {}
-
-help_menu_btn = ttk.Menubutton(toolbar, text=t("menu_help"), bootstyle="info-outline")
-_translatable_widgets["help_menu_btn"] = help_menu_btn
-help_menu = tk.Menu(help_menu_btn, tearoff=0)
-help_menu.add_command(label="About ModZT",
-                      command=lambda: messagebox.showinfo(
-                          "About",
-                          "ModZT v1.1.6\n"
-                          "Created by Kael\n\n"
-                          "Music: Zoo Tycoon 2 Theme Remaster\n"
-                          "by SirGoose"))
-help_menu.add_command(
-    label="Open GitHub Page",
-    command=lambda: webbrowser.open("https://github.com/kaelelson05/modzt"))
-help_menu.add_command(
-    label="Discord Server",
-    command=lambda: webbrowser.open("https://discord.gg/9y9DfmpZG4"))
-help_menu.add_command(label="Check for Updates", command=check_for_updates)
-help_menu.add_separator()
-help_menu.add_command(
-    label="Music Credit (SirGoose)",
-    command=lambda: webbrowser.open("https://www.youtube.com/watch?v=9S3P64v9lnw"))
-help_menu_btn["menu"] = help_menu
-help_menu_btn.pack(side=tk.RIGHT, padx=4)
-
-view_menu_button = ttk.Menubutton(toolbar,
-                                  text=t("menu_view"),
-                                  bootstyle="info-outline")
-view_menu = tk.Menu(view_menu_button, tearoff=0)
-view_menu.add_command(label=t("menu_toggle_theme"), command=toggle_theme)
-view_menu.add_command(label=t("menu_toggle_music"), command=toggle_background_music)
-view_menu.add_command(label=t("menu_compact_mode"), command=toggle_ui_mode)
 
 def refresh_ui_language():
     view_menu_button.configure(text=t("menu_view"))
@@ -3056,15 +3741,22 @@ def refresh_ui_language():
     if "launch_btn" in _translatable_widgets:
         _translatable_widgets["launch_btn"].configure(text=t("btn_launch_game"))
 
-    if "notebook" in _translatable_widgets:
-        nb = _translatable_widgets["notebook"]
-        tab_keys = ["tab_zt2_mods", "tab_zt1_mods", "tab_bundles", "tab_screenshots",
-                    "tab_saved_games", "tab_multiplayer", "tab_mod_browser", "tab_themes"]
-        for i, key in enumerate(tab_keys):
-            try:
-                nb.tab(i, text=t(key))
-            except Exception:
-                pass
+    update_sidebar_labels()
+
+    if "schedule_frame" in _translatable_widgets:
+        _translatable_widgets["schedule_frame"].configure(text=t("sched_title"))
+    if "sched_enable_cb" in _translatable_widgets:
+        _translatable_widgets["sched_enable_cb"].configure(text=t("sched_enable"))
+    if "sched_light_lbl" in _translatable_widgets:
+        _translatable_widgets["sched_light_lbl"].configure(text=t("sched_light_theme"))
+    if "sched_dark_lbl" in _translatable_widgets:
+        _translatable_widgets["sched_dark_lbl"].configure(text=t("sched_dark_theme"))
+    if "sched_from_lbl1" in _translatable_widgets:
+        _translatable_widgets["sched_from_lbl1"].configure(text=t("sched_from"))
+    if "sched_from_lbl2" in _translatable_widgets:
+        _translatable_widgets["sched_from_lbl2"].configure(text=t("sched_from"))
+    if "sched_hint_lbl" in _translatable_widgets:
+        _translatable_widgets["sched_hint_lbl"].configure(text=t("sched_time_hint"))
 
 def apply_language(lang_code):
     global current_language
@@ -3077,41 +3769,57 @@ def apply_language(lang_code):
         t("msg_language_changed")
     )
 
-language_menu = tk.Menu(view_menu, tearoff=0)
-for lang_code, lang_data in TRANSLATIONS.items():
-    language_menu.add_command(
-        label=lang_data["lang_name"],
-        command=lambda lc=lang_code: apply_language(lc)
-    )
-view_menu.add_cascade(label=t("menu_language"), menu=language_menu)
-
-view_menu_button["menu"] = view_menu
-view_menu_button.pack(side=tk.RIGHT, padx=4)
-
-achievements_btn = ttk.Button(toolbar, text=t("btn_achievements"), bootstyle="warning-outline",
-                               command=open_achievements_dialog)
+achievements_btn = ttk.Button(toolbar, text=t("btn_achievements"), bootstyle="warning-outline", command=open_achievements_dialog)
 achievements_btn.pack(side=tk.RIGHT, padx=4)
 _translatable_widgets["achievements_btn"] = achievements_btn
 
-tools_menu_btn = ttk.Menubutton(toolbar,
-                                text=t("menu_tools"),
-                                bootstyle="info-outline")
+help_menu_btn = ttk.Menubutton(toolbar, text=t("menu_help"), bootstyle="info-outline")
+_translatable_widgets["help_menu_btn"] = help_menu_btn
+help_menu = tk.Menu(help_menu_btn, tearoff=0)
+help_menu.add_command(label="About ModZT", command=lambda: messagebox.showinfo("About", "ModZT v1.1.8\nCreated by Songstorm\n\nMusic: Zoo Tycoon 2 Theme Remaster\nby SirGoose"))
+help_menu.add_command(label="Open GitHub Page", command=lambda: webbrowser.open("https://github.com/songstormstudios/modzt"))
+help_menu.add_command(label="Discord Server", command=lambda: webbrowser.open("https://discord.gg/9y9DfmpZG4"))
+help_menu.add_command(label="Check for Updates", command=check_for_updates)
+help_menu.add_separator()
+help_menu.add_command(label="Music Credit (SirGoose)", command=lambda: webbrowser.open("https://www.youtube.com/watch?v=9S3P64v9lnw"))
+help_menu_btn["menu"] = help_menu
+help_menu_btn.pack(side=tk.RIGHT, padx=4)
+
+view_menu_button = ttk.Menubutton(toolbar, text=t("menu_view"), bootstyle="info-outline")
+view_menu = tk.Menu(view_menu_button, tearoff=0)
+view_menu.add_command(label=t("menu_toggle_theme"), command=toggle_theme)
+view_menu.add_command(label=t("menu_toggle_music"), command=toggle_background_music)
+view_menu.add_command(label=t("menu_compact_mode"), command=toggle_ui_mode)
+language_menu = tk.Menu(view_menu, tearoff=0)
+for lang_code, lang_data in TRANSLATIONS.items():
+    language_menu.add_command(label=lang_data["lang_name"], command=lambda lc=lang_code: apply_language(lc))
+view_menu.add_cascade(label=t("menu_language"), menu=language_menu)
+view_menu_button["menu"] = view_menu
+view_menu_button.pack(side=tk.RIGHT, padx=4)
+
+tools_menu_btn = ttk.Menubutton(toolbar, text=t("menu_tools"), bootstyle="info-outline")
 _translatable_widgets["tools_menu_btn"] = tools_menu_btn
 tools_menu = tk.Menu(tools_menu_btn, tearoff=0)
-tools_menu.add_command(
-    label="Validate Mods",
-    command=lambda: messagebox.showinfo("Validate Mods",
-                                        "All mods validated successfully."))
-tools_menu.add_command(label="Clean Temporary Files",
-                       command=lambda: messagebox.showinfo(
-                           "Cleanup", "Temporary files cleaned up."))
+tools_menu.add_command(label="Validate Mods", command=lambda: messagebox.showinfo("Validate Mods", "All mods validated successfully."))
+tools_menu.add_command(label="Scan for Conflicts", command=lambda: scan_mod_conflicts())
+tools_menu.add_command(label="Smart Categories", command=lambda: smart_categorize_all_mods())
+tools_menu.add_command(label="Clean Temporary Files", command=lambda: messagebox.showinfo("Cleanup", "Temporary files cleaned up."))
 tools_menu.add_separator()
-tools_menu.add_command(label="Game Unlocks Manager",
-                       command=open_game_unlocks_dialog)
+tools_menu.add_command(label="Scheduled Profiles", command=lambda: open_scheduled_profiles_dialog())
+tools_menu.add_command(label="Generate Mod Report", command=lambda: open_mod_report_dialog())
+tools_menu.add_command(label="Export Mod List", command=lambda: export_mod_list_dialog())
+tools_menu.add_command(label="Import Friend's Profile", command=lambda: import_friend_profile())
+tools_menu.add_separator()
+tools_menu.add_command(label="Startup Time Analyzer", command=lambda: analyze_startup_time())
+tools_menu.add_command(label="Safe Mode Launch", command=lambda: launch_safe_mode())
+tools_menu.add_separator()
+tools_menu.add_command(label="Cloud Sync", command=lambda: open_cloud_sync_dialog())
+tools_menu.add_command(label="Portable Mode", command=lambda: open_portable_mode_dialog())
+tools_menu.add_command(label="Discord Integration", command=lambda: open_discord_settings_dialog())
+tools_menu.add_separator()
+tools_menu.add_command(label="Game Unlocks Manager", command=open_game_unlocks_dialog)
 tools_menu_btn["menu"] = tools_menu
 tools_menu_btn.pack(side=tk.RIGHT, padx=4)
-
-ttk.Separator(toolbar, orient="vertical").pack(side=tk.RIGHT, fill=tk.Y, padx=8)
 
 mods_menu_btn = ttk.Menubutton(toolbar, text=t("menu_mods"), bootstyle="info-outline")
 _translatable_widgets["mods_menu_btn"] = mods_menu_btn
@@ -3126,11 +3834,11 @@ game_menu_btn = ttk.Menubutton(toolbar, text=t("menu_game"), bootstyle="info-out
 _translatable_widgets["game_menu_btn"] = game_menu_btn
 game_menu = tk.Menu(game_menu_btn, tearoff=0)
 game_menu.add_command(label="Set ZT1 Path", command=set_zt1_paths)
-game_menu.add_command(
-    label="Set ZT2 Path",
-    command=set_game_path)
+game_menu.add_command(label="Set ZT2 Path", command=set_game_path)
 game_menu.add_command(label="Play ZT1", command=launch_zt1)
 game_menu.add_command(label="Play ZT2", command=launch_game)
+# game_menu.add_command(label="Play OpenZT2", command=launch_openzt2)
+# game_menu.add_command(label="Set OpenZT2 Path", command=set_openzt2_path)
 game_menu_btn["menu"] = game_menu
 game_menu_btn.pack(side=tk.RIGHT, padx=4)
 
@@ -3184,24 +3892,19 @@ def update_status_bar():
         print(f"[ModZT] Error updating status bar: {e}")
 
 
-main_frame = ttk.Frame(root)
-main_frame.pack(fill=tk.BOTH, expand=True)
+nav_items = []
+sidebar_buttons = {}
 
-notebook = ttk.Notebook(main_frame)
-notebook.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-_translatable_widgets["notebook"] = notebook
+notebook = ttk.Notebook(root)
+notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-mods_tab = ttk.Frame(notebook, padding=6)
+mods_tab = ttk.Frame(notebook, padding=10)
 notebook.add(mods_tab, text=t("tab_zt2_mods"))
 
-zt1_tab = ttk.Frame(notebook, padding=6)
+zt1_tab = ttk.Frame(notebook, padding=10)
 notebook.add(zt1_tab, text=t("tab_zt1_mods"))
 
-zt1_toolbar = ttk.Frame(zt1_tab)
-zt1_toolbar.pack(fill=tk.X, pady=4)
-
 zt1_search_var = tk.StringVar()
-zt1_status_filter = tk.StringVar(value="All")
 
 search_frame = ttk.Frame(zt1_tab)
 search_frame.pack(fill="x", padx=6, pady=(4, 0))
@@ -3210,66 +3913,33 @@ ttk.Label(search_frame, text="Search:").pack(side="left")
 search_entry = ttk.Entry(search_frame, textvariable=zt1_search_var)
 search_entry.pack(side="left", fill="x", expand=True, padx=(4, 6))
 
-ttk.Label(search_frame, text="Status:").pack(side="left")
-ttk.OptionMenu(search_frame, zt1_status_filter, "All", "All", "Enabled",
-               "Disabled").pack(side="left")
-
-ttk.Button(search_frame,
-           text="Clear",
-           command=lambda:
-           (zt1_search_var.set(""), zt1_status_filter.set("All"),
-            refresh_zt1_tree())).pack(side="left", padx=(6, 0))
-
-ttk.Button(zt1_toolbar,
-           text="Enable",
-           bootstyle="success",
-           width=10,
-           command=lambda: enable_selected_zt1_mod()).pack(side=tk.LEFT,
-                                                           padx=4)
-ttk.Button(zt1_toolbar,
-           text="Disable",
-           bootstyle="warning",
-           width=10,
-           command=lambda: disable_selected_zt1_mod()).pack(side=tk.LEFT,
-                                                            padx=4)
-ttk.Button(zt1_toolbar,
-           text="Uninstall",
-           width=10,
-           command=lambda: uninstall_selected_mod()).pack(side=tk.LEFT,
-                                                            padx=4)
-ttk.Button(zt1_toolbar,
-           text="Refresh List",
-           width=10,
-           command=lambda: refresh_zt1_tree()).pack(side=tk.LEFT, padx=4)
-ttk.Button(
-    zt1_toolbar,
-    text="Open Mods Folder",
-    width=16,
-    command=lambda: os.startfile(ZT1_MOD_DIR or os.path.join(
-        ZT1_PATH, "dlupdates"))
-    if ZT1_PATH else messagebox.showerror("Error", "ZT1 path not set.")).pack(
-        side=tk.LEFT, padx=4)
-
 zt1_frame = ttk.Frame(zt1_tab)
 zt1_frame.pack(fill=tk.BOTH, expand=True, pady=4)
 
 zt1_tree = ttk.Treeview(
     zt1_frame,
-    columns=("Name", "Status", "Category", "Tags", "Size"),
+    columns=("Name", "Status", "Category", "Size", "Modified"),
     show="headings",
     height=18,
+    selectmode="extended",
 )
 
-for col in ("Name", "Status", "Category", "Tags", "Size"):
+for col in ("Name", "Status", "Category", "Size", "Modified"):
+    if col == "Size":
+        heading_text = "Size (MB)"
+    elif col == "Modified":
+        heading_text = "Last Modified"
+    else:
+        heading_text = col
     zt1_tree.heading(col,
-                     text=col,
+                     text=heading_text,
                      command=lambda c=col: sort_zt1_tree(c, False))
 
-zt1_tree.column("Name", anchor="w", width=350)
-zt1_tree.column("Status", anchor="center", width=80)
+zt1_tree.column("Name", anchor="w", width=300)
+zt1_tree.column("Status", anchor="center", width=100)
 zt1_tree.column("Category", anchor="center", width=120)
-zt1_tree.column("Tags", anchor="center", width=180)
 zt1_tree.column("Size", anchor="e", width=80)
+zt1_tree.column("Modified", anchor="center", width=150)
 
 scrollbar = ttk.Scrollbar(zt1_frame,
                           orient=tk.VERTICAL,
@@ -3285,11 +3955,11 @@ zt1_frame.columnconfigure(0, weight=1)
 def auto_resize_columns(event):
     total_width = event.width
     ratios = {
-        "Name": 0.4,
-        "Status": 0.1,
-        "Category": 0.15,
-        "Tags": 0.15,
-        "Size": 0.1
+        "Name": 0.35,
+        "Status": 0.12,
+        "Category": 0.18,
+        "Size": 0.12,
+        "Modified": 0.18
     }
     for col, r in ratios.items():
         zt1_tree.column(col, width=int(total_width * r))
@@ -3298,6 +3968,11 @@ def auto_resize_columns(event):
 zt1_tree.bind("<Configure>", auto_resize_columns)
 
 zt1_menu = tk.Menu(zt1_tree, tearoff=0)
+zt1_menu.add_command(label="Enable", command=lambda: enable_selected_zt1_mods())
+zt1_menu.add_command(label="Disable", command=lambda: disable_selected_zt1_mods())
+zt1_menu.add_separator()
+zt1_menu.add_command(label="Toggle Favorite", command=lambda: toggle_zt1_favorite())
+zt1_menu.add_separator()
 zt1_menu.add_command(label="Set Category",
                      command=lambda: set_zt1_mod_category())
 zt1_menu.add_command(label="Set Tags", command=lambda: set_zt1_mod_tags())
@@ -3344,13 +4019,65 @@ def set_zt1_mod_tags():
         refresh_zt1_tree()
 
 
+zt1_footer = ttk.Label(zt1_tab,
+                       text="Total mods: 0 | Enabled: 0 | Disabled: 0",
+                       bootstyle="secondary")
+zt1_footer.pack(anchor="w", padx=6, pady=(2, 0))
+
 zt1_mod_btns = ttk.Frame(zt1_tab, padding=6)
 zt1_mod_btns.pack(fill=tk.X)
 
-zt1_footer = ttk.Label(zt1_tab,
-                       text="Total mods: Total 0 | Enabled 0 | Disabled 0",
-                       bootstyle="secondary")
-zt1_footer.pack(anchor="w", padx=6, pady=(2, 0))
+ttk.Button(zt1_mod_btns,
+           text="Enable",
+           bootstyle="success",
+           width=10,
+           command=lambda: enable_selected_zt1_mods()).pack(side=tk.LEFT, padx=4)
+ttk.Button(zt1_mod_btns,
+           text="Disable",
+           bootstyle="warning",
+           width=10,
+           command=lambda: disable_selected_zt1_mods()).pack(side=tk.LEFT, padx=4)
+ttk.Button(zt1_mod_btns,
+           text="Uninstall",
+           bootstyle="danger",
+           width=10,
+           command=lambda: uninstall_selected_mod()).pack(side=tk.LEFT, padx=4)
+ttk.Button(zt1_mod_btns,
+           text="Refresh",
+           bootstyle="info",
+           width=10,
+           command=lambda: refresh_zt1_tree()).pack(side=tk.LEFT, padx=4)
+ttk.Button(zt1_mod_btns,
+           text="Open Folder",
+           bootstyle="secondary",
+           width=12,
+           command=lambda: os.startfile(ZT1_MOD_DIR or os.path.join(ZT1_PATH, "dlupdates"))
+           if ZT1_PATH else messagebox.showerror("Error", "ZT1 path not set.")).pack(side=tk.LEFT, padx=4)
+
+zt1_bulk_btns = ttk.Frame(zt1_tab, padding=(6, 0, 6, 6))
+zt1_bulk_btns.pack(fill=tk.X)
+
+ttk.Button(zt1_bulk_btns,
+           text="Enable All",
+           bootstyle="success-outline",
+           width=10,
+           command=lambda: bulk_enable_zt1_mods(all_mods=True)).pack(side=tk.LEFT, padx=4)
+ttk.Button(zt1_bulk_btns,
+           text="Disable All",
+           bootstyle="warning-outline",
+           width=10,
+           command=lambda: bulk_disable_zt1_mods(all_mods=True)).pack(side=tk.LEFT, padx=4)
+ttk.Separator(zt1_bulk_btns, orient="vertical").pack(side=tk.LEFT, fill="y", padx=8, pady=2)
+ttk.Button(zt1_bulk_btns,
+           text="Favorite",
+           bootstyle="warning",
+           width=10,
+           command=lambda: toggle_zt1_favorite()).pack(side=tk.LEFT, padx=4)
+ttk.Button(zt1_bulk_btns,
+           text="Show Favorites",
+           bootstyle="info-outline",
+           width=12,
+           command=lambda: show_favorites_dialog()).pack(side=tk.LEFT, padx=4)
 
 def sort_zt1_tree(col, reverse=False):
     data = [(zt1_tree.set(k, col), k) for k in zt1_tree.get_children("")]
@@ -3375,7 +4102,7 @@ def sort_zt1_tree(col, reverse=False):
     for c in ("Name", "Status", "Category", "Tags", "Size"):
         label = c
         if c == col:
-            label += " 🔽" if reverse else " 🔼"
+            label += " v" if reverse else " ^"
         zt1_tree.heading(
             c,
             text=label,
@@ -3394,34 +4121,46 @@ def refresh_zt1_tree(filter_text=""):
     disabled_count = total - enabled_count
 
     cursor.execute(
-        "SELECT name, enabled, category, tags FROM zt1_mods ORDER BY name ASC")
+        "SELECT name, enabled, category FROM zt1_mods ORDER BY enabled DESC, name ASC")
     all_rows = cursor.fetchall()
 
     filter_text = (zt1_search_var.get() or "").strip().lower()
-    status_filter = zt1_status_filter.get().lower()
 
     visible_rows = []
-    for name, enabled, category, tags in all_rows:
+    for name, enabled, category in all_rows:
         status_str = "enabled" if enabled else "disabled"
-        combined = f"{name.lower()} {category.lower() if category else ''} {tags.lower() if tags else ''} {status_str}"
+        combined = f"{name.lower()} {category.lower() if category else ''} {status_str}"
 
         if filter_text and filter_text not in combined:
             continue
-        if status_filter != "all" and status_str != status_filter:
-            continue
 
-        visible_rows.append((name, enabled, category, tags))
+        visible_rows.append((name, enabled, category))
 
-    for name, enabled, category, tags in visible_rows:
+    for name, enabled, category in visible_rows:
         status = "enabled" if enabled else "disabled"
-        display_status = "🟢 Enabled" if enabled else "🔴 Disabled"
-        mod_path = os.path.join(ZT1_MOD_DIR, name)
-        size = f"{os.path.getsize(mod_path)/1024:.1f} KB" if os.path.exists(
-            mod_path) else "-"
+        display_status = "Enabled" if enabled else "Disabled"
+
+        mod_path = None
+        if ZT1_MOD_DIR:
+            enabled_path = os.path.join(ZT1_MOD_DIR, name)
+            disabled_path = os.path.join(zt1_mods_disabled_dir() or "", name)
+            if os.path.exists(enabled_path):
+                mod_path = enabled_path
+            elif os.path.exists(disabled_path):
+                mod_path = disabled_path
+
+        if mod_path and os.path.exists(mod_path):
+            size_mb = os.path.getsize(mod_path) / (1024 * 1024)
+            size = f"{size_mb:.2f}"
+            modified = time.strftime("%Y-%m-%d %H:%M:%S",
+                                     time.localtime(os.path.getmtime(mod_path)))
+        else:
+            size = "-"
+            modified = "N/A"
+
         zt1_tree.insert("",
                         tk.END,
-                        values=(name, display_status, category or "—", tags
-                                or "—", size),
+                        values=(name, display_status, category or "-", size, modified),
                         tags=(status, ))
 
     zt1_footer.config(
@@ -3433,7 +4172,6 @@ def refresh_zt1_tree(filter_text=""):
 
 
 zt1_search_var.trace_add("write", lambda *_: refresh_zt1_tree())
-zt1_status_filter.trace_add("write", lambda *_: refresh_zt1_tree())
 
 
 def on_search_zt1(*args):
@@ -3466,6 +4204,211 @@ def disable_selected_zt1_mod():
         refresh_zt1_tree()
 
 
+def enable_selected_zt1_mods():
+    selected = zt1_tree.selection()
+    if not selected:
+        messagebox.showinfo("Select", "Select one or more ZT1 mods first.")
+        return
+    count = 0
+    for item in selected:
+        name = zt1_tree.item(item)["values"][0]
+        try:
+            enable_zt1_mod(name, text_widget=log_text)
+            count += 1
+        except Exception as e:
+            log(f"[!] Failed to enable {name}: {e}", log_text)
+    refresh_zt1_tree()
+    if count > 1:
+        log(f"Enabled {count} ZT1 mods.", log_text)
+
+
+def disable_selected_zt1_mods():
+    selected = zt1_tree.selection()
+    if not selected:
+        messagebox.showinfo("Select", "Select one or more ZT1 mods first.")
+        return
+    count = 0
+    for item in selected:
+        name = zt1_tree.item(item)["values"][0]
+        try:
+            disable_zt1_mod(name, text_widget=log_text)
+            count += 1
+        except Exception as e:
+            log(f"[!] Failed to disable {name}: {e}", log_text)
+    refresh_zt1_tree()
+    if count > 1:
+        log(f"Disabled {count} ZT1 mods.", log_text)
+
+
+def bulk_enable_zt1_mods(all_mods=False):
+    if all_mods:
+        cursor.execute("SELECT name FROM zt1_mods WHERE enabled=0")
+        mods = [row[0] for row in cursor.fetchall()]
+        if not mods:
+            messagebox.showinfo("Info", "No disabled ZT1 mods to enable.")
+            return
+        if not messagebox.askyesno("Confirm", f"Enable all {len(mods)} disabled ZT1 mods?"):
+            return
+    else:
+        selected = zt1_tree.selection()
+        if not selected:
+            messagebox.showinfo("Select", "Select mods first.")
+            return
+        mods = [zt1_tree.item(item)["values"][0] for item in selected]
+    
+    count = 0
+    for name in mods:
+        try:
+            enable_zt1_mod(name, text_widget=log_text)
+            count += 1
+        except:
+            pass
+    refresh_zt1_tree()
+    log(f"Enabled {count} ZT1 mods.", log_text)
+
+
+def bulk_disable_zt1_mods(all_mods=False):
+    if all_mods:
+        cursor.execute("SELECT name FROM zt1_mods WHERE enabled=1")
+        mods = [row[0] for row in cursor.fetchall()]
+        if not mods:
+            messagebox.showinfo("Info", "No enabled ZT1 mods to disable.")
+            return
+        if not messagebox.askyesno("Confirm", f"Disable all {len(mods)} enabled ZT1 mods?"):
+            return
+    else:
+        selected = zt1_tree.selection()
+        if not selected:
+            messagebox.showinfo("Select", "Select mods first.")
+            return
+        mods = [zt1_tree.item(item)["values"][0] for item in selected]
+    
+    count = 0
+    for name in mods:
+        try:
+            disable_zt1_mod(name, text_widget=log_text)
+            count += 1
+        except:
+            pass
+    refresh_zt1_tree()
+    log(f"Disabled {count} ZT1 mods.", log_text)
+
+
+def toggle_zt1_favorite():
+    selected = zt1_tree.selection()
+    if not selected:
+        messagebox.showinfo("Select", "Select one or more ZT1 mods first.")
+        return
+    
+    for item in selected:
+        name = zt1_tree.item(item)["values"][0]
+        cursor.execute("SELECT id FROM favorites WHERE mod_name=? AND game='ZT1'", (name,))
+        if cursor.fetchone():
+            cursor.execute("DELETE FROM favorites WHERE mod_name=? AND game='ZT1'", (name,))
+            log(f"Removed from favorites: {name}", log_text)
+        else:
+            cursor.execute("INSERT OR REPLACE INTO favorites (mod_name, game, added_at) VALUES (?, 'ZT1', ?)",
+                          (name, datetime.now().isoformat()))
+            log(f"Added to favorites: {name}", log_text)
+    conn.commit()
+
+
+def toggle_zt2_favorite():
+    selected = mods_tree.selection()
+    if not selected:
+        messagebox.showinfo("Select", "Select one or more mods first.")
+        return
+    
+    for item in selected:
+        name = mods_tree.item(item)["values"][0]
+        cursor.execute("SELECT id FROM favorites WHERE mod_name=? AND game='ZT2'", (name,))
+        if cursor.fetchone():
+            cursor.execute("DELETE FROM favorites WHERE mod_name=? AND game='ZT2'", (name,))
+            log(f"Removed from favorites: {name}", log_text)
+        else:
+            cursor.execute("INSERT OR REPLACE INTO favorites (mod_name, game, added_at) VALUES (?, 'ZT2', ?)",
+                          (name, datetime.now().isoformat()))
+            log(f"Added to favorites: {name}", log_text)
+    conn.commit()
+
+
+def is_favorite(mod_name, game="ZT2"):
+    cursor.execute("SELECT id FROM favorites WHERE mod_name=? AND game=?", (mod_name, game))
+    return cursor.fetchone() is not None
+
+
+def show_favorites_dialog():
+    dialog = tk.Toplevel(root)
+    dialog.title("Favorite Mods")
+    dialog.geometry("600x450")
+    dialog.transient(root)
+    dialog.grab_set()
+    
+    main_frame = ttk.Frame(dialog, padding=15)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+    
+    ttk.Label(main_frame, text="Favorite Mods", font=("Segoe UI", 14, "bold")).pack(anchor="w", pady=(0, 10))
+    
+    tree_frame = ttk.Frame(main_frame)
+    tree_frame.pack(fill=tk.BOTH, expand=True)
+    
+    tree = ttk.Treeview(tree_frame, columns=("Name", "Game", "Added"), show="headings", height=15)
+    tree.heading("Name", text="Mod Name")
+    tree.heading("Game", text="Game")
+    tree.heading("Added", text="Added On")
+    tree.column("Name", width=300)
+    tree.column("Game", width=80, anchor="center")
+    tree.column("Added", width=150, anchor="center")
+    
+    scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
+    tree.configure(yscrollcommand=scrollbar.set)
+    tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    
+    def refresh_favorites():
+        for item in tree.get_children():
+            tree.delete(item)
+        cursor.execute("SELECT mod_name, game, added_at FROM favorites ORDER BY game, mod_name")
+        for name, game, added_at in cursor.fetchall():
+            try:
+                added_str = datetime.fromisoformat(added_at).strftime("%Y-%m-%d %H:%M")
+            except:
+                added_str = "Unknown"
+            tree.insert("", tk.END, values=(name, game, added_str))
+    
+    def remove_selected():
+        selected = tree.selection()
+        if not selected:
+            return
+        for item in selected:
+            values = tree.item(item)["values"]
+            cursor.execute("DELETE FROM favorites WHERE mod_name=? AND game=?", (values[0], values[1]))
+        conn.commit()
+        refresh_favorites()
+    
+    def enable_selected_favorites():
+        selected = tree.selection()
+        if not selected:
+            return
+        for item in selected:
+            values = tree.item(item)["values"]
+            name, game = values[0], values[1]
+            if game == "ZT2":
+                enable_mod(name, text_widget=log_text)
+            else:
+                enable_zt1_mod(name, text_widget=log_text)
+        refresh_zt1_tree()
+        refresh_tree()
+    
+    refresh_favorites()
+    
+    btn_frame = ttk.Frame(main_frame)
+    btn_frame.pack(fill=tk.X, pady=(10, 0))
+    ttk.Button(btn_frame, text="Enable Selected", bootstyle="success", command=enable_selected_favorites).pack(side=tk.LEFT, padx=4)
+    ttk.Button(btn_frame, text="Remove from Favorites", bootstyle="danger-outline", command=remove_selected).pack(side=tk.LEFT, padx=4)
+    ttk.Button(btn_frame, text="Close", bootstyle="secondary", command=dialog.destroy).pack(side=tk.RIGHT, padx=4)
+
+
 def apply_zt1_tree_theme():
     if root.style.theme_use() == "darkly":
         zt1_tree.tag_configure("enabled", foreground="#4bc969")
@@ -3482,16 +4425,6 @@ ttk.Label(search_frame, text="Search:").pack(side=tk.LEFT)
 search_var = tk.StringVar()
 search_entry = ttk.Entry(search_frame, textvariable=search_var)
 search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 6))
-
-ttk.Label(search_frame, text="Status:").pack(side=tk.LEFT)
-zt2_status_filter = tk.StringVar(value="All")
-ttk.OptionMenu(search_frame, zt2_status_filter, "All", "All", "Enabled",
-               "Disabled").pack(side=tk.LEFT)
-
-ttk.Button(search_frame,
-           text="Clear",
-           command=lambda: (search_var.set(""), zt2_status_filter.set("All"),
-                           filter_tree())).pack(side=tk.LEFT, padx=(6, 0))
 
 mods_tree_frame = ttk.Frame(mods_tab)
 mods_tree_frame.pack(fill=tk.BOTH, expand=True, pady=(4, 0))
@@ -3543,8 +4476,13 @@ mods_menu.add_command(label="Enable", command=lambda: enable_selected_mod())
 mods_menu.add_command(label="Disable", command=lambda: disable_selected_mod())
 mods_menu.add_command(label="Uninstall",
                       command=lambda: uninstall_selected_mod())
-mods_menu.add_command(label="Inspect ZIP",
+mods_menu.add_separator()
+mods_menu.add_command(label="Toggle Favorite", command=toggle_zt2_favorite)
+mods_menu.add_separator()
+mods_menu.add_command(label="View Contents",
                       command=lambda: inspect_selected_mod())
+mods_menu.add_command(label="Check Conflicts",
+                      command=lambda: check_selected_mod_conflicts())
 mods_menu.add_separator()
 mods_menu.add_command(label="Set Category",
                       command=lambda: set_mod_category_dialog())
@@ -3595,7 +4533,7 @@ def treeview_sort_column(tree, col, reverse=False):
     tree.heading(col,
                  command=lambda: treeview_sort_column(tree, col, not reverse))
 
-    sort_arrow = " ▲" if not reverse else " ▼"
+    sort_arrow = " v" if not reverse else " ^"
     for c in tree["columns"]:
         text = c.capitalize()
         if c == col:
@@ -3649,6 +4587,7 @@ mods_tree.bind('<Return>', on_mods_key)
 mods_tree.bind('<Control-a>', lambda e: mods_tree.selection_set(mods_tree.get_children()))
 mods_tree.bind('<Escape>', lambda e: mods_tree.selection_remove(mods_tree.get_children()))
 mods_tree.bind('<Control-z>', lambda e: undo_last_action())
+mods_tree.bind('<Double-1>', lambda e: inspect_selected_mod())
 
 mod_btns = ttk.Frame(mods_tab, padding=6)
 mod_btns.pack(fill=tk.X)
@@ -3693,23 +4632,1001 @@ undo_btn = ttk.Button(mod_btns,
                       bootstyle="info-outline")
 undo_btn.pack(side=tk.LEFT, padx=4)
 
-bundles_tab = ttk.Frame(notebook, padding=6)
+ttk.Separator(mod_btns, orient="vertical").pack(side=tk.LEFT, padx=8, fill=tk.Y)
+fav_btn = ttk.Button(mod_btns,
+                     text="Favorite",
+                     command=toggle_zt2_favorite,
+                     bootstyle="warning")
+fav_btn.pack(side=tk.LEFT, padx=4)
+show_fav_btn = ttk.Button(mod_btns,
+                          text="Show Favorites",
+                          command=show_favorites_dialog,
+                          bootstyle="info-outline")
+show_fav_btn.pack(side=tk.LEFT, padx=4)
+
+bundles_tab = ttk.Frame(notebook, padding=10)
 notebook.add(bundles_tab, text=t("tab_bundles"))
 
-shots_tab = ttk.Frame(notebook, padding=6)
+shots_tab = ttk.Frame(notebook, padding=10)
 notebook.add(shots_tab, text=t("tab_screenshots"))
 
-saves_tab = ttk.Frame(notebook, padding=6)
+saves_tab = ttk.Frame(notebook, padding=10)
 notebook.add(saves_tab, text=t("tab_saved_games"))
 
-multiplayer_tab = ttk.Frame(notebook, padding=6)
+multiplayer_tab = ttk.Frame(notebook, padding=10)
 notebook.add(multiplayer_tab, text=t("tab_multiplayer"))
 
-modbrowser_tab = ttk.Frame(notebook, padding=6)
+modbrowser_tab = ttk.Frame(notebook, padding=10)
 notebook.add(modbrowser_tab, text=t("tab_mod_browser"))
 
 themes_tab = ttk.Frame(notebook, padding=10)
 notebook.add(themes_tab, text=t("tab_themes"))
+
+def format_size(size_bytes):
+    for unit in ['B', 'KB', 'MB', 'GB']:
+        if size_bytes < 1024:
+            return f"{size_bytes:.1f} {unit}"
+        size_bytes /= 1024
+    return f"{size_bytes:.1f} TB"
+
+def open_scheduled_profiles_dialog():
+    dialog = tk.Toplevel(root)
+    dialog.title("Scheduled Profiles")
+    dialog.geometry("600x500")
+    dialog.transient(root)
+    dialog.grab_set()
+    
+    main_frame = ttk.Frame(dialog, padding=15)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+    
+    ttk.Label(main_frame, text="Scheduled Mod Profiles", 
+              font=("Segoe UI", 14, "bold")).pack(anchor="w")
+    ttk.Label(main_frame, text="Auto-switch mod bundles at specific times", 
+              bootstyle="secondary").pack(anchor="w", pady=(0, 15))
+    
+    add_frame = ttk.LabelFrame(main_frame, text="Add Schedule", padding=10)
+    add_frame.pack(fill=tk.X, pady=(0, 10))
+    
+    bundle_frame = ttk.Frame(add_frame)
+    bundle_frame.pack(fill=tk.X, pady=5)
+    ttk.Label(bundle_frame, text="Bundle:", width=10).pack(side=tk.LEFT)
+    bundle_combo = ttk.Combobox(bundle_frame, width=30, values=get_bundles())
+    bundle_combo.pack(side=tk.LEFT, padx=5)
+    
+    day_frame = ttk.Frame(add_frame)
+    day_frame.pack(fill=tk.X, pady=5)
+    ttk.Label(day_frame, text="Day:", width=10).pack(side=tk.LEFT)
+    day_combo = ttk.Combobox(day_frame, width=15, values=[
+        "Every Day", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Weekdays", "Weekends"
+    ])
+    day_combo.set("Every Day")
+    day_combo.pack(side=tk.LEFT, padx=5)
+    
+    ttk.Label(day_frame, text="Time:").pack(side=tk.LEFT, padx=(20, 5))
+    hour_spin = ttk.Spinbox(day_frame, from_=0, to=23, width=5, format="%02.0f")
+    hour_spin.set("18")
+    hour_spin.pack(side=tk.LEFT, padx=2)
+    ttk.Label(day_frame, text=":").pack(side=tk.LEFT)
+    min_spin = ttk.Spinbox(day_frame, from_=0, to=59, width=5, format="%02.0f")
+    min_spin.set("00")
+    min_spin.pack(side=tk.LEFT, padx=2)
+    
+    def add_schedule():
+        bundle = bundle_combo.get()
+        if not bundle:
+            messagebox.showinfo("Info", "Select a bundle first!")
+            return
+        day = day_combo.get()
+        time_str = f"{int(hour_spin.get()):02d}:{int(min_spin.get()):02d}"
+        cursor.execute("INSERT INTO scheduled_profiles (bundle_name, day_of_week, time_of_day, enabled) VALUES (?, ?, ?, 1)",
+                      (bundle, day, time_str))
+        conn.commit()
+        refresh_list()
+        log(f"Added schedule: {bundle} on {day} at {time_str}", text_widget=log_text)
+    
+    ttk.Button(add_frame, text="Add Schedule", bootstyle="success", command=add_schedule).pack(pady=10)
+    
+    list_frame = ttk.LabelFrame(main_frame, text="Active Schedules", padding=10)
+    list_frame.pack(fill=tk.BOTH, expand=True)
+    
+    tree = ttk.Treeview(list_frame, columns=("bundle", "day", "time", "status"), show="headings", height=10)
+    tree.heading("bundle", text="Bundle")
+    tree.heading("day", text="Day")
+    tree.heading("time", text="Time")
+    tree.heading("status", text="Status")
+    tree.column("bundle", width=180)
+    tree.column("day", width=100)
+    tree.column("time", width=70)
+    tree.column("status", width=70)
+    tree.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+    
+    def refresh_list():
+        for item in tree.get_children():
+            tree.delete(item)
+        cursor.execute("SELECT id, bundle_name, day_of_week, time_of_day, enabled FROM scheduled_profiles")
+        for row in cursor.fetchall():
+            status = "Active" if row[4] else "Paused"
+            tree.insert("", "end", iid=str(row[0]), values=(row[1], row[2], row[3], status))
+    
+    def toggle_schedule():
+        sel = tree.selection()
+        if sel:
+            cursor.execute("UPDATE scheduled_profiles SET enabled = NOT enabled WHERE id = ?", (int(sel[0]),))
+            conn.commit()
+            refresh_list()
+    
+    def delete_schedule():
+        sel = tree.selection()
+        if sel and messagebox.askyesno("Confirm", "Delete this schedule?"):
+            cursor.execute("DELETE FROM scheduled_profiles WHERE id = ?", (int(sel[0]),))
+            conn.commit()
+            refresh_list()
+    
+    btn_frame = ttk.Frame(list_frame)
+    btn_frame.pack(fill=tk.X)
+    ttk.Button(btn_frame, text="Toggle", command=toggle_schedule).pack(side=tk.LEFT, padx=5)
+    ttk.Button(btn_frame, text="Delete", bootstyle="danger", command=delete_schedule).pack(side=tk.LEFT, padx=5)
+    
+    refresh_list()
+
+def open_mod_report_dialog():
+    dialog = tk.Toplevel(root)
+    dialog.title("Generate Mod Report")
+    dialog.geometry("650x580")
+    dialog.transient(root)
+    dialog.grab_set()
+    
+    main_frame = ttk.Frame(dialog, padding=15)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+    
+    ttk.Label(main_frame, text="Mod Report Generator", font=("Segoe UI", 14, "bold")).pack(anchor="w", pady=(0, 15))
+    
+    options_frame = ttk.LabelFrame(main_frame, text="Report Options", padding=10)
+    options_frame.pack(fill=tk.X, pady=(0, 10))
+    
+    game_frame = ttk.Frame(options_frame)
+    game_frame.pack(fill=tk.X, pady=5)
+    ttk.Label(game_frame, text="Games:").pack(side=tk.LEFT, padx=(0, 10))
+    inc_zt2 = tk.BooleanVar(value=True)
+    inc_zt1 = tk.BooleanVar(value=True)
+    ttk.Checkbutton(game_frame, text="Zoo Tycoon 2", variable=inc_zt2).pack(side=tk.LEFT, padx=5)
+    ttk.Checkbutton(game_frame, text="Zoo Tycoon 1", variable=inc_zt1).pack(side=tk.LEFT, padx=5)
+    
+    inc_frame = ttk.Frame(options_frame)
+    inc_frame.pack(fill=tk.X, pady=5)
+    ttk.Label(inc_frame, text="Include:").pack(side=tk.LEFT, padx=(0, 10))
+    
+    inc_enabled = tk.BooleanVar(value=True)
+    inc_disabled = tk.BooleanVar(value=True)
+    inc_sizes = tk.BooleanVar(value=True)
+    inc_stats = tk.BooleanVar(value=True)
+    
+    ttk.Checkbutton(inc_frame, text="Enabled Mods", variable=inc_enabled).pack(side=tk.LEFT, padx=5)
+    ttk.Checkbutton(inc_frame, text="Disabled Mods", variable=inc_disabled).pack(side=tk.LEFT, padx=5)
+    ttk.Checkbutton(inc_frame, text="File Sizes", variable=inc_sizes).pack(side=tk.LEFT, padx=5)
+    ttk.Checkbutton(inc_frame, text="Statistics", variable=inc_stats).pack(side=tk.LEFT, padx=5)
+    
+    fmt_frame = ttk.Frame(options_frame)
+    fmt_frame.pack(fill=tk.X, pady=5)
+    ttk.Label(fmt_frame, text="Format:").pack(side=tk.LEFT, padx=(0, 10))
+    fmt_var = tk.StringVar(value="html")
+    ttk.Radiobutton(fmt_frame, text="HTML", variable=fmt_var, value="html").pack(side=tk.LEFT, padx=5)
+    ttk.Radiobutton(fmt_frame, text="Text", variable=fmt_var, value="txt").pack(side=tk.LEFT, padx=5)
+    ttk.Radiobutton(fmt_frame, text="JSON", variable=fmt_var, value="json").pack(side=tk.LEFT, padx=5)
+    ttk.Radiobutton(fmt_frame, text="CSV", variable=fmt_var, value="csv").pack(side=tk.LEFT, padx=5)
+    
+    preview_frame = ttk.LabelFrame(main_frame, text="Preview", padding=10)
+    preview_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+    
+    preview_text = tk.Text(preview_frame, wrap=tk.WORD, height=12)
+    preview_text.pack(fill=tk.BOTH, expand=True)
+    
+    def generate():
+        from datetime import datetime
+        
+        report_data = {"generated_at": datetime.now().isoformat(), "game_path": GAME_PATH, "zt2_mods": [], "zt1_mods": [], "statistics": {}}
+        zt2_enabled = zt2_disabled = zt1_enabled = zt1_disabled = total_size = 0
+        categories = {}
+        
+        if inc_zt2.get():
+            cursor.execute("SELECT name, enabled, category, tags, author FROM mods ORDER BY name")
+            for row in cursor.fetchall():
+                name, enabled, category, tags, author = row
+                mod_info = {"name": name, "enabled": bool(enabled), "category": category or "Uncategorized", "game": "ZT2"}
+                
+                if inc_sizes.get():
+                    path = find_mod_file(name)
+                    if path:
+                        try:
+                            size = os.path.getsize(path)
+                            mod_info["size"] = size
+                            mod_info["size_formatted"] = format_size(size)
+                            total_size += size
+                        except:
+                            mod_info["size"] = 0
+                
+                if enabled:
+                    zt2_enabled += 1
+                    if inc_enabled.get():
+                        report_data["zt2_mods"].append(mod_info)
+                else:
+                    zt2_disabled += 1
+                    if inc_disabled.get():
+                        report_data["zt2_mods"].append(mod_info)
+                
+                categories[category or "Uncategorized"] = categories.get(category or "Uncategorized", 0) + 1
+
+        if inc_zt1.get():
+            cursor.execute("SELECT name, enabled, category FROM zt1_mods ORDER BY name")
+            for row in cursor.fetchall():
+                name, enabled, category = row
+                mod_info = {"name": name, "enabled": bool(enabled), "category": category or "Uncategorized", "game": "ZT1"}
+                
+                if enabled:
+                    zt1_enabled += 1
+                    if inc_enabled.get():
+                        report_data["zt1_mods"].append(mod_info)
+                else:
+                    zt1_disabled += 1
+                    if inc_disabled.get():
+                        report_data["zt1_mods"].append(mod_info)
+        
+        total_enabled = zt2_enabled + zt1_enabled
+        total_disabled = zt2_disabled + zt1_disabled
+        
+        if inc_stats.get():
+            report_data["statistics"] = {
+                "total_mods": total_enabled + total_disabled,
+                "enabled_mods": total_enabled,
+                "disabled_mods": total_disabled,
+                "zt2_mods": zt2_enabled + zt2_disabled,
+                "zt1_mods": zt1_enabled + zt1_disabled,
+                "total_size_formatted": format_size(total_size),
+                "categories": categories
+            }
+        
+        all_mods = report_data["zt2_mods"] + report_data["zt1_mods"]
+        
+        fmt = fmt_var.get()
+        if fmt == "json":
+            output = json.dumps(report_data, indent=2)
+            ext = "json"
+        elif fmt == "csv":
+            lines = ["Name,Game,Enabled,Category,Size"]
+            for m in all_mods:
+                lines.append(f'"{m["name"]}",{m["game"]},{m["enabled"]},"{m["category"]}",{m.get("size", 0)}')
+            output = "\n".join(lines)
+            ext = "csv"
+        elif fmt == "txt":
+            lines = ["=" * 50, "MODZT MOD REPORT", f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", "=" * 50, "",
+                     f"Total Mods: {total_enabled + total_disabled}", f"Enabled: {total_enabled} | Disabled: {total_disabled}"]
+            if inc_zt2.get():
+                lines.append(f"ZT2 Mods: {zt2_enabled + zt2_disabled}")
+            if inc_zt1.get():
+                lines.append(f"ZT1 Mods: {zt1_enabled + zt1_disabled}")
+            lines.extend([f"Total Size: {format_size(total_size)}", ""])
+            if inc_zt2.get() and report_data["zt2_mods"]:
+                lines.extend(["-" * 50, "ZOO TYCOON 2 MODS", "-" * 50])
+                for m in report_data["zt2_mods"]:
+                    lines.append(f'{"[ON]" if m["enabled"] else "[OFF]"} {m["name"]}')
+            if inc_zt1.get() and report_data["zt1_mods"]:
+                lines.extend(["", "-" * 50, "ZOO TYCOON 1 MODS", "-" * 50])
+                for m in report_data["zt1_mods"]:
+                    lines.append(f'{"[ON]" if m["enabled"] else "[OFF]"} {m["name"]}')
+            output = "\n".join(lines)
+            ext = "txt"
+        else:
+            html = f"""<!DOCTYPE html><html><head><title>ModZT Report</title>
+<style>body{{font-family:'Segoe UI',sans-serif;margin:40px;background:#1a1a2e;color:#eee}}
+h1{{color:#4fc3f7}}h2{{color:#81d4fa;margin-top:30px}}table{{width:100%;border-collapse:collapse;margin-bottom:20px}}th,td{{padding:10px;border-bottom:1px solid #333}}
+th{{background:#2d2d44;color:#4fc3f7}}.on{{color:#4caf50}}.off{{color:#f44336}}</style></head>
+<body><h1>ModZT Mod Report</h1><p>Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+<p>Total: {total_enabled + total_disabled} | Enabled: {total_enabled} | Disabled: {total_disabled} | Size: {format_size(total_size)}</p>"""
+            if inc_zt2.get() and report_data["zt2_mods"]:
+                html += f"<h2>Zoo Tycoon 2 Mods ({len(report_data['zt2_mods'])})</h2><table><tr><th>Status</th><th>Name</th><th>Category</th></tr>"
+                for m in report_data["zt2_mods"]:
+                    cls = "on" if m["enabled"] else "off"
+                    html += f'<tr><td class="{cls}">{"On" if m["enabled"] else "Off"}</td><td>{m["name"]}</td><td>{m["category"]}</td></tr>'
+                html += "</table>"
+            if inc_zt1.get() and report_data["zt1_mods"]:
+                html += f"<h2>Zoo Tycoon 1 Mods ({len(report_data['zt1_mods'])})</h2><table><tr><th>Status</th><th>Name</th><th>Category</th></tr>"
+                for m in report_data["zt1_mods"]:
+                    cls = "on" if m["enabled"] else "off"
+                    html += f'<tr><td class="{cls}">{"On" if m["enabled"] else "Off"}</td><td>{m["name"]}</td><td>{m["category"]}</td></tr>'
+                html += "</table>"
+            html += "</body></html>"
+            output = html
+            ext = "html"
+        
+        preview_text.delete("1.0", tk.END)
+        preview_text.insert("1.0", output[:3000] + ("..." if len(output) > 3000 else ""))
+        
+        save_path = filedialog.asksaveasfilename(
+            defaultextension=f".{ext}",
+            filetypes=[(f"{ext.upper()} files", f"*.{ext}"), ("All files", "*.*")],
+            initialfile=f"modzt_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{ext}"
+        )
+        if save_path:
+            with open(save_path, "w", encoding="utf-8") as f:
+                f.write(output)
+            log(f"Report saved to: {save_path}", text_widget=log_text)
+            messagebox.showinfo("Success", f"Report saved to:\n{save_path}")
+    
+    ttk.Button(main_frame, text="Generate Report", bootstyle="success", command=generate).pack(pady=10)
+
+def auto_categorize_mod(mod_name):
+    path = find_mod_file(mod_name)
+    if not path:
+        return "Uncategorized"
+    
+    contents = parse_z2f_contents(path)
+    if not contents:
+        return "Uncategorized"
+    
+    if len(contents["animals"]) > 0:
+        if len(contents["animals"]) > 5:
+            return "Animal Pack"
+        return "Animals"
+    elif len(contents["buildings"]) > 0:
+        return "Buildings"
+    elif len(contents["scenery"]) > 0:
+        return "Scenery"
+    elif len(contents["foliage"]) > 0:
+        return "Foliage"
+    elif len(contents["fences"]) > 0:
+        return "Fences"
+    elif len(contents["paths"]) > 0:
+        return "Paths"
+    elif len(contents["objects"]) > 0:
+        return "Objects"
+    
+    name_lower = mod_name.lower()
+    if any(x in name_lower for x in ['animal', 'creature', 'species']):
+        return "Animals"
+    elif any(x in name_lower for x in ['building', 'shop', 'restaurant', 'restroom']):
+        return "Buildings"
+    elif any(x in name_lower for x in ['tree', 'plant', 'flower', 'bush']):
+        return "Foliage"
+    elif any(x in name_lower for x in ['scenery', 'rock', 'decoration']):
+        return "Scenery"
+    elif any(x in name_lower for x in ['fence', 'wall', 'barrier']):
+        return "Fences"
+    elif any(x in name_lower for x in ['path', 'road', 'walkway']):
+        return "Paths"
+    elif any(x in name_lower for x in ['ui', 'interface', 'menu', 'hack']):
+        return "UI/Hacks"
+    elif any(x in name_lower for x in ['map', 'scenario', 'zoo']):
+        return "Maps/Scenarios"
+    
+    return "Uncategorized"
+
+
+def smart_categorize_all_mods():
+    cursor.execute("SELECT name FROM mods WHERE category IS NULL OR category = '' OR category = 'Uncategorized'")
+    uncategorized = cursor.fetchall()
+    
+    if not uncategorized:
+        messagebox.showinfo("Smart Categories", "All mods are already categorized!")
+        return
+    
+    if not messagebox.askyesno("Smart Categories", 
+                               f"Auto-categorize {len(uncategorized)} uncategorized mods?\n\n"
+                               "This will analyze mod contents and assign categories automatically."):
+        return
+    
+    progress = tk.Toplevel(root)
+    progress.title("Categorizing Mods...")
+    progress.geometry("400x100")
+    progress.transient(root)
+    
+    ttk.Label(progress, text="Analyzing mods...", font=("Segoe UI", 11)).pack(pady=10)
+    pbar = ttk.Progressbar(progress, length=350, mode='determinate')
+    pbar.pack(pady=10)
+    status_label = ttk.Label(progress, text="")
+    status_label.pack()
+    
+    categorized = 0
+    total = len(uncategorized)
+    
+    def do_categorize():
+        nonlocal categorized
+        for i, (name,) in enumerate(uncategorized):
+            category = auto_categorize_mod(name)
+            if category != "Uncategorized":
+                cursor.execute("UPDATE mods SET category = ? WHERE name = ?", (category, name))
+                categorized += 1
+            pbar['value'] = ((i + 1) / total) * 100
+            status_label.config(text=f"Processing: {name[:40]}...")
+            progress.update()
+        conn.commit()
+        progress.destroy()
+        refresh_tree()
+        messagebox.showinfo("Smart Categories", f"Categorized {categorized} of {total} mods!")
+    
+    progress.after(100, do_categorize)
+
+CLOUD_SYNC_FILE = "modzt_sync.json"
+
+def get_cloud_sync_path():
+    onedrive = os.environ.get("OneDrive")
+    if onedrive and os.path.isdir(onedrive):
+        return os.path.join(onedrive, "ModZT")
+    
+    return None
+
+
+def open_cloud_sync_dialog():
+    dialog = tk.Toplevel(root)
+    dialog.title("Cloud Sync")
+    dialog.geometry("550x400")
+    dialog.transient(root)
+    dialog.grab_set()
+    
+    main_frame = ttk.Frame(dialog, padding=15)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+    
+    ttk.Label(main_frame, text="Cloud Sync", font=("Segoe UI", 14, "bold")).pack(anchor="w")
+    ttk.Label(main_frame, text="Sync favorites, bundles, and settings across devices",
+              bootstyle="secondary").pack(anchor="w", pady=(0, 15))
+    
+    cloud_path = get_cloud_sync_path()
+    
+    path_frame = ttk.LabelFrame(main_frame, text="Sync Location", padding=10)
+    path_frame.pack(fill=tk.X, pady=(0, 10))
+    
+    path_var = tk.StringVar(value=cloud_path or "Not configured")
+    ttk.Entry(path_frame, textvariable=path_var, width=50).pack(side=tk.LEFT, fill=tk.X, expand=True)
+    
+    def browse_path():
+        folder = filedialog.askdirectory(title="Select Cloud Sync Folder")
+        if folder:
+            path_var.set(os.path.join(folder, "ModZT"))
+    
+    ttk.Button(path_frame, text="Browse", command=browse_path).pack(side=tk.LEFT, padx=5)
+    
+    options_frame = ttk.LabelFrame(main_frame, text="What to Sync", padding=10)
+    options_frame.pack(fill=tk.X, pady=(0, 10))
+    
+    sync_favorites = tk.BooleanVar(value=True)
+    sync_bundles = tk.BooleanVar(value=True)
+    sync_categories = tk.BooleanVar(value=True)
+    sync_settings = tk.BooleanVar(value=False)
+    
+    ttk.Checkbutton(options_frame, text="Favorites", variable=sync_favorites).pack(anchor="w")
+    ttk.Checkbutton(options_frame, text="Bundles", variable=sync_bundles).pack(anchor="w")
+    ttk.Checkbutton(options_frame, text="Mod Categories", variable=sync_categories).pack(anchor="w")
+    ttk.Checkbutton(options_frame, text="App Settings", variable=sync_settings).pack(anchor="w")
+    
+    status_frame = ttk.LabelFrame(main_frame, text="Status", padding=10)
+    status_frame.pack(fill=tk.X, pady=(0, 10))
+    status_text = ttk.Label(status_frame, text="Not synced", bootstyle="secondary")
+    status_text.pack(anchor="w")
+    
+    def do_export():
+        sync_path = path_var.get()
+        if not sync_path or sync_path == "Not configured":
+            messagebox.showerror("Error", "Please configure a sync folder first!")
+            return
+        
+        os.makedirs(sync_path, exist_ok=True)
+        
+        sync_data = {"exported_at": datetime.now().isoformat(), "app_version": APP_VERSION}
+        
+        if sync_favorites.get():
+            cursor.execute("SELECT mod_name, game, added_at FROM favorites")
+            sync_data["favorites"] = [{"mod_name": r[0], "game": r[1], "added_at": r[2]} for r in cursor.fetchall()]
+        
+        if sync_bundles.get():
+            cursor.execute("SELECT name FROM bundles")
+            bundles = []
+            for (name,) in cursor.fetchall():
+                cursor.execute("SELECT mod_name FROM bundle_mods WHERE bundle_id=(SELECT id FROM bundles WHERE name=?)", (name,))
+                mods = [r[0] for r in cursor.fetchall()]
+                bundles.append({"name": name, "mods": mods})
+            sync_data["bundles"] = bundles
+        
+        if sync_categories.get():
+            cursor.execute("SELECT name, category FROM mods WHERE category IS NOT NULL AND category != ''")
+            sync_data["categories"] = [{"name": r[0], "category": r[1]} for r in cursor.fetchall()]
+        
+        if sync_settings.get():
+            sync_data["settings"] = load_settings()
+        
+        sync_file = os.path.join(sync_path, CLOUD_SYNC_FILE)
+        with open(sync_file, "w", encoding="utf-8") as f:
+            json.dump(sync_data, f, indent=2)
+        
+        status_text.config(text=f"Exported at {datetime.now().strftime('%H:%M:%S')}")
+        log(f"Cloud sync exported to: {sync_file}", text_widget=log_text)
+        messagebox.showinfo("Success", f"Data exported to cloud!\n\n{sync_file}")
+    
+    def do_import():
+        sync_path = path_var.get()
+        if not sync_path or sync_path == "Not configured":
+            messagebox.showerror("Error", "Please configure a sync folder first!")
+            return
+        
+        sync_file = os.path.join(sync_path, CLOUD_SYNC_FILE)
+        if not os.path.isfile(sync_file):
+            messagebox.showerror("Error", "No sync data found in cloud folder!")
+            return
+        
+        with open(sync_file, "r", encoding="utf-8") as f:
+            sync_data = json.load(f)
+        
+        imported = []
+        
+        if sync_favorites.get() and "favorites" in sync_data:
+            for fav in sync_data["favorites"]:
+                cursor.execute("INSERT OR REPLACE INTO favorites (mod_name, game, added_at) VALUES (?, ?, ?)",
+                              (fav["mod_name"], fav["game"], fav.get("added_at", datetime.now().isoformat())))
+            imported.append(f"{len(sync_data['favorites'])} favorites")
+        
+        if sync_bundles.get() and "bundles" in sync_data:
+            for bundle in sync_data["bundles"]:
+                cursor.execute("INSERT OR IGNORE INTO bundles (name) VALUES (?)", (bundle["name"],))
+                cursor.execute("SELECT id FROM bundles WHERE name=?", (bundle["name"],))
+                bid = cursor.fetchone()[0]
+                for mod in bundle["mods"]:
+                    cursor.execute("INSERT OR IGNORE INTO bundle_mods (bundle_id, mod_name) VALUES (?, ?)", (bid, mod))
+            imported.append(f"{len(sync_data['bundles'])} bundles")
+        
+        if sync_categories.get() and "categories" in sync_data:
+            for cat in sync_data["categories"]:
+                cursor.execute("UPDATE mods SET category=? WHERE name=?", (cat["category"], cat["name"]))
+            imported.append(f"{len(sync_data['categories'])} categories")
+        
+        conn.commit()
+        
+        status_text.config(text=f"Imported at {datetime.now().strftime('%H:%M:%S')}")
+        log(f"Cloud sync imported: {', '.join(imported)}", text_widget=log_text)
+        messagebox.showinfo("Success", f"Imported from cloud!\n\n" + "\n".join(imported))
+        refresh_tree()
+    
+    btn_frame = ttk.Frame(main_frame)
+    btn_frame.pack(fill=tk.X, pady=10)
+    ttk.Button(btn_frame, text="Export to Cloud", bootstyle="success", command=do_export).pack(side=tk.LEFT, padx=5)
+    ttk.Button(btn_frame, text="Import from Cloud", bootstyle="info", command=do_import).pack(side=tk.LEFT, padx=5)
+    ttk.Button(btn_frame, text="Close", command=dialog.destroy).pack(side=tk.RIGHT, padx=5)
+
+def export_mod_list_dialog():
+    dialog = tk.Toplevel(root)
+    dialog.title("Export Mod List")
+    dialog.geometry("600x500")
+    dialog.transient(root)
+    dialog.grab_set()
+    
+    main_frame = ttk.Frame(dialog, padding=15)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+    
+    ttk.Label(main_frame, text="Export Mod List", font=("Segoe UI", 14, "bold")).pack(anchor="w")
+    ttk.Label(main_frame, text="Share your mod list with friends",
+              bootstyle="secondary").pack(anchor="w", pady=(0, 15))
+    
+    options_frame = ttk.LabelFrame(main_frame, text="Options", padding=10)
+    options_frame.pack(fill=tk.X, pady=(0, 10))
+    
+    export_enabled = tk.BooleanVar(value=True)
+    export_disabled = tk.BooleanVar(value=False)
+    inc_categories = tk.BooleanVar(value=True)
+    
+    ttk.Checkbutton(options_frame, text="Include Enabled Mods", variable=export_enabled).pack(anchor="w")
+    ttk.Checkbutton(options_frame, text="Include Disabled Mods", variable=export_disabled).pack(anchor="w")
+    ttk.Checkbutton(options_frame, text="Include Categories", variable=inc_categories).pack(anchor="w")
+    
+    preview_frame = ttk.LabelFrame(main_frame, text="Preview", padding=10)
+    preview_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+    
+    preview_text = tk.Text(preview_frame, wrap=tk.WORD, height=12)
+    preview_text.pack(fill=tk.BOTH, expand=True)
+    
+    def generate_preview():
+        lines = ["# ModZT Mod List", f"# Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", ""]
+        
+        cursor.execute("SELECT name, enabled, category FROM mods ORDER BY category, name")
+        mods = cursor.fetchall()
+        
+        current_cat = None
+        for name, enabled, category in mods:
+            if enabled and not export_enabled.get():
+                continue
+            if not enabled and not export_disabled.get():
+                continue
+            
+            if inc_categories.get() and category != current_cat:
+                if current_cat is not None:
+                    lines.append("")
+                lines.append(f"## {category or 'Uncategorized'}")
+                current_cat = category
+            
+            status = "[ON]" if enabled else "[OFF]"
+            lines.append(f"{status} {name}")
+        
+        preview_text.delete("1.0", tk.END)
+        preview_text.insert("1.0", "\n".join(lines))
+    
+    generate_preview()
+    
+    def copy_to_clipboard():
+        content = preview_text.get("1.0", tk.END)
+        root.clipboard_clear()
+        root.clipboard_append(content)
+        messagebox.showinfo("Copied", "Mod list copied to clipboard!")
+    
+    def save_to_file():
+        path = filedialog.asksaveasfilename(
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt"), ("Markdown", "*.md")],
+            initialfile=f"modzt_modlist_{datetime.now().strftime('%Y%m%d')}.txt"
+        )
+        if path:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(preview_text.get("1.0", tk.END))
+            messagebox.showinfo("Saved", f"Mod list saved to:\n{path}")
+    
+    def save_as_modzt_profile():
+        path = filedialog.asksaveasfilename(
+            defaultextension=".modztprofile",
+            filetypes=[("ModZT Profile", "*.modztprofile")],
+            initialfile=f"my_mods_{datetime.now().strftime('%Y%m%d')}.modztprofile"
+        )
+        if path:
+            profile = {"version": 1, "created": datetime.now().isoformat(), "mods": []}
+            cursor.execute("SELECT name, enabled, category FROM mods")
+            for name, enabled, category in cursor.fetchall():
+                if enabled and export_enabled.get():
+                    profile["mods"].append({"name": name, "category": category})
+                elif not enabled and export_disabled.get():
+                    profile["mods"].append({"name": name, "category": category, "disabled": True})
+            
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(profile, f, indent=2)
+            messagebox.showinfo("Saved", f"Profile saved!\nShare this file with friends:\n{path}")
+    
+    for var in [export_enabled, export_disabled, inc_categories]:
+        var.trace_add("write", lambda *_: generate_preview())
+    
+    btn_frame = ttk.Frame(main_frame)
+    btn_frame.pack(fill=tk.X)
+    ttk.Button(btn_frame, text="Copy to Clipboard", bootstyle="info", command=copy_to_clipboard).pack(side=tk.LEFT, padx=4)
+    ttk.Button(btn_frame, text="Save as Text", bootstyle="secondary", command=save_to_file).pack(side=tk.LEFT, padx=4)
+    ttk.Button(btn_frame, text="Save as Profile", bootstyle="success", command=save_as_modzt_profile).pack(side=tk.LEFT, padx=4)
+    ttk.Button(btn_frame, text="Close", command=dialog.destroy).pack(side=tk.RIGHT, padx=4)
+
+def import_friend_profile():
+    path = filedialog.askopenfilename(
+        title="Import Friend's Profile",
+        filetypes=[("ModZT Profile", "*.modztprofile"), ("JSON files", "*.json"), ("Text files", "*.txt")]
+    )
+    if not path:
+        return
+    
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            content = f.read()
+        
+        try:
+            profile = json.loads(content)
+            if "mods" in profile:
+                mod_names = [m["name"] for m in profile["mods"] if not m.get("disabled", False)]
+            else:
+                messagebox.showerror("Error", "Invalid profile format!")
+                return
+        except json.JSONDecodeError:
+            mod_names = []
+            for line in content.split("\n"):
+                line = line.strip()
+                if line.startswith("[ON]"):
+                    mod_names.append(line[4:].strip())
+                elif line and not line.startswith("#") and not line.startswith("[OFF]"):
+                    mod_names.append(line)
+        
+        if not mod_names:
+            messagebox.showinfo("Info", "No mods found in profile!")
+            return
+        
+        dialog = tk.Toplevel(root)
+        dialog.title("Import Profile")
+        dialog.geometry("600x500")
+        dialog.transient(root)
+        dialog.grab_set()
+        
+        main_frame = ttk.Frame(dialog, padding=15)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+        
+        ttk.Label(main_frame, text="Import Friend's Profile", font=("Segoe UI", 14, "bold")).pack(anchor="w")
+        ttk.Label(main_frame, text=f"Found {len(mod_names)} mods in profile",
+                  bootstyle="secondary").pack(anchor="w", pady=(0, 15))
+        
+        cursor.execute("SELECT name FROM mods")
+        existing = {r[0] for r in cursor.fetchall()}
+        
+        found = [m for m in mod_names if m in existing]
+        missing = [m for m in mod_names if m not in existing]
+        
+        ttk.Label(main_frame, text=f"Mods you have: {len(found)}", bootstyle="success").pack(anchor="w")
+        ttk.Label(main_frame, text=f"Mods missing: {len(missing)}", bootstyle="warning").pack(anchor="w", pady=(0, 10))
+        
+        list_frame = ttk.Frame(main_frame)
+        list_frame.pack(fill=tk.BOTH, expand=True)
+        
+        tree = ttk.Treeview(list_frame, columns=("name", "status"), show="headings", height=12)
+        tree.heading("name", text="Mod Name")
+        tree.heading("status", text="Status")
+        tree.column("name", width=400)
+        tree.column("status", width=100)
+        
+        scroll = ttk.Scrollbar(list_frame, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scroll.set)
+        tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        for mod in found:
+            tree.insert("", tk.END, values=(mod, "Found"), tags=("found",))
+        for mod in missing:
+            tree.insert("", tk.END, values=(mod, "Missing"), tags=("missing",))
+        
+        tree.tag_configure("found", foreground="#4caf50")
+        tree.tag_configure("missing", foreground="#ff9800")
+        
+        def do_import():
+            if not found:
+                messagebox.showinfo("Info", "No matching mods to enable!")
+                return
+            
+            if messagebox.askyesno("Import", "Disable all current mods before applying profile?"):
+                cursor.execute("UPDATE mods SET enabled=0")
+            
+            for mod in found:
+                cursor.execute("UPDATE mods SET enabled=1 WHERE name=?", (mod,))
+            conn.commit()
+            
+            dialog.destroy()
+            refresh_tree()
+            log(f"Imported profile: enabled {len(found)} mods", text_widget=log_text)
+            messagebox.showinfo("Success", f"Enabled {len(found)} mods from profile!")
+        
+        btn_frame = ttk.Frame(main_frame)
+        btn_frame.pack(fill=tk.X, pady=10)
+        ttk.Button(btn_frame, text=f"Enable {len(found)} Mods", bootstyle="success", command=do_import).pack(side=tk.LEFT, padx=4)
+        ttk.Button(btn_frame, text="Cancel", command=dialog.destroy).pack(side=tk.RIGHT, padx=4)
+        
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to import profile:\n{e}")
+
+def analyze_startup_time():
+    dialog = tk.Toplevel(root)
+    dialog.title("Startup Time Analyzer")
+    dialog.geometry("550x450")
+    dialog.transient(root)
+    dialog.grab_set()
+    
+    main_frame = ttk.Frame(dialog, padding=15)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+    
+    ttk.Label(main_frame, text="Startup Time Analyzer", font=("Segoe UI", 14, "bold")).pack(anchor="w")
+    ttk.Label(main_frame, text="Estimate game load time based on enabled mods",
+              bootstyle="secondary").pack(anchor="w", pady=(0, 15))
+    
+    cursor.execute("SELECT name FROM mods WHERE enabled=1")
+    enabled_mods = cursor.fetchall()
+    
+    total_size = 0
+    mod_sizes = []
+    
+    for (name,) in enabled_mods:
+        path = find_mod_file(name)
+        if path and os.path.isfile(path):
+            size = os.path.getsize(path)
+            total_size += size
+            mod_sizes.append((name, size))
+    
+    mod_sizes.sort(key=lambda x: x[1], reverse=True)
+    
+    estimated_seconds = max(10, total_size / (50 * 1024 * 1024) * 1)
+    
+    stats_frame = ttk.LabelFrame(main_frame, text="Statistics", padding=10)
+    stats_frame.pack(fill=tk.X, pady=(0, 10))
+    
+    stats = [
+        ("Enabled Mods", str(len(enabled_mods))),
+        ("Total Size", format_size(total_size)),
+        ("Estimated Load Time", f"{estimated_seconds:.0f} - {estimated_seconds * 1.5:.0f} seconds"),
+    ]
+    
+    for label, value in stats:
+        row = ttk.Frame(stats_frame)
+        row.pack(fill=tk.X, pady=2)
+        ttk.Label(row, text=f"{label}:", width=20).pack(side=tk.LEFT)
+        ttk.Label(row, text=value, bootstyle="info").pack(side=tk.LEFT)
+    
+    if total_size < 500 * 1024 * 1024:
+        rating = ("Excellent", "success", "Fast loading expected")
+    elif total_size < 1024 * 1024 * 1024:
+        rating = ("Good", "info", "Reasonable load time")
+    elif total_size < 2 * 1024 * 1024 * 1024:
+        rating = ("Moderate", "warning", "May take a while to load")
+    else:
+        rating = ("Heavy", "danger", "Expect long load times")
+    
+    rating_frame = ttk.Frame(stats_frame)
+    rating_frame.pack(fill=tk.X, pady=5)
+    ttk.Label(rating_frame, text="Performance Rating:", width=20).pack(side=tk.LEFT)
+    ttk.Label(rating_frame, text=f"{rating[0]} - {rating[2]}", bootstyle=rating[1]).pack(side=tk.LEFT)
+    
+    ttk.Label(main_frame, text="Largest Enabled Mods:", font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(10, 5))
+    
+    tree = ttk.Treeview(main_frame, columns=("name", "size"), show="headings", height=8)
+    tree.heading("name", text="Mod Name")
+    tree.heading("size", text="Size")
+    tree.column("name", width=350)
+    tree.column("size", width=100, anchor="e")
+    tree.pack(fill=tk.BOTH, expand=True)
+    
+    for name, size in mod_sizes[:15]:
+        tree.insert("", tk.END, values=(name, format_size(size)))
+    
+    ttk.Label(main_frame, text="Tip: Disable large mods you don't need to improve load times",
+              bootstyle="secondary", font=("Segoe UI", 9)).pack(anchor="w", pady=5)
+    
+    ttk.Button(main_frame, text="Close", command=dialog.destroy).pack(pady=10)
+
+def launch_safe_mode():
+    if not GAME_PATH:
+        messagebox.showerror("Error", "Set game path first!")
+        return
+    
+    if not messagebox.askyesno("Safe Mode Launch", 
+                               "Launch game with ALL mods disabled?\n\n"
+                               "This is useful for troubleshooting crashes.\n"
+                               "Your mod states will be restored after closing this dialog."):
+        return
+    
+    cursor.execute("SELECT name FROM mods WHERE enabled=1")
+    previously_enabled = [r[0] for r in cursor.fetchall()]
+    
+    cursor.execute("UPDATE mods SET enabled=0")
+    conn.commit()
+    
+    disabled_dir = mods_disabled_dir()
+    os.makedirs(disabled_dir, exist_ok=True)
+    
+    moved_mods = []
+    for mod_name in previously_enabled:
+        src = os.path.join(GAME_PATH, mod_name)
+        dst = os.path.join(disabled_dir, mod_name)
+        if os.path.isfile(src):
+            try:
+                shutil.move(src, dst)
+                moved_mods.append(mod_name)
+            except:
+                pass
+    
+    log(f"Safe Mode: Disabled {len(moved_mods)} mods", text_widget=log_text)
+    
+    exe_path = os.path.join(GAME_PATH, "zt.exe")
+    try:
+        proc = subprocess.Popen([exe_path], cwd=GAME_PATH)
+        messagebox.showinfo("Safe Mode", 
+                           f"Game launched with {len(moved_mods)} mods disabled.\n\n"
+                           "Click OK after closing the game to restore your mods.")
+        proc.wait()
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to launch: {e}")
+    
+    restored = 0
+    for mod_name in moved_mods:
+        src = os.path.join(disabled_dir, mod_name)
+        dst = os.path.join(GAME_PATH, mod_name)
+        if os.path.isfile(src):
+            try:
+                shutil.move(src, dst)
+                cursor.execute("UPDATE mods SET enabled=1 WHERE name=?", (mod_name,))
+                restored += 1
+            except:
+                pass
+    
+    conn.commit()
+    refresh_tree()
+    log(f"Safe Mode: Restored {restored} mods", text_widget=log_text)
+    messagebox.showinfo("Restored", f"Restored {restored} mods to enabled state.")
+
+PORTABLE_MODE_FILE = "portable.flag"
+
+def is_portable_mode():
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.exists(os.path.join(app_dir, PORTABLE_MODE_FILE))
+
+
+def get_portable_config_dir():
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(app_dir, "config")
+
+
+def toggle_portable_mode():
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    flag_file = os.path.join(app_dir, PORTABLE_MODE_FILE)
+    
+    if is_portable_mode():
+        if messagebox.askyesno("Portable Mode", 
+                               "Disable portable mode?\n\n"
+                               "Settings will be stored in your user folder instead."):
+            try:
+                os.remove(flag_file)
+                messagebox.showinfo("Portable Mode", 
+                                   "Portable mode disabled.\n\n"
+                                   "Restart ModZT to apply changes.")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to disable: {e}")
+    else:
+        if messagebox.askyesno("Portable Mode", 
+                               "Enable portable mode?\n\n"
+                               "All settings and data will be stored next to modzt.py.\n"
+                               "This makes ModZT fully portable on USB drives."):
+            try:
+                with open(flag_file, "w") as f:
+                    f.write("Portable mode enabled")
+                
+                portable_config = get_portable_config_dir()
+                os.makedirs(portable_config, exist_ok=True)
+                
+                if os.path.isfile(DB_FILE):
+                    shutil.copy2(DB_FILE, os.path.join(portable_config, "mods.db"))
+                if os.path.isfile(SETTINGS_FILE):
+                    shutil.copy2(SETTINGS_FILE, os.path.join(portable_config, "settings.json"))
+                
+                messagebox.showinfo("Portable Mode", 
+                                   f"Portable mode enabled!\n\n"
+                                   f"Config folder: {portable_config}\n\n"
+                                   "Restart ModZT to apply changes.")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to enable: {e}")
+
+
+def open_portable_mode_dialog():
+    dialog = tk.Toplevel(root)
+    dialog.title("Portable Mode")
+    dialog.geometry("500x350")
+    dialog.transient(root)
+    dialog.grab_set()
+    
+    main_frame = ttk.Frame(dialog, padding=15)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+    
+    ttk.Label(main_frame, text="Portable Mode", font=("Segoe UI", 14, "bold")).pack(anchor="w")
+    
+    is_portable = is_portable_mode()
+    
+    status = "ENABLED" if is_portable else "DISABLED"
+    status_style = "success" if is_portable else "secondary"
+    ttk.Label(main_frame, text=f"Status: {status}", 
+              bootstyle=status_style, font=("Segoe UI", 12)).pack(anchor="w", pady=(5, 15))
+    
+    info_frame = ttk.LabelFrame(main_frame, text="Information", padding=10)
+    info_frame.pack(fill=tk.X, pady=(0, 15))
+    
+    info_text = (
+        "Portable mode stores all settings and data in the same folder as ModZT.\n\n"
+        "Benefits:\n"
+        "  • Run ModZT from USB drive on any computer\n"
+        "  • Keep settings separate from system\n"
+        "  • Easy backup - just copy the folder\n\n"
+        "Current config location:\n"
+    )
+    
+    if is_portable:
+        info_text += f"  {get_portable_config_dir()}"
+    else:
+        info_text += f"  {CONFIG_DIR}"
+    
+    ttk.Label(info_frame, text=info_text, justify=tk.LEFT).pack(anchor="w")
+    
+    btn_text = "Disable Portable Mode" if is_portable else "Enable Portable Mode"
+    btn_style = "warning" if is_portable else "success"
+    
+    ttk.Button(main_frame, text=btn_text, bootstyle=btn_style, 
+               command=lambda: (toggle_portable_mode(), dialog.destroy())).pack(pady=10)
+    ttk.Button(main_frame, text="Close", command=dialog.destroy).pack()
 
 themes_header = ttk.Frame(themes_tab)
 themes_header.pack(fill=tk.X, pady=(0, 10))
@@ -3828,6 +5745,12 @@ MODZT_THEMES = {
         "category": "Zoo Tycoon",
         "colors": {"bg": "#ffffff", "fg": "#333333", "accent": "#158cba"}
     },
+    "yeti": {
+        "display": "ZT1 Classic",
+        "description": "Cream and brown interface mimicking the original Zoo Tycoon 1 UI.",
+        "category": "Game UI",
+        "colors": {"bg": "#e8d5b7", "fg": "#3d2817", "accent": "#8b6f47"}
+    },
 }
 
 themes_list_frame = ttk.Frame(themes_left)
@@ -3916,11 +5839,15 @@ def apply_selected_theme():
         return
 
     try:
-        root.style.theme_use(theme_id)
-        current_theme_var.set(f"Current: {theme_id}")
+        if theme_id.startswith("custom_"):
+            apply_custom_theme_by_id(theme_id)
+        else:
+            root.style.theme_use(theme_id)
+            current_theme_var.set(f"Current: {theme_id}")
 
-        settings["theme"] = theme_id
-        save_settings(settings)
+            settings["theme"] = theme_id
+            settings["active_custom_theme"] = None
+            save_settings(settings)
 
         if 'apply_tree_theme' in dir():
             apply_tree_theme()
@@ -3930,21 +5857,822 @@ def apply_selected_theme():
     except Exception as e:
         messagebox.showerror("Theme Error", f"Could not apply theme: {e}")
 
+
+def apply_custom_theme_by_id(theme_id):
+    if "custom_themes" not in settings or theme_id not in settings["custom_themes"]:
+        messagebox.showerror("Error", "Custom theme not found in settings.")
+        return
+    
+    theme_data = settings["custom_themes"][theme_id]
+    base = theme_data.get("base", "darkly")
+    colors = theme_data.get("colors", {})
+    
+    root.style.theme_use(base)
+    
+    style = root.style
+    
+    bg = colors.get("bg", "#222222")
+    fg = colors.get("fg", "#ffffff")
+    primary = colors.get("primary", "#375a7f")
+    secondary = colors.get("secondary", "#444444")
+    success = colors.get("success", "#00bc8c")
+    info = colors.get("info", "#3498db")
+    warning = colors.get("warning", "#f39c12")
+    danger = colors.get("danger", "#e74c3c")
+    selectbg = colors.get("selectbg", "#375a7f")
+    inputbg = colors.get("inputbg", "#2b2b2b")
+    inputfg = colors.get("inputfg", "#ffffff")
+    border = colors.get("border", "#444444")
+    
+    def safe_configure(style_name, **kwargs):
+        try:
+            style.configure(style_name, **kwargs)
+        except Exception:
+            pass
+    
+    def safe_map(style_name, **kwargs):
+        try:
+            style.map(style_name, **kwargs)
+        except Exception:
+            pass
+    
+    safe_configure(".", background=bg, foreground=fg)
+    safe_configure("TFrame", background=bg)
+    safe_configure("TLabel", background=bg, foreground=fg)
+    safe_configure("TLabelframe", background=bg)
+    safe_configure("TLabelframe.Label", background=bg, foreground=fg)
+    safe_configure("TNotebook", background=bg)
+    safe_configure("TNotebook.Tab", background=secondary, foreground=fg)
+    safe_map("TNotebook.Tab", background=[("selected", primary)])
+    safe_configure("TPanedwindow", background=bg)
+    safe_configure("TEntry", fieldbackground=inputbg, foreground=inputfg)
+    safe_configure("TCombobox", fieldbackground=inputbg, foreground=inputfg)
+    safe_configure("TSpinbox", fieldbackground=inputbg, foreground=inputfg)
+    safe_configure("Treeview", background=inputbg, foreground=fg, fieldbackground=inputbg)
+    safe_map("Treeview", background=[("selected", selectbg)], foreground=[("selected", "#ffffff")])
+    safe_configure("Treeview.Heading", background=secondary, foreground=fg)
+    safe_configure("Horizontal.TProgressbar", background=primary)
+    safe_configure("TMenubutton", background=secondary, foreground=fg)
+    
+    safe_configure("TButton", background=primary, foreground="#ffffff")
+    safe_configure("success.TButton", background=success)
+    safe_configure("info.TButton", background=info)
+    safe_configure("warning.TButton", background=warning)
+    safe_configure("danger.TButton", background=danger)
+    safe_configure("secondary.TButton", background=secondary)
+    safe_configure("info-outline.TButton", background=bg, foreground=info)
+    safe_configure("success-outline.TButton", background=bg, foreground=success)
+    safe_configure("warning-outline.TButton", background=bg, foreground=warning)
+    safe_configure("secondary-outline.TButton", background=bg, foreground=secondary)
+    
+    current_theme_var.set(f"Current: {theme_data['name']}")
+    
+    settings["theme"] = base
+    settings["active_custom_theme"] = theme_id
+    save_settings(settings)
+    
+    log(f"Applied custom theme: {theme_data['name']}", text_widget=log_text)
+
+
 themes_tree.bind("<<TreeviewSelect>>", on_theme_select)
+
+def reset_theme_to_default():
+    root.style.theme_use("darkly")
+    current_theme_var.set("Current: darkly")
+    settings["theme"] = "darkly"
+    save_settings(settings)
+    log("Reset theme to default (darkly)", text_widget=log_text)
+
+
+def open_custom_theme_creator():
+    dialog = tk.Toplevel(root)
+    dialog.title("Custom Theme Creator")
+    dialog.geometry("650x700")
+    dialog.transient(root)
+    dialog.grab_set()
+    
+    dialog.update_idletasks()
+    x = root.winfo_x() + (root.winfo_width() // 2) - 325
+    y = root.winfo_y() + (root.winfo_height() // 2) - 350
+    dialog.geometry(f"+{x}+{y}")
+    
+    main_frame = ttk.Frame(dialog, padding=15)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+    
+    ttk.Label(main_frame, text="Create Your Custom Theme",
+              font=("Segoe UI", 14, "bold")).pack(anchor="w", pady=(0, 5))
+    ttk.Label(main_frame, text="Customize colors to create your perfect ModZT look",
+              bootstyle="secondary").pack(anchor="w", pady=(0, 15))
+    
+    name_frame = ttk.Frame(main_frame)
+    name_frame.pack(fill=tk.X, pady=(0, 15))
+    
+    ttk.Label(name_frame, text="Theme Name:", width=15).pack(side=tk.LEFT)
+    theme_name_var = tk.StringVar(value="My Custom Theme")
+    ttk.Entry(name_frame, textvariable=theme_name_var, width=30).pack(side=tk.LEFT, padx=5)
+    
+    base_frame = ttk.Frame(main_frame)
+    base_frame.pack(fill=tk.X, pady=(0, 15))
+    
+    ttk.Label(base_frame, text="Base Theme:", width=15).pack(side=tk.LEFT)
+    base_theme_var = tk.StringVar(value="darkly")
+    base_themes = ["darkly", "litera", "flatly", "superhero", "solar", "cyborg", "vapor", "cosmo", "morph"]
+    base_combo = ttk.Combobox(base_frame, textvariable=base_theme_var, values=base_themes, 
+                               state="readonly", width=20)
+    base_combo.pack(side=tk.LEFT, padx=5)
+    
+    ttk.Label(base_frame, text="(determines light/dark mode)", 
+              bootstyle="secondary").pack(side=tk.LEFT, padx=10)
+    
+    colors_lf = ttk.LabelFrame(main_frame, text="Color Customization", padding=15)
+    colors_lf.pack(fill=tk.BOTH, expand=True, pady=(0, 15))
+    
+    color_vars = {}
+    color_canvases = {}
+    
+    default_colors = {
+        "primary": "#375a7f",
+        "secondary": "#444444", 
+        "success": "#00bc8c",
+        "info": "#3498db",
+        "warning": "#f39c12",
+        "danger": "#e74c3c",
+        "light": "#f8f9fa",
+        "dark": "#303030",
+        "bg": "#222222",
+        "fg": "#ffffff",
+        "selectbg": "#375a7f",
+        "selectfg": "#ffffff",
+        "border": "#444444",
+        "inputfg": "#ffffff",
+        "inputbg": "#2b2b2b",
+    }
+    
+    color_defs = [
+        ("primary", "Primary", "Main accent color for buttons and highlights"),
+        ("secondary", "Secondary", "Secondary buttons and subtle elements"),
+        ("success", "Success", "Success messages and positive actions"),
+        ("info", "Info", "Information and links"),
+        ("warning", "Warning", "Warnings and cautions"),
+        ("danger", "Danger", "Errors and destructive actions"),
+        ("bg", "Background", "Main window background"),
+        ("fg", "Foreground", "Primary text color"),
+        ("selectbg", "Selection BG", "Background for selected items"),
+        ("selectfg", "Selection FG", "Text color for selected items"),
+        ("inputbg", "Input BG", "Background for text inputs"),
+        ("inputfg", "Input FG", "Text color in inputs"),
+        ("border", "Border", "Border and divider color"),
+    ]
+    
+    colors_canvas = tk.Canvas(colors_lf, highlightthickness=0)
+    colors_scroll = ttk.Scrollbar(colors_lf, orient="vertical", command=colors_canvas.yview)
+    colors_inner = ttk.Frame(colors_canvas)
+    
+    colors_inner.bind("<Configure>", 
+                      lambda e: colors_canvas.configure(scrollregion=colors_canvas.bbox("all")))
+    colors_canvas.create_window((0, 0), window=colors_inner, anchor="nw")
+    colors_canvas.configure(yscrollcommand=colors_scroll.set)
+    
+    colors_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    colors_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+    
+    def _on_colors_mousewheel(event):
+        colors_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+    colors_canvas.bind("<MouseWheel>", _on_colors_mousewheel)
+    colors_inner.bind("<MouseWheel>", _on_colors_mousewheel)
+    
+    def pick_color(color_key):
+        from tkinter import colorchooser
+        current = color_vars[color_key].get()
+        result = colorchooser.askcolor(color=current, title=f"Choose {color_key} color", parent=dialog)
+        if result[1]:
+            color_vars[color_key].set(result[1])
+            color_canvases[color_key].delete("all")
+            color_canvases[color_key].create_rectangle(0, 0, 40, 25, fill=result[1], outline="#666")
+            update_preview()
+    
+    for i, (key, label, desc) in enumerate(color_defs):
+        row = ttk.Frame(colors_inner)
+        row.pack(fill=tk.X, pady=3)
+        
+        ttk.Label(row, text=label, width=12, font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT)
+        
+        canvas = tk.Canvas(row, width=40, height=25, highlightthickness=1, highlightbackground="#666")
+        canvas.pack(side=tk.LEFT, padx=5)
+        canvas.create_rectangle(0, 0, 40, 25, fill=default_colors[key], outline="")
+        color_canvases[key] = canvas
+        
+        var = tk.StringVar(value=default_colors[key])
+        color_vars[key] = var
+        entry = ttk.Entry(row, textvariable=var, width=10)
+        entry.pack(side=tk.LEFT, padx=5)
+        
+        ttk.Button(row, text="Pick", width=5,
+                   command=lambda k=key: pick_color(k)).pack(side=tk.LEFT, padx=2)
+        
+        ttk.Label(row, text=desc, bootstyle="secondary", 
+                  font=("Segoe UI", 8)).pack(side=tk.LEFT, padx=10)
+        
+        def on_entry_change(event, k=key, c=canvas):
+            try:
+                color = color_vars[k].get()
+                if len(color) == 7 and color.startswith("#"):
+                    c.delete("all")
+                    c.create_rectangle(0, 0, 40, 25, fill=color, outline="")
+                    update_preview()
+            except:
+                pass
+        entry.bind("<KeyRelease>", on_entry_change)
+    
+    preview_lf = ttk.LabelFrame(main_frame, text="Live Preview", padding=10)
+    preview_lf.pack(fill=tk.X, pady=(0, 15))
+    
+    preview_canvas = tk.Canvas(preview_lf, width=600, height=120, highlightthickness=1)
+    preview_canvas.pack(fill=tk.X)
+    
+    def update_preview():
+        preview_canvas.delete("all")
+        
+        bg = color_vars["bg"].get()
+        fg = color_vars["fg"].get()
+        primary = color_vars["primary"].get()
+        secondary = color_vars["secondary"].get()
+        success = color_vars["success"].get()
+        info = color_vars["info"].get()
+        warning = color_vars["warning"].get()
+        danger = color_vars["danger"].get()
+        selectbg = color_vars["selectbg"].get()
+        inputbg = color_vars["inputbg"].get()
+        
+        try:
+            preview_canvas.create_rectangle(0, 0, 600, 120, fill=bg, outline="")
+            
+            preview_canvas.create_text(10, 15, text="ModZT Preview", fill=fg, 
+                                       anchor="w", font=("Segoe UI", 12, "bold"))
+            
+            btn_y = 45
+            preview_canvas.create_rectangle(10, btn_y, 80, btn_y+25, fill=primary, outline="")
+            preview_canvas.create_text(45, btn_y+12, text="Primary", fill="#fff", font=("Segoe UI", 9))
+            
+            preview_canvas.create_rectangle(90, btn_y, 160, btn_y+25, fill=success, outline="")
+            preview_canvas.create_text(125, btn_y+12, text="Success", fill="#fff", font=("Segoe UI", 9))
+            
+            preview_canvas.create_rectangle(170, btn_y, 230, btn_y+25, fill=info, outline="")
+            preview_canvas.create_text(200, btn_y+12, text="Info", fill="#fff", font=("Segoe UI", 9))
+            
+            preview_canvas.create_rectangle(240, btn_y, 310, btn_y+25, fill=warning, outline="")
+            preview_canvas.create_text(275, btn_y+12, text="Warning", fill="#fff", font=("Segoe UI", 9))
+            
+            preview_canvas.create_rectangle(320, btn_y, 390, btn_y+25, fill=danger, outline="")
+            preview_canvas.create_text(355, btn_y+12, text="Danger", fill="#fff", font=("Segoe UI", 9))
+            
+            preview_canvas.create_rectangle(400, btn_y, 480, btn_y+25, fill=secondary, outline="")
+            preview_canvas.create_text(440, btn_y+12, text="Secondary", fill="#fff", font=("Segoe UI", 9))
+            
+            preview_canvas.create_rectangle(10, 80, 300, 115, fill=inputbg, outline=secondary)
+            preview_canvas.create_rectangle(10, 80, 300, 95, fill=selectbg, outline="")
+            preview_canvas.create_text(15, 87, text="Selected Item", fill="#fff", anchor="w", font=("Segoe UI", 9))
+            preview_canvas.create_text(15, 105, text="Regular Item", fill=fg, anchor="w", font=("Segoe UI", 9))
+            
+            preview_canvas.create_rectangle(320, 80, 580, 100, fill=inputbg, outline=secondary)
+            preview_canvas.create_text(325, 90, text="Input field text...", fill=fg, anchor="w", font=("Segoe UI", 9))
+            
+        except Exception as e:
+            preview_canvas.create_text(300, 60, text=f"Preview error: {e}", fill="red")
+    
+    update_preview()
+    
+    preset_frame = ttk.Frame(main_frame)
+    preset_frame.pack(fill=tk.X, pady=(0, 10))
+    
+    ttk.Label(preset_frame, text="Quick Presets:", font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT, padx=(0, 10))
+    
+    def apply_preset(preset_name):
+        presets = {
+            "Ocean Blue": {"primary": "#0077b6", "secondary": "#48cae4", "success": "#00b4d8", 
+                          "info": "#90e0ef", "warning": "#f9c74f", "danger": "#f94144",
+                          "bg": "#03045e", "fg": "#caf0f8", "selectbg": "#0077b6", 
+                          "selectfg": "#ffffff", "inputbg": "#023e8a", "inputfg": "#caf0f8", "border": "#48cae4"},
+            "Forest Green": {"primary": "#2d6a4f", "secondary": "#40916c", "success": "#52b788",
+                            "info": "#74c69d", "warning": "#ffc107", "danger": "#dc3545",
+                            "bg": "#1b4332", "fg": "#d8f3dc", "selectbg": "#2d6a4f",
+                            "selectfg": "#ffffff", "inputbg": "#2d6a4f", "inputfg": "#d8f3dc", "border": "#40916c"},
+            "Sunset Orange": {"primary": "#ff6b35", "secondary": "#f7c59f", "success": "#2ec4b6",
+                             "info": "#3a86ff", "warning": "#ffbe0b", "danger": "#ff006e",
+                             "bg": "#1a1a2e", "fg": "#edf2f4", "selectbg": "#ff6b35",
+                             "selectfg": "#ffffff", "inputbg": "#16213e", "inputfg": "#edf2f4", "border": "#f7c59f"},
+            "Purple Haze": {"primary": "#7209b7", "secondary": "#b5179e", "success": "#4cc9f0",
+                           "info": "#4895ef", "warning": "#f72585", "danger": "#d62828",
+                           "bg": "#10002b", "fg": "#e0aaff", "selectbg": "#7209b7",
+                           "selectfg": "#ffffff", "inputbg": "#240046", "inputfg": "#e0aaff", "border": "#b5179e"},
+            "Monochrome": {"primary": "#6c757d", "secondary": "#adb5bd", "success": "#28a745",
+                          "info": "#17a2b8", "warning": "#ffc107", "danger": "#dc3545",
+                          "bg": "#212529", "fg": "#f8f9fa", "selectbg": "#6c757d",
+                          "selectfg": "#ffffff", "inputbg": "#343a40", "inputfg": "#f8f9fa", "border": "#495057"},
+            "Candy Pink": {"primary": "#ff69b4", "secondary": "#ffb6c1", "success": "#98fb98",
+                          "info": "#87ceeb", "warning": "#ffd700", "danger": "#ff6347",
+                          "bg": "#2d2d2d", "fg": "#ffc0cb", "selectbg": "#ff69b4",
+                          "selectfg": "#ffffff", "inputbg": "#3d3d3d", "inputfg": "#ffc0cb", "border": "#ffb6c1"},
+        }
+        
+        if preset_name in presets:
+            for key, value in presets[preset_name].items():
+                if key in color_vars:
+                    color_vars[key].set(value)
+                    color_canvases[key].delete("all")
+                    color_canvases[key].create_rectangle(0, 0, 40, 25, fill=value, outline="")
+            update_preview()
+    
+    for preset in ["Ocean Blue", "Forest Green", "Sunset Orange", "Purple Haze", "Monochrome", "Candy Pink"]:
+        ttk.Button(preset_frame, text=preset, width=12,
+                   command=lambda p=preset: apply_preset(p),
+                   bootstyle="info-outline").pack(side=tk.LEFT, padx=2)
+    
+    btn_frame = ttk.Frame(main_frame)
+    btn_frame.pack(fill=tk.X)
+    
+    def save_custom_theme():
+        name = theme_name_var.get().strip()
+        if not name:
+            messagebox.showerror("Error", "Please enter a theme name.", parent=dialog)
+            return
+        
+        theme_id = "custom_" + name.lower().replace(" ", "_").replace("-", "_")
+        
+        custom_colors = {key: var.get() for key, var in color_vars.items()}
+        
+        if "custom_themes" not in settings:
+            settings["custom_themes"] = {}
+        
+        settings["custom_themes"][theme_id] = {
+            "name": name,
+            "base": base_theme_var.get(),
+            "colors": custom_colors
+        }
+        save_settings(settings)
+        
+        MODZT_THEMES[theme_id] = {
+            "display": name,
+            "description": f"Custom theme based on {base_theme_var.get()}",
+            "category": "Custom",
+            "colors": {"bg": custom_colors["bg"], "fg": custom_colors["fg"], "accent": custom_colors["primary"]}
+        }
+        
+        refresh_themes_tree()
+        
+        log(f"Saved custom theme: {name}", text_widget=log_text)
+        messagebox.showinfo("Theme Saved", 
+                           f"Custom theme '{name}' has been saved!\n\n"
+                           "Select it from the 'Custom' category to apply.",
+                           parent=dialog)
+    
+    def apply_custom_theme_now():
+        base = base_theme_var.get()
+        
+        primary = color_vars["primary"].get()
+        secondary = color_vars["secondary"].get()
+        success = color_vars["success"].get()
+        info = color_vars["info"].get()
+        warning = color_vars["warning"].get()
+        danger = color_vars["danger"].get()
+        bg = color_vars["bg"].get()
+        fg = color_vars["fg"].get()
+        selectbg = color_vars["selectbg"].get()
+        inputbg = color_vars["inputbg"].get()
+        inputfg = color_vars["inputfg"].get()
+        theme_name = theme_name_var.get()
+        
+        def do_apply():
+            try:
+                root.style.theme_use(base)
+                
+                style = root.style
+                
+                def safe_cfg(style_name, **kwargs):
+                    try:
+                        style.configure(style_name, **kwargs)
+                    except Exception:
+                        pass
+                
+                def safe_map(style_name, **kwargs):
+                    try:
+                        style.map(style_name, **kwargs)
+                    except Exception:
+                        pass
+                
+                safe_cfg(".", background=bg, foreground=fg)
+                safe_cfg("TFrame", background=bg)
+                safe_cfg("TLabel", background=bg, foreground=fg)
+                safe_cfg("TLabelframe", background=bg)
+                safe_cfg("TLabelframe.Label", background=bg, foreground=fg)
+                safe_cfg("TButton", background=primary)
+                safe_cfg("success.TButton", background=success)
+                safe_cfg("info.TButton", background=info)
+                safe_cfg("warning.TButton", background=warning)
+                safe_cfg("danger.TButton", background=danger)
+                safe_cfg("secondary.TButton", background=secondary)
+                safe_cfg("TEntry", fieldbackground=inputbg, foreground=inputfg)
+                safe_cfg("Treeview", background=inputbg, foreground=fg, fieldbackground=inputbg)
+                safe_map("Treeview", background=[("selected", selectbg)])
+                
+                current_theme_var.set(f"Current: {theme_name} (preview)")
+                log(f"Previewing custom theme: {theme_name}", text_widget=log_text)
+                
+            except Exception as e:
+                log(f"Preview error: {e}", text_widget=log_text)
+        
+        root.after(100, do_apply)
+    
+    def refresh_themes_tree():
+        for item in themes_tree.get_children():
+            themes_tree.delete(item)
+
+        categories = {}
+        for theme_id, theme_data in MODZT_THEMES.items():
+            cat = theme_data["category"]
+            if cat not in categories:
+                categories[cat] = themes_tree.insert("", tk.END, text=cat, open=True)
+            themes_tree.insert(categories[cat], tk.END, text=theme_data["display"],
+                              values=(theme_id,), tags=(theme_id,))
+    
+    ttk.Button(btn_frame, text="Preview", command=apply_custom_theme_now,
+               bootstyle="info", width=12).pack(side=tk.LEFT, padx=5)
+    ttk.Button(btn_frame, text="Save Theme", command=save_custom_theme,
+               bootstyle="success", width=12).pack(side=tk.LEFT, padx=5)
+    ttk.Button(btn_frame, text="Cancel", command=dialog.destroy,
+               bootstyle="secondary", width=10).pack(side=tk.RIGHT, padx=5)
+    
+    if "custom_themes" in settings and settings["custom_themes"]:
+        pass
+
+
+def load_custom_themes_on_startup():
+    if "custom_themes" in settings:
+        for theme_id, theme_data in settings["custom_themes"].items():
+            if theme_id not in MODZT_THEMES:
+                MODZT_THEMES[theme_id] = {
+                    "display": theme_data["name"],
+                    "description": f"Custom theme based on {theme_data.get('base', 'darkly')}",
+                    "category": "Custom",
+                    "colors": {
+                        "bg": theme_data["colors"].get("bg", "#222222"),
+                        "fg": theme_data["colors"].get("fg", "#ffffff"),
+                        "accent": theme_data["colors"].get("primary", "#375a7f")
+                    }
+                }
+
+load_custom_themes_on_startup()
+
+def restore_active_custom_theme():
+    if settings.get("active_custom_theme"):
+        theme_id = settings["active_custom_theme"]
+        if theme_id in settings.get("custom_themes", {}):
+            try:
+                apply_custom_theme_by_id(theme_id)
+                log(f"Restored custom theme: {settings['custom_themes'][theme_id]['name']}", text_widget=log_text)
+            except Exception as e:
+                log(f"Could not restore custom theme: {e}", text_widget=log_text)
+
+def refresh_modzt_themes_tree():
+    for item in themes_tree.get_children():
+        themes_tree.delete(item)
+    
+    _cats = {}
+    for tid, tdata in MODZT_THEMES.items():
+        cat = tdata["category"]
+        if cat not in _cats:
+            _cats[cat] = themes_tree.insert("", tk.END, text=cat, open=True)
+        themes_tree.insert(_cats[cat], tk.END, text=tdata["display"],
+                          values=(tid,), tags=(tid,))
+
+refresh_modzt_themes_tree()
+
+root.after(500, restore_active_custom_theme)
+
+
+def delete_selected_custom_theme():
+    theme_id = _selected_theme_id[0]
+    if not theme_id:
+        messagebox.showinfo("Delete Theme", "Please select a theme first.")
+        return
+    
+    if not theme_id.startswith("custom_"):
+        messagebox.showinfo("Delete Theme", "Only custom themes can be deleted.")
+        return
+    
+    if theme_id not in settings.get("custom_themes", {}):
+        messagebox.showerror("Error", "Custom theme not found.")
+        return
+    
+    theme_name = settings["custom_themes"][theme_id]["name"]
+    
+    if not messagebox.askyesno("Confirm Delete", 
+                               f"Are you sure you want to delete the custom theme '{theme_name}'?"):
+        return
+    
+    del settings["custom_themes"][theme_id]
+    
+    if settings.get("active_custom_theme") == theme_id:
+        settings["active_custom_theme"] = None
+        root.style.theme_use("darkly")
+        current_theme_var.set("Current: darkly")
+    
+    save_settings(settings)
+    
+    if theme_id in MODZT_THEMES:
+        del MODZT_THEMES[theme_id]
+    
+    refresh_modzt_themes_tree()
+    
+    log(f"Deleted custom theme: {theme_name}", text_widget=log_text)
+    messagebox.showinfo("Deleted", f"Custom theme '{theme_name}' has been deleted.")
+
 
 ttk.Button(apply_frame, text="Apply Theme", command=apply_selected_theme,
            bootstyle="success").pack(side=tk.LEFT, padx=5)
+ttk.Button(apply_frame, text="Create Custom",
+           command=open_custom_theme_creator,
+           bootstyle="warning").pack(side=tk.LEFT, padx=5)
+ttk.Button(apply_frame, text="Delete Custom",
+           command=delete_selected_custom_theme,
+           bootstyle="danger").pack(side=tk.LEFT, padx=5)
 ttk.Button(apply_frame, text="Reset to Default",
-           command=lambda: (root.style.theme_use("darkly"), current_theme_var.set("Current: darkly")),
+           command=reset_theme_to_default,
            bootstyle="secondary").pack(side=tk.LEFT, padx=5)
 
 info_frame = ttk.LabelFrame(themes_right, text="Tips", padding=10)
 info_frame.pack(fill=tk.X, pady=(15, 0))
-ttk.Label(info_frame, text="• Dark themes are easier on the eyes during long sessions\n"
-                           "• Zoo Tycoon themes are inspired by in-game biomes\n"
-                           "• Your theme choice is saved automatically",
+ttk.Label(info_frame, text="* Dark themes are easier on the eyes during long sessions\n"
+                           "* Zoo Tycoon themes are inspired by in-game biomes\n"
+                           "* Click 'Create Custom' to design your own color scheme\n"
+                           "* Custom themes are saved and appear in the Custom category",
           justify="left", bootstyle="secondary").pack(anchor="w")
 
+schedule_frame = ttk.LabelFrame(themes_left, text=t("sched_title"), padding=10)
+schedule_frame.pack(fill=tk.X, pady=(15, 0))
+_translatable_widgets["schedule_frame"] = schedule_frame
+
+schedule_enabled_var = tk.BooleanVar(value=settings.get("theme_scheduling_enabled", False))
+
+def toggle_schedule_enabled():
+    enabled = schedule_enabled_var.get()
+    settings["theme_scheduling_enabled"] = enabled
+    save_settings(settings)
+    state = "normal" if enabled else "disabled"
+    light_theme_combo.configure(state="readonly" if enabled else "disabled")
+    dark_theme_combo.configure(state="readonly" if enabled else "disabled")
+    light_time_entry.configure(state=state)
+    dark_time_entry.configure(state=state)
+    if enabled:
+        check_theme_schedule()
+    log(f"Theme scheduling {'enabled' if enabled else 'disabled'}", text_widget=log_text)
+
+sched_enable_cb = ttk.Checkbutton(schedule_frame, text=t("sched_enable"),
+                variable=schedule_enabled_var, command=toggle_schedule_enabled,
+                bootstyle="round-toggle")
+sched_enable_cb.pack(anchor="w", pady=(0, 10))
+_translatable_widgets["sched_enable_cb"] = sched_enable_cb
+
+schedule_grid = ttk.Frame(schedule_frame)
+schedule_grid.pack(fill=tk.X)
+
+sched_light_lbl = ttk.Label(schedule_grid, text=t("sched_light_theme"))
+sched_light_lbl.grid(row=0, column=0, sticky="w", pady=2)
+_translatable_widgets["sched_light_lbl"] = sched_light_lbl
+
+light_theme_var = tk.StringVar(value=settings.get("theme_light", "litera"))
+light_themes = ["litera", "flatly", "journal", "cosmo", "morph", "minty", "sandstone", "lumen"]
+light_theme_combo = ttk.Combobox(schedule_grid, textvariable=light_theme_var,
+                                  values=light_themes, width=15, state="readonly" if schedule_enabled_var.get() else "disabled")
+light_theme_combo.grid(row=0, column=1, padx=5, pady=2)
+
+sched_from_lbl1 = ttk.Label(schedule_grid, text=t("sched_from"))
+sched_from_lbl1.grid(row=0, column=2, padx=5)
+_translatable_widgets["sched_from_lbl1"] = sched_from_lbl1
+
+light_time_var = tk.StringVar(value=settings.get("theme_light_start", "07:00"))
+light_time_entry = ttk.Entry(schedule_grid, textvariable=light_time_var, width=6,
+                              state="normal" if schedule_enabled_var.get() else "disabled")
+light_time_entry.grid(row=0, column=3, pady=2)
+
+sched_dark_lbl = ttk.Label(schedule_grid, text=t("sched_dark_theme"))
+sched_dark_lbl.grid(row=1, column=0, sticky="w", pady=2)
+_translatable_widgets["sched_dark_lbl"] = sched_dark_lbl
+
+dark_theme_var = tk.StringVar(value=settings.get("theme_dark", "darkly"))
+dark_themes = ["darkly", "superhero", "solar", "cyborg", "vapor"]
+dark_theme_combo = ttk.Combobox(schedule_grid, textvariable=dark_theme_var,
+                                 values=dark_themes, width=15, state="readonly" if schedule_enabled_var.get() else "disabled")
+dark_theme_combo.grid(row=1, column=1, padx=5, pady=2)
+
+sched_from_lbl2 = ttk.Label(schedule_grid, text=t("sched_from"))
+sched_from_lbl2.grid(row=1, column=2, padx=5)
+_translatable_widgets["sched_from_lbl2"] = sched_from_lbl2
+
+dark_time_var = tk.StringVar(value=settings.get("theme_dark_start", "19:00"))
+dark_time_entry = ttk.Entry(schedule_grid, textvariable=dark_time_var, width=6,
+                             state="normal" if schedule_enabled_var.get() else "disabled")
+dark_time_entry.grid(row=1, column=3, pady=2)
+
+def save_schedule_settings(*args):
+    settings["theme_light"] = light_theme_var.get()
+    settings["theme_dark"] = dark_theme_var.get()
+    settings["theme_light_start"] = light_time_var.get()
+    settings["theme_dark_start"] = dark_time_var.get()
+    save_settings(settings)
+
+light_theme_var.trace_add("write", save_schedule_settings)
+dark_theme_var.trace_add("write", save_schedule_settings)
+light_time_var.trace_add("write", save_schedule_settings)
+dark_time_var.trace_add("write", save_schedule_settings)
+
+sched_hint_lbl = ttk.Label(schedule_frame, text=t("sched_time_hint"),
+          bootstyle="secondary", font=("Segoe UI", 9))
+sched_hint_lbl.pack(anchor="w", pady=(8, 0))
+_translatable_widgets["sched_hint_lbl"] = sched_hint_lbl
+
+advanced_frame = ttk.LabelFrame(themes_left, text="Advanced Customization", padding=10)
+advanced_frame.pack(fill=tk.X, pady=(15, 0))
+
+font_row = ttk.Frame(advanced_frame)
+font_row.pack(fill=tk.X, pady=(0, 8))
+
+ttk.Label(font_row, text="Font Family:").pack(side=tk.LEFT)
+font_family_var = tk.StringVar(value=settings.get("font_family", "Segoe UI"))
+
+import tkinter.font as tkfont
+available_fonts = sorted(set(tkfont.families()))
+common_fonts = ["Segoe UI", "Arial", "Helvetica", "Verdana", "Tahoma", "Calibri",
+                "Consolas", "Courier New", "Georgia", "Times New Roman"]
+font_list = [f for f in common_fonts if f in available_fonts] + \
+            [f for f in available_fonts if f not in common_fonts]
+
+font_family_combo = ttk.Combobox(font_row, textvariable=font_family_var,
+                                  values=font_list, width=20, state="readonly")
+font_family_combo.pack(side=tk.LEFT, padx=(5, 0))
+
+font_size_row = ttk.Frame(advanced_frame)
+font_size_row.pack(fill=tk.X, pady=(0, 8))
+
+ttk.Label(font_size_row, text="Font Size:").pack(side=tk.LEFT)
+font_size_var = tk.IntVar(value=settings.get("font_size", 10))
+font_size_spin = ttk.Spinbox(font_size_row, from_=8, to=18, width=5,
+                              textvariable=font_size_var)
+font_size_spin.pack(side=tk.LEFT, padx=(5, 10))
+
+ttk.Label(font_size_row, text="pt", bootstyle="secondary").pack(side=tk.LEFT)
+
+scale_row = ttk.Frame(advanced_frame)
+scale_row.pack(fill=tk.X, pady=(0, 8))
+
+ttk.Label(scale_row, text="UI Scale:").pack(side=tk.LEFT)
+ui_scale_var = tk.StringVar(value=settings.get("ui_scale", "100%"))
+ui_scale_combo = ttk.Combobox(scale_row, textvariable=ui_scale_var,
+                               values=["90%", "100%", "110%", "125%", "150%"],
+                               width=8, state="readonly")
+ui_scale_combo.pack(side=tk.LEFT, padx=(5, 0))
+
+compact_row = ttk.Frame(advanced_frame)
+compact_row.pack(fill=tk.X, pady=(0, 8))
+
+compact_mode_var = tk.BooleanVar(value=settings.get("compact_mode", False))
+ttk.Checkbutton(compact_row, text="Compact Mode (reduce padding)",
+                variable=compact_mode_var).pack(side=tk.LEFT)
+
+close_on_launch_row = ttk.Frame(advanced_frame)
+close_on_launch_row.pack(fill=tk.X, pady=(0, 8))
+
+close_on_launch_var = tk.BooleanVar(value=settings.get("close_on_game_launch", False))
+
+def toggle_close_on_launch():
+    settings["close_on_game_launch"] = close_on_launch_var.get()
+    save_settings(settings)
+
+ttk.Checkbutton(close_on_launch_row, text="Close ModZT when launching Zoo Tycoon",
+                variable=close_on_launch_var,
+                command=toggle_close_on_launch).pack(side=tk.LEFT)
+
+row_height_row = ttk.Frame(advanced_frame)
+row_height_row.pack(fill=tk.X, pady=(0, 8))
+
+ttk.Label(row_height_row, text="List Row Height:").pack(side=tk.LEFT)
+row_height_var = tk.IntVar(value=settings.get("row_height", 24))
+row_height_spin = ttk.Spinbox(row_height_row, from_=18, to=40, width=5,
+                               textvariable=row_height_var)
+row_height_spin.pack(side=tk.LEFT, padx=(5, 10))
+
+ttk.Label(row_height_row, text="px", bootstyle="secondary").pack(side=tk.LEFT)
+
+custom_btn_row = ttk.Frame(advanced_frame)
+custom_btn_row.pack(fill=tk.X, pady=(10, 0))
+
+def apply_custom_settings():
+    try:
+        font_family = font_family_var.get()
+        font_size = font_size_var.get()
+        row_height = row_height_var.get()
+        ui_scale = ui_scale_var.get()
+        compact = compact_mode_var.get()
+
+        settings["font_family"] = font_family
+        settings["font_size"] = font_size
+        settings["row_height"] = row_height
+        settings["ui_scale"] = ui_scale
+        settings["compact_mode"] = compact
+        save_settings(settings)
+
+        scale_factor = float(ui_scale.replace("%", "")) / 100.0
+
+        scaled_font_size = int(font_size * scale_factor)
+        scaled_row_height = int(row_height * scale_factor)
+        default_font = (font_family, scaled_font_size)
+
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=scaled_row_height, font=default_font)
+        style.configure("Treeview.Heading", font=(font_family, scaled_font_size, "bold"))
+
+        style.configure("TLabel", font=default_font)
+        style.configure("TButton", font=default_font)
+        style.configure("TCheckbutton", font=default_font)
+        style.configure("TRadiobutton", font=default_font)
+        style.configure("TEntry", font=default_font)
+        style.configure("TCombobox", font=default_font)
+        style.configure("TLabelframe.Label", font=default_font)
+        style.configure("TNotebook.Tab", font=default_font)
+
+        root.tk.call('tk', 'scaling', scale_factor * 1.333)
+
+        mods_tree.configure(style="Treeview")
+        zt1_tree.configure(style="Treeview")
+
+        log(f"Applied custom settings: {font_family} {font_size}pt @ {ui_scale}, row height {row_height}px", text_widget=log_text)
+        messagebox.showinfo("Settings Applied",
+                           f"Custom settings applied:\n\n"
+                           f"Font: {font_family} {scaled_font_size}pt (base {font_size}pt)\n"
+                           f"Row Height: {scaled_row_height}px (base {row_height}px)\n"
+                           f"UI Scale: {ui_scale}\n"
+                           f"Compact Mode: {'On' if compact else 'Off'}\n\n"
+                           "Some changes may require restart for full effect.")
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to apply settings: {e}")
+
+def reset_custom_settings():
+    font_family_var.set("Segoe UI")
+    font_size_var.set(10)
+    row_height_var.set(24)
+    ui_scale_var.set("100%")
+    compact_mode_var.set(False)
+
+    settings["font_family"] = "Segoe UI"
+    settings["font_size"] = 10
+    settings["row_height"] = 24
+    settings["ui_scale"] = "100%"
+    settings["compact_mode"] = False
+    save_settings(settings)
+
+    default_font = ("Segoe UI", 10)
+    style = ttk.Style()
+    style.configure("Treeview", rowheight=24, font=default_font)
+    style.configure("Treeview.Heading", font=("Segoe UI", 10, "bold"))
+    style.configure("TLabel", font=default_font)
+    style.configure("TButton", font=default_font)
+    style.configure("TCheckbutton", font=default_font)
+    style.configure("TRadiobutton", font=default_font)
+    style.configure("TEntry", font=default_font)
+    style.configure("TCombobox", font=default_font)
+    style.configure("TLabelframe.Label", font=default_font)
+    style.configure("TNotebook.Tab", font=default_font)
+
+    root.tk.call('tk', 'scaling', 1.333)
+
+    log("Reset custom settings to defaults", text_widget=log_text)
+    messagebox.showinfo("Settings Reset", "Custom settings have been reset to defaults.")
+
+ttk.Button(custom_btn_row, text="Apply",
+           command=apply_custom_settings,
+           bootstyle="success").pack(side=tk.LEFT, padx=(0, 5))
+
+ttk.Button(custom_btn_row, text="Reset to Defaults",
+           command=reset_custom_settings,
+           bootstyle="secondary").pack(side=tk.LEFT)
+
+preview_frame = ttk.LabelFrame(advanced_frame, text="Preview", padding=8)
+preview_frame.pack(fill=tk.X, pady=(10, 0))
+
+font_preview_label = ttk.Label(preview_frame,
+                                text="The quick brown fox jumps over the lazy dog. 0123456789",
+                                font=(font_family_var.get(), font_size_var.get()))
+font_preview_label.pack(anchor="w")
+
+def update_font_preview(*args):
+    try:
+        font_preview_label.configure(font=(font_family_var.get(), font_size_var.get()))
+    except:
+        pass
+
+font_family_var.trace_add("write", update_font_preview)
+font_size_var.trace_add("write", update_font_preview)
 
 shots_toolbar = ttk.Frame(shots_tab)
 shots_toolbar.pack(fill=tk.X, pady=(0, 6))
@@ -3963,7 +6691,7 @@ def browse_shots_root():
         refresh_screenshots()
 
 
-ttk.Button(shots_toolbar, text="Browse…",
+ttk.Button(shots_toolbar, text="Browse...",
            command=browse_shots_root).pack(side=tk.LEFT, padx=4)
 ttk.Button(shots_toolbar,
            text="Refresh",
@@ -4079,8 +6807,8 @@ def show_full_preview(img_paths, start_index=0):
             idx += 1
             render()
 
-    ttk.Button(btns, text="◀ Prev", command=do_prev).pack(side=tk.LEFT, padx=4)
-    ttk.Button(btns, text="Next ▶", command=do_next).pack(side=tk.LEFT, padx=4)
+    ttk.Button(btns, text="<< Prev", command=do_prev).pack(side=tk.LEFT, padx=4)
+    ttk.Button(btns, text="Next >>", command=do_next).pack(side=tk.LEFT, padx=4)
 
     def open_in_folder():
         p = img_paths[idx]
@@ -4684,49 +7412,6 @@ def list_sessions():
     return sessions
 
 
-def parse_zoo_stats(save_path):
-    stats = {
-        "money": None,
-        "animals": None,
-        "species": None,
-        "guests": None,
-        "rating": None,
-        "zoo_name": None
-    }
-
-    if not os.path.isfile(save_path):
-        return stats
-
-    try:
-        if zipfile.is_zipfile(save_path):
-            with zipfile.ZipFile(save_path, 'r') as zf:
-                for name in zf.namelist():
-                    if name.lower().endswith('.xml'):
-                        try:
-                            content = zf.read(name).decode('utf-8', errors='ignore')
-
-                            import re
-
-                            money_match = re.search(r'<cash[^>]*>(\d+(?:\.\d+)?)</cash>', content, re.I)
-                            if money_match:
-                                stats["money"] = float(money_match.group(1))
-
-                            name_match = re.search(r'<zooname[^>]*>([^<]+)</zooname>', content, re.I)
-                            if name_match:
-                                stats["zoo_name"] = name_match.group(1)
-
-                            rating_match = re.search(r'<rating[^>]*>(\d+(?:\.\d+)?)</rating>', content, re.I)
-                            if rating_match:
-                                stats["rating"] = float(rating_match.group(1))
-
-                        except Exception:
-                            pass
-    except Exception:
-        pass
-
-    return stats
-
-
 def take_turn(session_id, new_save_path, note=""):
     session = load_session(session_id)
     if not session:
@@ -5268,7 +7953,7 @@ def on_view_history():
         timestamp = h.get('timestamp', '')[:16].replace('T', ' ')
         note = h.get('note', '')[:50]
         if h.get('is_rollback'):
-            note = f"🔄 {note}"
+            note = f"[Note] {note}"
 
         stats = h.get('stats', {})
         stats_str = ""
@@ -5277,7 +7962,7 @@ def on_view_history():
             if stats.get('money') is not None:
                 parts.append(f"${stats['money']:,.0f}")
             if stats.get('rating') is not None:
-                parts.append(f"⭐{stats['rating']:.1f}")
+                parts.append(f"*{stats['rating']:.1f}")
             if stats.get('zoo_name'):
                 parts.append(stats['zoo_name'][:20])
             stats_str = " | ".join(parts)
@@ -5388,7 +8073,7 @@ instructions = ttk.Label(async_frame, text="""How to play:
 2. Export session and share with friends
 3. Friends import the session and load the save
 4. After playing, submit your turn with the updated save
-5. Export again and pass to the next player!""",
+5. Export again and pass to the next player""",
     justify="left", bootstyle="secondary", font=("Segoe UI", 9))
 instructions.pack(anchor="w")
 
@@ -5398,57 +8083,12 @@ modbrowser_header.pack(fill=tk.X, pady=(0, 10))
 ttk.Label(modbrowser_header, text="Mod Browser",
           font=("Segoe UI", 14, "bold")).pack(side=tk.LEFT)
 
-FEATURED_MODS = [
-    "Radical Remake", "African Elephant", "Bengal Tiger", "Giant Panda",
-    "Komodo Dragon", "Emperor Penguin", "Grizzly Bear", "Deinonychus"
-]
-
-def load_featured_mod(mod_title):
-    search_zt2dl_mods(mod_title)
-
-def on_quickpick_select(event=None):
-    sel = quickpick_var.get()
-    if sel and sel != "Quick Picks...":
-        load_featured_mod(sel)
-        quickpick_var.set("Quick Picks...")
-
-quickpick_var = tk.StringVar(value="Quick Picks...")
-quickpick_combo = ttk.Combobox(modbrowser_header, textvariable=quickpick_var,
-                               values=FEATURED_MODS, state="readonly", width=18)
-quickpick_combo.pack(side=tk.RIGHT, padx=4)
-quickpick_combo.bind("<<ComboboxSelected>>", on_quickpick_select)
-ttk.Label(modbrowser_header, text="Featured:", bootstyle="secondary").pack(side=tk.RIGHT)
-
-browse_frame = ttk.LabelFrame(modbrowser_tab, text="Browse by Category", padding=6)
-browse_frame.pack(fill=tk.X, pady=(0, 8))
-
-modbrowser_category_var = tk.StringVar(value="Animals")
-modbrowser_category_combo = ttk.Combobox(
-    browse_frame,
-    textvariable=modbrowser_category_var,
-    values=["Animals", "Foliage", "Objects", "Scenery", "Buildings", "Packs"],
-    state="readonly",
-    width=12
-)
-modbrowser_category_combo.pack(side=tk.LEFT, padx=(0, 8))
-
-ttk.Button(browse_frame, text="Browse", command=lambda: browse_zt2dl_category(),
-           bootstyle="success", width=10).pack(side=tk.LEFT, padx=2)
-
-ttk.Separator(browse_frame, orient="vertical").pack(side=tk.LEFT, padx=12, fill=tk.Y, pady=2)
-
-ttk.Button(browse_frame, text="Recent Additions", command=lambda: load_recent_zt2dl(),
-           bootstyle="info-outline").pack(side=tk.LEFT, padx=2)
-
-ttk.Button(browse_frame, text="Surprise Me!", command=lambda: load_random_zt2dl_mod(),
-           bootstyle="warning-outline").pack(side=tk.LEFT, padx=2)
-
-search_frame = ttk.LabelFrame(modbrowser_tab, text="Search", padding=6)
-search_frame.pack(fill=tk.X, pady=(0, 8))
+search_toolbar = ttk.Frame(modbrowser_tab)
+search_toolbar.pack(fill=tk.X, pady=(0, 8))
 
 modbrowser_search_var = tk.StringVar()
-modbrowser_search_entry = ttk.Entry(search_frame, textvariable=modbrowser_search_var, width=40)
-modbrowser_search_entry.pack(side=tk.LEFT, padx=(0, 8))
+modbrowser_search_entry = ttk.Entry(search_toolbar, textvariable=modbrowser_search_var, width=35)
+modbrowser_search_entry.pack(side=tk.LEFT, padx=(0, 4))
 
 def on_modbrowser_search(event=None):
     query = modbrowser_search_var.get().strip()
@@ -5456,11 +8096,68 @@ def on_modbrowser_search(event=None):
         search_zt2dl_mods(query)
 
 modbrowser_search_entry.bind("<Return>", on_modbrowser_search)
-ttk.Button(search_frame, text="Search", command=on_modbrowser_search,
-           bootstyle="info", width=10).pack(side=tk.LEFT, padx=2)
 
-ttk.Label(search_frame, text="Tip: Search for animal names, creators, or mod types",
-          bootstyle="secondary", font=("Segoe UI", 8)).pack(side=tk.LEFT, padx=(12, 0))
+ttk.Button(search_toolbar, text="Search", command=on_modbrowser_search,
+           bootstyle="info", width=8).pack(side=tk.LEFT, padx=2)
+
+ttk.Separator(search_toolbar, orient="vertical").pack(side=tk.LEFT, padx=8, fill=tk.Y, pady=2)
+
+modbrowser_category_var = tk.StringVar(value="Animals")
+modbrowser_category_combo = ttk.Combobox(search_toolbar, textvariable=modbrowser_category_var,
+    values=["Animals", "Foliage", "Objects", "Scenery", "Buildings", "Packs"],
+    state="readonly", width=10)
+modbrowser_category_combo.pack(side=tk.LEFT, padx=(0, 4))
+
+ttk.Button(search_toolbar, text="Browse", command=lambda: browse_zt2dl_category(),
+           bootstyle="success", width=8).pack(side=tk.LEFT, padx=2)
+
+ttk.Button(search_toolbar, text="Recent", command=lambda: load_recent_zt2dl(),
+           bootstyle="info-outline", width=7).pack(side=tk.LEFT, padx=2)
+
+ttk.Button(search_toolbar, text="Random", command=lambda: load_random_zt2dl_mod(),
+           bootstyle="warning-outline", width=7).pack(side=tk.LEFT, padx=2)
+
+ttk.Separator(search_toolbar, orient="vertical").pack(side=tk.LEFT, padx=8, fill=tk.Y, pady=2)
+
+ttk.Label(search_toolbar, text="Author:").pack(side=tk.LEFT, padx=(0, 4))
+modbrowser_author_var = tk.StringVar()
+modbrowser_author_entry = ttk.Entry(search_toolbar, textvariable=modbrowser_author_var, width=20)
+modbrowser_author_entry.pack(side=tk.LEFT, padx=(0, 4))
+
+def on_modbrowser_author_search(event=None):
+    author = modbrowser_author_var.get().strip()
+    if author:
+        search_zt2dl_by_author(author)
+
+modbrowser_author_entry.bind("<Return>", on_modbrowser_author_search)
+
+ttk.Button(search_toolbar, text="Find", command=on_modbrowser_author_search,
+           bootstyle="success-outline", width=5).pack(side=tk.LEFT, padx=2)
+
+def open_moddb_zt2():
+    webbrowser.open("https://www.moddb.com/games/zoo-tycoon-2/downloads")
+    log("Opened Mod DB", text_widget=log_text)
+
+def open_zt2_roundtable():
+    webbrowser.open("https://thezt2roundtable.com/downloads-f169/")
+    log("Opened ZT2 Round Table", text_widget=log_text)
+
+def open_nexus_mods_zt2():
+    webbrowser.open("https://www.nexusmods.com/zootycoon2")
+    log("Opened Nexus Mods", text_widget=log_text)
+
+ttk.Separator(search_toolbar, orient="vertical").pack(side=tk.LEFT, padx=8, fill=tk.Y, pady=2)
+
+external_btn = ttk.Menubutton(search_toolbar, text="More Sources", bootstyle="secondary-outline")
+external_menu = tk.Menu(external_btn, tearoff=0)
+external_menu.add_command(label="Mod DB", command=open_moddb_zt2)
+external_menu.add_command(label="ZT2 Round Table", command=open_zt2_roundtable)
+external_menu.add_command(label="Nexus Mods", command=open_nexus_mods_zt2)
+external_btn["menu"] = external_menu
+external_btn.pack(side=tk.LEFT, padx=2)
+
+ttk.Button(search_toolbar, text="Install URL", command=install_mod_from_url_dialog,
+           bootstyle="success-outline", width=10).pack(side=tk.LEFT, padx=2)
 
 modbrowser_split = ttk.PanedWindow(modbrowser_tab, orient=tk.HORIZONTAL)
 modbrowser_split.pack(fill=tk.BOTH, expand=True)
@@ -5501,8 +8198,8 @@ modbrowser_open_btn = ttk.Button(modbrowser_action_frame, text="Wiki Page",
                                   state="disabled")
 modbrowser_open_btn.pack(side=tk.LEFT, padx=(0, 4))
 
-modbrowser_link_btn = ttk.Button(modbrowser_action_frame, text="Download",
-                                  bootstyle="success", command=lambda: open_zt2dl_download(),
+modbrowser_link_btn = ttk.Button(modbrowser_action_frame, text="Open Link",
+                                  bootstyle="info-outline", command=lambda: open_zt2dl_download(),
                                   state="disabled")
 modbrowser_link_btn.pack(side=tk.LEFT, padx=2)
 
@@ -5639,6 +8336,42 @@ def search_zt2dl_mods(query):
 
     threading.Thread(target=lambda: root.after(0, lambda: on_complete(fetch())),
                      daemon=True).start()
+
+
+def search_zt2dl_by_author(author):
+    global _modbrowser_items
+    modbrowser_status_var.set(f"Searching for mods by '{author}'...")
+    root.update()
+
+    def fetch():
+        try:
+            results = zt2dl_api.search_mods(author, limit=100)
+            author_lower = author.lower()
+            filtered = [r for r in results if author_lower in r.get("title", "").lower()]
+            return filtered if filtered else results, None
+        except Exception as e:
+            return None, str(e)
+
+    def on_complete(result):
+        results, error = result
+        if error:
+            modbrowser_status_var.set(f"Error: {error}")
+            return
+
+        global _modbrowser_items
+        _modbrowser_items = [{"title": r.get("title", ""), "type": "page"} for r in results]
+
+        modbrowser_tree.delete(*modbrowser_tree.get_children())
+        for r in results:
+            title = r.get("title", "Unknown")
+            modbrowser_tree.insert("", tk.END, values=(title, "Mod"))
+
+        modbrowser_status_var.set(f"Found {len(results)} mods by/matching '{author}'")
+        increment_stat("browser_searches")
+
+    threading.Thread(target=lambda: root.after(0, lambda: on_complete(fetch())),
+                     daemon=True).start()
+
 
 def load_recent_zt2dl():
     modbrowser_category_var.set("Recent")
@@ -5994,12 +8727,40 @@ def open_zt2dl_download():
         if link and not link.startswith("("):
             webbrowser.open(link)
 
+
+
 modbrowser_tree.bind("<<TreeviewSelect>>", on_modbrowser_select)
 modbrowser_tree.bind("<Double-1>", lambda e: open_zt2dl_page())
 modbrowser_links_list.bind("<Double-1>", lambda e: open_zt2dl_download())
 
+modbrowser_links_context = tk.Menu(modbrowser_links_list, tearoff=0)
+modbrowser_links_context.add_command(label="Open in Browser", command=open_zt2dl_download)
+modbrowser_links_context.add_separator()
+modbrowser_links_context.add_command(label="Copy Link", command=lambda: copy_selected_link())
+
+def on_links_right_click(event):
+    idx = modbrowser_links_list.nearest(event.y)
+    if idx >= 0:
+        modbrowser_links_list.selection_clear(0, tk.END)
+        modbrowser_links_list.selection_set(idx)
+        link = modbrowser_links_list.get(idx)
+        if link and not link.startswith("("):
+            modbrowser_links_context.post(event.x_root, event.y_root)
+
+def copy_selected_link():
+    selection = modbrowser_links_list.curselection()
+    if selection:
+        link = modbrowser_links_list.get(selection[0])
+        if link and not link.startswith("("):
+            root.clipboard_clear()
+            root.clipboard_append(link)
+            modbrowser_status_var.set("Link copied to clipboard!")
+
+modbrowser_links_list.bind("<Button-3>", on_links_right_click)
+
 modbrowser_context = tk.Menu(modbrowser_tree, tearoff=0)
 modbrowser_context.add_command(label="Open Wiki Page", command=open_zt2dl_page)
+modbrowser_context.add_separator()
 modbrowser_context.add_command(label="Copy Page URL", command=lambda: copy_zt2dl_url())
 
 def on_modbrowser_right_click(event):
@@ -6086,16 +8847,6 @@ ttk.Label(bundle_preview, textvariable=bundle_stats,
 
 bundle_btns = ttk.Frame(bundles_tab, padding=6)
 bundle_btns.pack(side=tk.BOTTOM, fill=tk.X, pady=(4, 0))
-
-
-def update_bundle_toolbar_state():
-    has_selection = bool(bundle_list.curselection())
-    for btn in (apply_btn, delete_btn):
-        state = "normal" if has_selection else "disabled"
-        btn.config(state=state)
-
-
-bundle_list.bind("<<ListboxSelect>>", lambda _: update_bundle_toolbar_state())
 
 create_btn = ttk.Button(bundle_btns,
                         text="Create",
@@ -6276,12 +9027,15 @@ def bundle_disable_all():
 
 refresh_bundles_list()
 
-log_frame = ttk.Frame(main_frame, padding=6)
+log_frame = ttk.Frame(root, padding=6)
 log_frame.pack(side=tk.RIGHT, fill=tk.Y)
 
 ttk.Label(log_frame, text="Log Output:").pack(anchor='w')
 log_text = tk.Text(log_frame, height=40, wrap='word', state='disabled')
 log_text.pack(fill=tk.BOTH, expand=True)
+
+log_frame = ttk.Frame(root)
+log_text = tk.Text(log_frame, height=1, state='disabled')
 
 def refresh_tree():
     mods_tree.delete(*mods_tree.get_children())
@@ -6312,12 +9066,12 @@ def refresh_tree():
                                   time.localtime(os.path.getmtime(path)))
                     if exists else "N/A")
 
-        status = ("🟢 Enabled" if enabled_flag else
-                  ("🟡 Missing" if not exists else "🔴 Disabled"))
+        status = ("Enabled" if enabled_flag else
+                  ("Missing" if not exists else "Disabled"))
 
         mods_tree.insert("",
                          tk.END,
-                         values=(name, status, category or "—", f"{size_mb:.2f}", modified),
+                         values=(name, status, category or "-", f"{size_mb:.2f}", modified),
                          tags=("enabled" if enabled_flag else
                                ("missing" if not exists else "disabled"), ))
 
@@ -6366,9 +9120,9 @@ def sort_tree_by(column):
 
     for r in items:
         status_text = r[1]
-        if "🟢" in status_text:
+        if "Enabled" in status_text:
             tag = "enabled"
-        elif "🟡" in status_text:
+        elif "Missing" in status_text:
             tag = "missing"
         else:
             tag = "disabled"
@@ -6379,7 +9133,7 @@ def sort_tree_by(column):
     for col in ("Name", "Status", "Category", "Size", "Modified"):
         arrow = ""
         if col == column:
-            arrow = "▼" if sort_state["reverse"] else "▲"
+            arrow = "^" if sort_state["reverse"] else "v"
         mods_tree.heading(col,
                           text=f"{col} {arrow}",
                           command=lambda c=col: sort_tree_by(c))
@@ -6531,6 +9285,154 @@ def open_mod_folder():
     messagebox.showinfo("Not Found", f"Could not find {mod} on disk.")
 
 
+def parse_z2f_contents(z2f_path):
+    contents = {
+        "animals": [],
+        "objects": [],
+        "buildings": [],
+        "scenery": [],
+        "foliage": [],
+        "fences": [],
+        "paths": [],
+        "guests": [],
+        "staff": [],
+        "other": [],
+        "files": [],
+        "total_size": 0,
+        "compressed_size": 0
+    }
+
+    try:
+        with zipfile.ZipFile(z2f_path, 'r') as zf:
+            for info in zf.infolist():
+                contents["total_size"] += info.file_size
+                contents["compressed_size"] += info.compress_size
+                contents["files"].append({
+                    "name": info.filename,
+                    "size": info.file_size,
+                    "compressed": info.compress_size
+                })
+
+                if info.filename.lower().endswith('.xml'):
+                    try:
+                        xml_data = zf.read(info.filename).decode('utf-8', errors='ignore')
+                        if xml_data.startswith('\ufeff'):
+                            xml_data = xml_data[1:]
+
+                        root_elem = ET.fromstring(xml_data)
+
+                        entity_info = extract_entity_info(root_elem, info.filename)
+                        if entity_info:
+                            category = entity_info.get("category", "other")
+                            if category in contents:
+                                contents[category].append(entity_info)
+                            else:
+                                contents["other"].append(entity_info)
+                    except ET.ParseError:
+                        pass
+                    except Exception:
+                        pass
+    except zipfile.BadZipFile:
+        return None
+
+    return contents
+
+
+def extract_entity_info(root_elem, filename):
+    info = {
+        "filename": filename,
+        "name": None,
+        "codename": None,
+        "type": None,
+        "category": "other",
+        "icon": None,
+        "description": None
+    }
+
+    root_tag = root_elem.tag.lower() if root_elem.tag else ""
+
+    if root_tag == "bfaitype" or root_elem.find(".//BFAIType") is not None:
+        info["category"] = "animals"
+        info["type"] = "Animal"
+    elif root_tag == "bfbuildingtype" or root_elem.find(".//BFBuildingType") is not None:
+        info["category"] = "buildings"
+        info["type"] = "Building"
+    elif root_tag == "bfscenerytype" or root_elem.find(".//BFSceneryType") is not None:
+        info["category"] = "scenery"
+        info["type"] = "Scenery"
+    elif root_tag == "bffencetype" or root_elem.find(".//BFFenceType") is not None:
+        info["category"] = "fences"
+        info["type"] = "Fence"
+    elif root_tag == "bfpathtype" or root_elem.find(".//BFPathType") is not None:
+        info["category"] = "paths"
+        info["type"] = "Path"
+    elif root_tag == "bffoliagetype" or root_elem.find(".//BFFoliageType") is not None:
+        info["category"] = "foliage"
+        info["type"] = "Foliage"
+    elif root_tag == "bfguesttype" or root_elem.find(".//BFGuestType") is not None:
+        info["category"] = "guests"
+        info["type"] = "Guest"
+    elif root_tag == "bfstafftype" or root_elem.find(".//BFStaffType") is not None:
+        info["category"] = "staff"
+        info["type"] = "Staff"
+    elif root_tag == "bfunittype" or root_elem.find(".//BFUnitType") is not None:
+        info["category"] = "objects"
+        info["type"] = "Object"
+    else:
+        path_lower = filename.lower()
+        if "/animals/" in path_lower or "\\animals\\" in path_lower:
+            info["category"] = "animals"
+            info["type"] = "Animal"
+        elif "/buildings/" in path_lower or "\\buildings\\" in path_lower:
+            info["category"] = "buildings"
+            info["type"] = "Building"
+        elif "/scenery/" in path_lower or "\\scenery\\" in path_lower:
+            info["category"] = "scenery"
+            info["type"] = "Scenery"
+        elif "/foliage/" in path_lower or "\\foliage\\" in path_lower:
+            info["category"] = "foliage"
+            info["type"] = "Foliage"
+        elif "/fences/" in path_lower or "\\fences\\" in path_lower:
+            info["category"] = "fences"
+            info["type"] = "Fence"
+        elif "/paths/" in path_lower or "\\paths\\" in path_lower:
+            info["category"] = "paths"
+            info["type"] = "Path"
+        else:
+            return None
+
+    for tag in ["codename", "Codename", "cCodename", "ccodename"]:
+        elem = root_elem.find(f".//{tag}")
+        if elem is not None and elem.text:
+            info["codename"] = elem.text.strip()
+            break
+
+    if not info["codename"]:
+        type_attr = root_elem.get("Type") or root_elem.get("type")
+        if type_attr:
+            info["codename"] = type_attr
+        else:
+            base = os.path.basename(filename)
+            info["codename"] = os.path.splitext(base)[0]
+
+    for tag in ["cIconName", "ciconname", "IconName", "Name", "name", "cName"]:
+        elem = root_elem.find(f".//{tag}")
+        if elem is not None and elem.text:
+            info["name"] = elem.text.strip()
+            break
+
+    if not info["name"]:
+        info["name"] = info["codename"]
+
+    for tag in ["cDescription", "Description", "description"]:
+        elem = root_elem.find(f".//{tag}")
+        if elem is not None and elem.text:
+            info["description"] = elem.text.strip()
+            break
+
+    return info
+
+
 def inspect_selected_mod():
     mod = get_selected_mod()
     if not mod:
@@ -6541,50 +9443,609 @@ def inspect_selected_mod():
         messagebox.showerror("Error", f"Cannot find file for '{mod}'.")
         return
 
-    dlg = tk.Toplevel(root)
-    dlg.title(f"Inspect: {mod}")
-    dlg.geometry("700x700")
-
-    frame = ttk.Frame(dlg, padding=8)
-    frame.pack(fill=tk.BOTH, expand=True)
-
-    ttk.Label(frame,
-              text=f"📦 Contents of {mod}",
-              font=("Segoe UI", 12, "bold")).pack(anchor="w", pady=(0, 8))
-
-    tree = ttk.Treeview(frame, columns=("size", "compressed"), show="headings")
-    tree.heading("size", text="Size (KB)")
-    tree.heading("compressed", text="Compressed (KB)")
-    tree.column("size", width=100, anchor="e")
-    tree.column("compressed", width=120, anchor="e")
-    tree.pack(fill=tk.BOTH, expand=True)
-
-    scrollbar = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
-    tree.configure(yscrollcommand=scrollbar.set)
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-    try:
-        with zipfile.ZipFile(path, 'r') as zf:
-            for info in zf.infolist():
-                size_kb = info.file_size / 1024
-                comp_kb = info.compress_size / 1024
-                tree.insert("",
-                            tk.END,
-                            values=(info.filename, f"{size_kb:.1f}",
-                                    f"{comp_kb:.1f}"))
-    except zipfile.BadZipFile:
+    contents = parse_z2f_contents(path)
+    if contents is None:
         messagebox.showerror("Error", "This mod file is not a valid Z2F file.")
-        dlg.destroy()
         return
+
+    dlg = tk.Toplevel(root)
+    dlg.title(f"Z2F Contents: {mod}")
+    dlg.geometry("900x700")
+
+    main_frame = ttk.Frame(dlg, padding=8)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    header = ttk.Frame(main_frame)
+    header.pack(fill=tk.X, pady=(0, 10))
+
+    ttk.Label(header,
+              text=f"Contents of {mod}",
+              font=("Segoe UI", 14, "bold")).pack(side=tk.LEFT)
+
+    total_entities = sum(len(contents[cat]) for cat in
+                         ["animals", "objects", "buildings", "scenery", "foliage", "fences", "paths"])
+    size_mb = contents["total_size"] / (1024 * 1024)
+    comp_mb = contents["compressed_size"] / (1024 * 1024)
+
+    ttk.Label(header,
+              text=f"Size: {size_mb:.2f} MB ({comp_mb:.2f} MB compressed)",
+              bootstyle="secondary").pack(side=tk.RIGHT)
+
+    summary_frame = ttk.Frame(main_frame)
+    summary_frame.pack(fill=tk.X, pady=(0, 10))
+
+    categories = [
+        ("Animals", "animals", "success"),
+        ("Buildings", "buildings", "info"),
+        ("Scenery", "scenery", "warning"),
+        ("Foliage", "foliage", "success"),
+        ("Fences", "fences", "secondary"),
+        ("Paths", "paths", "secondary"),
+        ("Objects", "objects", "primary"),
+    ]
+
+    for i, (label, key, style) in enumerate(categories):
+        count = len(contents[key])
+        if count > 0:
+            card = ttk.Frame(summary_frame)
+            card.pack(side=tk.LEFT, padx=4)
+            ttk.Label(card, text=str(count), font=("Segoe UI", 16, "bold")).pack()
+            ttk.Label(card, text=label, bootstyle=style).pack()
+
+    notebook = ttk.Notebook(main_frame)
+    notebook.pack(fill=tk.BOTH, expand=True, pady=(10, 0))
+
+    content_tab = ttk.Frame(notebook, padding=6)
+    notebook.add(content_tab, text="Content")
+
+    content_tree = ttk.Treeview(content_tab,
+                                 columns=("Type", "Name", "Codename"),
+                                 show="headings", height=15)
+    content_tree.heading("Type", text="Type")
+    content_tree.heading("Name", text="Display Name")
+    content_tree.heading("Codename", text="Codename")
+    content_tree.column("Type", width=100)
+    content_tree.column("Name", width=300)
+    content_tree.column("Codename", width=300)
+
+    content_scroll = ttk.Scrollbar(content_tab, orient="vertical", command=content_tree.yview)
+    content_tree.configure(yscrollcommand=content_scroll.set)
+
+    content_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    content_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+    type_icons = {
+        "animals": "Animal",
+        "buildings": "Building",
+        "scenery": "Scenery",
+        "foliage": "Foliage",
+        "fences": "Fence",
+        "paths": "Path",
+        "objects": "Object",
+        "guests": "Guest",
+        "staff": "Staff",
+        "other": "Other"
+    }
+
+    for cat_key, cat_label in type_icons.items():
+        for entity in contents[cat_key]:
+            content_tree.insert("", tk.END,
+                              values=(cat_label,
+                                     entity.get("name", "Unknown"),
+                                     entity.get("codename", "Unknown")))
+
+    files_tab = ttk.Frame(notebook, padding=6)
+    notebook.add(files_tab, text=f"Files ({len(contents['files'])})")
+
+    files_tree = ttk.Treeview(files_tab,
+                               columns=("Filename", "Size", "Compressed"),
+                               show="headings", height=15)
+    files_tree.heading("Filename", text="Filename")
+    files_tree.heading("Size", text="Size (KB)")
+    files_tree.heading("Compressed", text="Compressed (KB)")
+    files_tree.column("Filename", width=500)
+    files_tree.column("Size", width=100, anchor="e")
+    files_tree.column("Compressed", width=100, anchor="e")
+
+    files_scroll = ttk.Scrollbar(files_tab, orient="vertical", command=files_tree.yview)
+    files_tree.configure(yscrollcommand=files_scroll.set)
+
+    files_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    files_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+    for f in contents["files"]:
+        size_kb = f["size"] / 1024
+        comp_kb = f["compressed"] / 1024
+        files_tree.insert("", tk.END,
+                         values=(f["name"], f"{size_kb:.1f}", f"{comp_kb:.1f}"))
+
+    detail_frame = ttk.LabelFrame(main_frame, text="Details", padding=8)
+    detail_frame.pack(fill=tk.X, pady=(10, 0))
+
+    detail_text = tk.Text(detail_frame, height=4, state="disabled",
+                          bg="#2b2b2b", fg="#e0e0e0", font=("Consolas", 9), wrap=tk.WORD)
+    detail_text.pack(fill=tk.X)
+
+    def on_content_select(event):
+        selected = content_tree.selection()
+        if not selected:
+            return
+        item = content_tree.item(selected[0])
+        values = item["values"]
+
+        detail_text.config(state="normal")
+        detail_text.delete("1.0", tk.END)
+        detail_text.insert("1.0", f"Type: {values[0]}\nDisplay Name: {values[1]}\nCodename: {values[2]}")
+        detail_text.config(state="disabled")
+
+    content_tree.bind("<<TreeviewSelect>>", on_content_select)
 
     btns = ttk.Frame(dlg, padding=6)
     btns.pack(fill=tk.X)
+
     ttk.Button(btns,
                text="Extract to Folder",
-               command=lambda: extract_zip_contents(path)).pack(side=tk.LEFT,
-                                                                padx=4)
-    ttk.Button(btns, text="Close", command=dlg.destroy).pack(side=tk.RIGHT,
-                                                             padx=4)
+               command=lambda: extract_zip_contents(path),
+               bootstyle="info").pack(side=tk.LEFT, padx=4)
+
+    ttk.Button(btns,
+               text="Copy Content List",
+               command=lambda: copy_content_list(contents),
+               bootstyle="secondary").pack(side=tk.LEFT, padx=4)
+
+    ttk.Button(btns, text="Close", command=dlg.destroy).pack(side=tk.RIGHT, padx=4)
+
+
+def copy_content_list(contents):
+    lines = ["Content Summary", "=" * 40, ""]
+
+    categories = [
+        ("Animals", "animals"),
+        ("Buildings", "buildings"),
+        ("Scenery", "scenery"),
+        ("Foliage", "foliage"),
+        ("Fences", "fences"),
+        ("Paths", "paths"),
+        ("Objects", "objects"),
+    ]
+
+    for label, key in categories:
+        if contents[key]:
+            lines.append(f"{label} ({len(contents[key])}):")
+            for entity in contents[key]:
+                name = entity.get("name", "Unknown")
+                codename = entity.get("codename", "")
+                if name != codename:
+                    lines.append(f"  - {name} ({codename})")
+                else:
+                    lines.append(f"  - {name}")
+            lines.append("")
+
+    text = "\n".join(lines)
+    root.clipboard_clear()
+    root.clipboard_append(text)
+    messagebox.showinfo("Copied", "Content list copied to clipboard!")
+
+
+def scan_mod_conflicts():
+    if not GAME_PATH or not os.path.isdir(GAME_PATH):
+        messagebox.showwarning("No Game Path", "Please set your Zoo Tycoon 2 game path first.")
+        return
+
+    cursor.execute("SELECT name, enabled FROM mods")
+    all_mods = cursor.fetchall()
+
+    if not all_mods:
+        messagebox.showinfo("No Mods", "No mods found to scan.")
+        return
+
+    progress_dlg = tk.Toplevel(root)
+    progress_dlg.title("Scanning for Conflicts")
+    progress_dlg.geometry("400x120")
+    progress_dlg.transient(root)
+    progress_dlg.grab_set()
+
+    ttk.Label(progress_dlg, text="Scanning mods for file conflicts...",
+              font=("Segoe UI", 11)).pack(pady=(20, 10))
+
+    progress_var = tk.DoubleVar(value=0)
+    progress_bar = ttk.Progressbar(progress_dlg, variable=progress_var,
+                                    maximum=100, length=350)
+    progress_bar.pack(pady=10)
+
+    status_var = tk.StringVar(value="Initializing...")
+    ttk.Label(progress_dlg, textvariable=status_var).pack()
+
+    progress_dlg.update()
+
+    file_index = {}
+    mod_count = len(all_mods)
+
+    for i, (mod_name, enabled) in enumerate(all_mods):
+        progress_var.set((i / mod_count) * 100)
+        status_var.set(f"Scanning: {mod_name[:40]}...")
+        progress_dlg.update()
+
+        mod_path = find_mod_file(mod_name)
+        if not mod_path or not os.path.isfile(mod_path):
+            continue
+
+        try:
+            with zipfile.ZipFile(mod_path, 'r') as zf:
+                for info in zf.infolist():
+                    file_path = info.filename.lower().replace('\\', '/')
+
+                    if file_path.endswith('/'):
+                        continue
+
+                    if file_path not in file_index:
+                        file_index[file_path] = []
+
+                    file_index[file_path].append({
+                        "mod": mod_name,
+                        "size": info.file_size,
+                        "enabled": enabled == 1,
+                        "original_path": info.filename
+                    })
+        except zipfile.BadZipFile:
+            continue
+        except Exception:
+            continue
+
+    progress_dlg.destroy()
+
+    conflicts = {}
+    for file_path, mods in file_index.items():
+        if len(mods) > 1:
+            conflicts[file_path] = mods
+
+    show_conflict_results(conflicts, len(all_mods))
+
+
+def show_conflict_results(conflicts, total_mods):
+    dlg = tk.Toplevel(root)
+    dlg.title("Mod Conflict Scanner")
+    dlg.geometry("1000x700")
+
+    main_frame = ttk.Frame(dlg, padding=10)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    header = ttk.Frame(main_frame)
+    header.pack(fill=tk.X, pady=(0, 10))
+
+    ttk.Label(header, text="Mod Conflict Scanner",
+              font=("Segoe UI", 14, "bold")).pack(side=tk.LEFT)
+
+    conflict_count = len(conflicts)
+    affected_mods = set()
+    for file_path, mods in conflicts.items():
+        for mod_info in mods:
+            affected_mods.add(mod_info["mod"])
+
+    if conflict_count == 0:
+        summary_text = f"No conflicts found among {total_mods} mods!"
+        summary_style = "success"
+    else:
+        summary_text = f"Found {conflict_count} file conflicts affecting {len(affected_mods)} mods"
+        summary_style = "warning"
+
+    ttk.Label(header, text=summary_text, bootstyle=summary_style).pack(side=tk.RIGHT)
+
+    if conflict_count == 0:
+        ttk.Label(main_frame,
+                  text="All mods are compatible - no file overwrites detected.",
+                  font=("Segoe UI", 12)).pack(pady=50)
+        ttk.Button(main_frame, text="Close", command=dlg.destroy).pack()
+        return
+
+    filter_frame = ttk.Frame(main_frame)
+    filter_frame.pack(fill=tk.X, pady=(0, 10))
+
+    filter_var = tk.StringVar(value="all")
+    ttk.Label(filter_frame, text="Show:").pack(side=tk.LEFT, padx=(0, 5))
+    ttk.Radiobutton(filter_frame, text="All Conflicts", variable=filter_var,
+                    value="all").pack(side=tk.LEFT, padx=5)
+    ttk.Radiobutton(filter_frame, text="Enabled Mods Only", variable=filter_var,
+                    value="enabled").pack(side=tk.LEFT, padx=5)
+    ttk.Radiobutton(filter_frame, text="Critical (XML files)", variable=filter_var,
+                    value="critical").pack(side=tk.LEFT, padx=5)
+
+    paned = ttk.PanedWindow(main_frame, orient=tk.HORIZONTAL)
+    paned.pack(fill=tk.BOTH, expand=True)
+
+    left_frame = ttk.Frame(paned, padding=5)
+    paned.add(left_frame, weight=1)
+
+    ttk.Label(left_frame, text="Conflicting Files",
+              font=("Segoe UI", 11, "bold")).pack(anchor="w")
+
+    conflict_tree = ttk.Treeview(left_frame,
+                                  columns=("File", "Mods", "Type"),
+                                  show="headings", height=20)
+    conflict_tree.heading("File", text="File Path")
+    conflict_tree.heading("Mods", text="# Mods")
+    conflict_tree.heading("Type", text="Type")
+    conflict_tree.column("File", width=350)
+    conflict_tree.column("Mods", width=60, anchor="center")
+    conflict_tree.column("Type", width=80)
+
+    conflict_scroll = ttk.Scrollbar(left_frame, orient="vertical",
+                                     command=conflict_tree.yview)
+    conflict_tree.configure(yscrollcommand=conflict_scroll.set)
+
+    conflict_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    conflict_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+    right_frame = ttk.Frame(paned, padding=5)
+    paned.add(right_frame, weight=1)
+
+    ttk.Label(right_frame, text="Affected Mods",
+              font=("Segoe UI", 11, "bold")).pack(anchor="w")
+
+    detail_tree = ttk.Treeview(right_frame,
+                                columns=("Mod", "Status", "Size"),
+                                show="headings", height=10)
+    detail_tree.heading("Mod", text="Mod Name")
+    detail_tree.heading("Status", text="Status")
+    detail_tree.heading("Size", text="File Size")
+    detail_tree.column("Mod", width=250)
+    detail_tree.column("Status", width=80)
+    detail_tree.column("Size", width=80, anchor="e")
+
+    detail_scroll = ttk.Scrollbar(right_frame, orient="vertical",
+                                   command=detail_tree.yview)
+    detail_tree.configure(yscrollcommand=detail_scroll.set)
+
+    detail_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, pady=(5, 0))
+    detail_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=(5, 0))
+
+    info_frame = ttk.LabelFrame(right_frame, text="Conflict Info", padding=8)
+    info_frame.pack(fill=tk.X, pady=(10, 0))
+
+    info_text = tk.Text(info_frame, height=6, state="disabled",
+                        bg="#2b2b2b", fg="#e0e0e0", font=("Consolas", 9), wrap=tk.WORD)
+    info_text.pack(fill=tk.X)
+
+    conflicts_data = conflicts
+
+    def get_file_type(filepath):
+        ext = os.path.splitext(filepath)[1].lower()
+        if ext == '.xml':
+            return "XML"
+        elif ext in ['.dds', '.tga', '.png', '.bmp']:
+            return "Texture"
+        elif ext in ['.nif', '.bfm']:
+            return "Model"
+        elif ext in ['.wav', '.mp3', '.ogg']:
+            return "Audio"
+        elif ext == '.lua':
+            return "Script"
+        elif ext == '.ini':
+            return "Config"
+        else:
+            return "Other"
+
+    def populate_conflict_tree(filter_type="all"):
+        conflict_tree.delete(*conflict_tree.get_children())
+
+        for file_path, mods in conflicts_data.items():
+            if filter_type == "enabled":
+                enabled_mods = [m for m in mods if m["enabled"]]
+                if len(enabled_mods) < 2:
+                    continue
+                display_mods = enabled_mods
+            elif filter_type == "critical":
+                if not file_path.endswith('.xml'):
+                    continue
+                display_mods = mods
+            else:
+                display_mods = mods
+
+            file_type = get_file_type(file_path)
+            display_path = file_path
+            if len(display_path) > 50:
+                display_path = "..." + display_path[-47:]
+
+            item_id = conflict_tree.insert("", tk.END,
+                                           values=(display_path, len(display_mods), file_type),
+                                           tags=(file_path,))
+
+    def on_conflict_select(event):
+        selected = conflict_tree.selection()
+        if not selected:
+            return
+
+        item = conflict_tree.item(selected[0])
+        file_path = item["tags"][0] if item["tags"] else None
+
+        if not file_path or file_path not in conflicts_data:
+            return
+
+        mods = conflicts_data[file_path]
+
+        detail_tree.delete(*detail_tree.get_children())
+
+        for mod_info in mods:
+            status = "Enabled" if mod_info["enabled"] else "Disabled"
+            size_kb = mod_info["size"] / 1024
+            detail_tree.insert("", tk.END,
+                              values=(mod_info["mod"], status, f"{size_kb:.1f} KB"),
+                              tags=("enabled" if mod_info["enabled"] else "disabled",))
+
+        detail_tree.tag_configure("enabled", foreground="#2ecc71")
+        detail_tree.tag_configure("disabled", foreground="#95a5a6")
+
+        info_text.config(state="normal")
+        info_text.delete("1.0", tk.END)
+
+        info_lines = [
+            f"File: {file_path}",
+            f"Type: {get_file_type(file_path)}",
+            f"Conflicting mods: {len(mods)}",
+            "",
+            "Note: The last loaded mod will overwrite earlier ones.",
+            "Load order depends on alphabetical filename order."
+        ]
+        info_text.insert("1.0", "\n".join(info_lines))
+        info_text.config(state="disabled")
+
+    conflict_tree.bind("<<TreeviewSelect>>", on_conflict_select)
+
+    def on_filter_change(*args):
+        populate_conflict_tree(filter_var.get())
+
+    filter_var.trace_add("write", on_filter_change)
+
+    populate_conflict_tree()
+
+    btn_frame = ttk.Frame(dlg, padding=8)
+    btn_frame.pack(fill=tk.X)
+
+    def export_conflicts():
+        filepath = filedialog.asksaveasfilename(
+            title="Save Conflict Report",
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+        )
+        if not filepath:
+            return
+
+        lines = ["Conflict Report", "=" * 50, "",
+                 f"Total conflicts: {len(conflicts_data)}",
+                 f"Affected mods: {len(affected_mods)}", ""]
+
+        for file_path, mods in sorted(conflicts_data.items()):
+            lines.append(f"\nFile: {file_path}")
+            lines.append(f"Type: {get_file_type(file_path)}")
+            lines.append("Mods:")
+            for mod_info in mods:
+                status = "[ENABLED]" if mod_info["enabled"] else "[disabled]"
+                lines.append(f"  - {mod_info['mod']} {status}")
+
+        try:
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write("\n".join(lines))
+            messagebox.showinfo("Exported", f"Conflict report saved to:\n{filepath}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to save report:\n{e}")
+
+    ttk.Button(btn_frame, text="Export Report",
+               command=export_conflicts,
+               bootstyle="info").pack(side=tk.LEFT, padx=4)
+
+    ttk.Button(btn_frame, text="Rescan",
+               command=lambda: [dlg.destroy(), scan_mod_conflicts()],
+               bootstyle="secondary").pack(side=tk.LEFT, padx=4)
+
+    ttk.Button(btn_frame, text="Close",
+               command=dlg.destroy).pack(side=tk.RIGHT, padx=4)
+
+
+def check_selected_mod_conflicts():
+    mod = get_selected_mod()
+    if mod:
+        check_mod_conflicts_for(mod)
+
+
+def check_mod_conflicts_for(mod_name):
+    mod_path = find_mod_file(mod_name)
+    if not mod_path or not os.path.isfile(mod_path):
+        messagebox.showerror("Error", f"Cannot find file for '{mod_name}'.")
+        return
+
+    target_files = set()
+    try:
+        with zipfile.ZipFile(mod_path, 'r') as zf:
+            for info in zf.infolist():
+                if not info.filename.endswith('/'):
+                    target_files.add(info.filename.lower().replace('\\', '/'))
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to read mod:\n{e}")
+        return
+
+    cursor.execute("SELECT name FROM mods WHERE name != ?", (mod_name,))
+    other_mods = [row[0] for row in cursor.fetchall()]
+
+    conflicts = {}
+
+    for other_mod in other_mods:
+        other_path = find_mod_file(other_mod)
+        if not other_path or not os.path.isfile(other_path):
+            continue
+
+        try:
+            with zipfile.ZipFile(other_path, 'r') as zf:
+                for info in zf.infolist():
+                    if info.filename.endswith('/'):
+                        continue
+                    file_path = info.filename.lower().replace('\\', '/')
+                    if file_path in target_files:
+                        if other_mod not in conflicts:
+                            conflicts[other_mod] = []
+                        conflicts[other_mod].append(info.filename)
+        except Exception:
+            continue
+
+    if not conflicts:
+        messagebox.showinfo("No Conflicts",
+                           f"'{mod_name}' has no file conflicts with other mods.")
+        return
+
+    dlg = tk.Toplevel(root)
+    dlg.title(f"Conflicts for: {mod_name}")
+    dlg.geometry("700x500")
+
+    main_frame = ttk.Frame(dlg, padding=10)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    ttk.Label(main_frame,
+              text=f"Conflicts for: {mod_name}",
+              font=("Segoe UI", 12, "bold")).pack(anchor="w", pady=(0, 5))
+
+    ttk.Label(main_frame,
+              text=f"Found conflicts with {len(conflicts)} other mod(s)",
+              bootstyle="warning").pack(anchor="w", pady=(0, 10))
+
+    tree = ttk.Treeview(main_frame, columns=("Mod", "Files"),
+                        show="headings", height=15)
+    tree.heading("Mod", text="Conflicting Mod")
+    tree.heading("Files", text="# Conflicting Files")
+    tree.column("Mod", width=400)
+    tree.column("Files", width=150, anchor="center")
+
+    scroll = ttk.Scrollbar(main_frame, orient="vertical", command=tree.yview)
+    tree.configure(yscrollcommand=scroll.set)
+
+    tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+    for other_mod, files in sorted(conflicts.items(), key=lambda x: -len(x[1])):
+        tree.insert("", tk.END, values=(other_mod, len(files)), tags=(other_mod,))
+
+    detail_frame = ttk.LabelFrame(dlg, text="Conflicting Files", padding=8)
+    detail_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+
+    detail_text = tk.Text(detail_frame, height=8, state="disabled",
+                          bg="#2b2b2b", fg="#e0e0e0", font=("Consolas", 9))
+    detail_text.pack(fill=tk.X)
+
+    def on_select(event):
+        selected = tree.selection()
+        if not selected:
+            return
+        item = tree.item(selected[0])
+        other_mod = item["tags"][0] if item["tags"] else None
+        if other_mod and other_mod in conflicts:
+            detail_text.config(state="normal")
+            detail_text.delete("1.0", tk.END)
+            detail_text.insert("1.0", "\n".join(conflicts[other_mod][:50]))
+            if len(conflicts[other_mod]) > 50:
+                detail_text.insert(tk.END, f"\n... and {len(conflicts[other_mod]) - 50} more")
+            detail_text.config(state="disabled")
+
+    tree.bind("<<TreeviewSelect>>", on_select)
+
+    ttk.Button(dlg, text="Close", command=dlg.destroy).pack(pady=10)
 
 
 def extract_zip_contents(path):
@@ -6642,7 +10103,7 @@ def show_mod_details():
     frame = ttk.Frame(dlg, padding=10)
     frame.pack(fill=tk.BOTH, expand=True)
 
-    ttk.Label(frame, text=f"🧩 {mod}",
+    ttk.Label(frame, text=f"[mod] {mod}",
               font=("Segoe UI", 14, "bold")).pack(anchor="w", pady=(0, 6))
     ttk.Label(frame, text=f"Path: {path}", wraplength=560).pack(anchor="w",
                                                                 pady=(0, 3))
@@ -6725,9 +10186,6 @@ def on_create_bundle():
     ttk.Button(dlg, text="Create", command=do_create).pack(padx=6, pady=6)
 
 
-on_create_bundle = on_create_bundle
-
-
 def on_delete_bundle():
     name = get_selected_bundle_name()
     if not name:
@@ -6764,18 +10222,12 @@ def on_export_bundle_as_mod():
         return
     export_bundle_as_mod_ui(name)
 
-def update_status():
-    pass
-
-
 
 search_var.trace_add('write', lambda *_: filter_tree())
-zt2_status_filter.trace_add('write', lambda *_: filter_tree())
 
 
 def filter_tree(*_):
     query = search_var.get().strip().lower()
-    status_filter = zt2_status_filter.get().lower()
 
     for row in mods_tree.get_children():
         mods_tree.delete(row)
@@ -6792,9 +10244,6 @@ def filter_tree(*_):
         if query and query not in combined:
             continue
 
-        if status_filter != "all" and status_str != status_filter:
-            continue
-
         path = find_mod_file(name)
         size_mb = 0
         modified = "N/A"
@@ -6804,18 +10253,18 @@ def filter_tree(*_):
                                      time.localtime(os.path.getmtime(path)))
 
         if enabled_flag:
-            status = "🟢 Enabled"
+            status = "Enabled"
         elif not path or not os.path.isfile(path):
-            status = "🟡 Missing"
+            status = "Missing"
         else:
-            status = "🔴 Disabled"
+            status = "Disabled"
 
         tag = ("enabled" if enabled_flag else (
             "missing" if not path or not os.path.isfile(path) else "disabled"))
 
         mods_tree.insert("",
                          tk.END,
-                         values=(name, status, category or "—", f"{size_mb:.2f}", modified),
+                         values=(name, status, category or "-", f"{size_mb:.2f}", modified),
                          tags=(tag, ))
 
         visible_rows.append(name)
@@ -6830,15 +10279,23 @@ def filter_tree(*_):
         f"Total mods: {len(visible_rows)} (Filtered) | Enabled: {enabled} | Disabled: {disabled}"
     )
 
+def deferred_init():
+    refresh_tree()
+    apply_ui_mode()
+    detect_existing_zt1_mods()
+    refresh_zt1_tree()
 
-refresh_tree()
-apply_ui_mode()
-detect_existing_zt1_mods()
-refresh_zt1_tree()
+try:
+    deferred_init()
+except Exception as _e:
+    print(f"[!] deferred_init() raised: {_e}")
 
 if not hasattr(root, "_watcher_started"):
-    watch_mods(root, refresh_tree, interval=3)
-    root._watcher_started = True
+    try:
+        watch_mods(root, refresh_tree, interval=3)
+        root._watcher_started = True
+    except Exception as _e:
+        print(f"[!] watch_mods() failed to start: {_e}")
 
 if __name__ == '__main__':
 
@@ -6846,11 +10303,11 @@ if __name__ == '__main__':
         detected = auto_detect_zt2_installation()
         if detected:
             GAME_PATH = detected
-            log(f"✅ Detected Zoo Tycoon 2 installation at: {GAME_PATH}",
+            log(f"[OK] Detected Zoo Tycoon 2 installation at: {GAME_PATH}",
                 log_text)
             pass
         else:
-            log("⚠️ Could not auto-detect Zoo Tycoon 2 path.", log_text)
+            log("[!] Could not auto-detect Zoo Tycoon 2 path.", log_text)
 
 
 def on_close():
@@ -6872,6 +10329,12 @@ def on_close():
         print("Database connection closed.")
     except Exception as e:
         print("Error closing DB:", e)
+    
+    try:
+        disconnect_discord_rpc()
+    except Exception as e:
+        print(f"Error disconnecting Discord: {e}")
+    
     root.destroy()
 
 root.protocol("WM_DELETE_WINDOW", on_close)
@@ -6909,7 +10372,7 @@ for icon_path in icon_candidates:
 
             root.update_idletasks()
 
-            print(f"[✓] Icon successfully set from: {abs_icon_path}")
+            print(f"[[x]] Icon successfully set from: {abs_icon_path}")
             icon_set = True
             break
         except Exception as e:
@@ -6918,10 +10381,23 @@ for icon_path in icon_candidates:
 if not icon_set:
     print("[!] No icon file found, using default")
 
-refresh_screenshots()
-refresh_saves_list()
-refresh_sessions()
+root.after(200, refresh_screenshots)
+root.after(300, refresh_saves_list)
+root.after(400, refresh_sessions)
 
-start_background_music(volume=0.3)
+# start_background_music(volume=0.3)
+
+start_theme_scheduler()
+
+if settings.get("discord_rpc_enabled", False):
+    try:
+        init_discord_rpc()
+    except Exception as e:
+        print(f"[!] Failed to initialize Discord RPC: {e}")
+
+try:
+    populate_xp_icons_async(xp_icons_holder)
+except Exception as _e:
+    print(f"[!] populate_xp_icons_async() failed: {_e}")
 
 root.mainloop()
